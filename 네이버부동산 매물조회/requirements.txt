@@ -1,0 +1,4 @@
+curl_cffi>=0.16
+requests>=2.32
+openpyxl>=3.1
+PySide6-Essentials>=6.8
