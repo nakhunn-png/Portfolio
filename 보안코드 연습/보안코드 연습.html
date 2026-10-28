@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>보안코드 연습</title>
+<style>
+  :root { --bg:#f5f6f8; --card:#fff; --text:#1d1f23; --muted:#7a808a; --line:#dde1e6; --ok:#16a34a; --fail:#dc2626; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:"Malgun Gothic",system-ui,sans-serif;
+         display:flex; justify-content:center; padding:40px 16px; }
+  .wrap { width:100%; max-width:440px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:28px; text-align:center; }
+  h1 { font-size:18px; margin:0 0 20px; }
+  #code { font-family:Consolas,monospace; font-size:52px; font-weight:700; letter-spacing:12px;
+          background:#eef1f5; border-radius:10px; padding:18px 0 18px 12px; user-select:none; }
+  #input { margin-top:20px; width:100%; font-family:Consolas,monospace; font-size:30px; letter-spacing:8px;
+           text-align:center; padding:12px; border:2px solid var(--line); border-radius:10px; outline:none; }
+  #input:focus { border-color:#4b7bec; }
+  #result { margin-top:18px; min-height:64px; }
+  .verdict { font-size:32px; font-weight:800; }
+  .ok { color:var(--ok); } .fail { color:var(--fail); }
+  .time { font-family:Consolas,monospace; font-size:22px; margin-top:4px; }
+  .hint { color:var(--muted); font-size:13px; margin-top:10px; }
+  .stats { display:flex; gap:8px; margin-top:16px; }
+  .stat { flex:1; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px; text-align:center; }
+  .stat b { display:block; font-family:Consolas,monospace; font-size:17px; }
+  .stat span { color:var(--muted); font-size:12px; }
+  table { width:100%; border-collapse:collapse; margin-top:16px; background:var(--card); border:1px solid var(--line);
+          border-radius:10px; overflow:hidden; font-size:14px; }
+  th, td { padding:7px 10px; border-bottom:1px solid var(--line); text-align:center; font-family:Consolas,monospace; }
+  th { background:#eef1f5; font-family:inherit; font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>보안코드 입력 연습</h1>
+    <div id="code">------</div>
+    <input id="input" maxlength="6" inputmode="numeric" autocomplete="off" autofocus>
+    <div id="result"></div>
+    <div class="hint" id="hint">코드를 입력하고 Enter → 채점</div>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="sCount">0 / 0</b><span>정답 / 시도</span></div>
+    <div class="stat"><b id="sBest">-</b><span>최고 기록</span></div>
+    <div class="stat"><b id="sAvg">-</b><span>평균 (정답)</span></div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>코드</th><th>입력</th><th>결과</th><th>시간</th></tr></thead>
+    <tbody id="log"></tbody>
+  </table>
+</div>
+<script>
+  const codeEl = document.getElementById('code'), input = document.getElementById('input');
+  const resultEl = document.getElementById('result'), hint = document.getElementById('hint'), log = document.getElementById('log');
+  let code = '', start = 0, graded = false, n = 0;
+  const times = [];
+
+  let counting = false;
+
+  function next() {
+    counting = true; graded = false;
+    input.value = ''; input.readOnly = true;
+    resultEl.innerHTML = ''; hint.textContent = '준비…';
+    let c = 3;
+    codeEl.textContent = c;
+    const t = setInterval(() => {
+      c--;
+      if (c > 0) { codeEl.textContent = c; return; }
+      clearInterval(t);
+      code = String(Math.floor(Math.random() * 1e6)).padStart(6, '0');
+      codeEl.textContent = code;
+      input.readOnly = false; input.focus();
+      hint.textContent = '코드를 입력하고 Enter → 채점';
+      counting = false;
+      start = performance.now();        // 코드가 표시된 순간부터 측정
+    }, 1000);
+  }
+
+  input.addEventListener('keydown', e => {
+    if (counting) { e.preventDefault(); return; }
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    if (graded) { next(); return; }
+    const sec = (performance.now() - start) / 1000;
+    const ok = input.value === code;
+    graded = true;
+    n++;
+    if (ok) times.push(sec);
+    resultEl.innerHTML = `<div class="verdict ${ok ? 'ok' : 'fail'}">${ok ? 'Correct' : 'Fail'}</div>
+                          <div class="time">${sec.toFixed(4)}s</div>`;
+    hint.textContent = 'Enter → 다음 코드';
+    log.insertAdjacentHTML('afterbegin',
+      `<tr><td>${n}</td><td>${code}</td><td>${input.value || '-'}</td>
+       <td class="${ok ? 'ok' : 'fail'}">${ok ? 'Correct' : 'Fail'}</td><td>${sec.toFixed(4)}s</td></tr>`);
+    document.getElementById('sCount').textContent = `${times.length} / ${n}`;
+    if (times.length) {
+      document.getElementById('sBest').textContent = Math.min(...times).toFixed(4) + 's';
+      document.getElementById('sAvg').textContent = (times.reduce((a, b) => a + b, 0) / times.length).toFixed(4) + 's';
+    }
+  });
+
+  document.addEventListener('click', () => input.focus());
+  next();
+</script>
+</body>
+</html>
