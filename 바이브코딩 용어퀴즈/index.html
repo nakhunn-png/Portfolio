@@ -1,0 +1,1283 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>바이브코딩 용어 퀴즈</title>
+<style>
+:root{--bg:#0b0e22;--panel:#141836;--card:#1b2048;--line:#2b3168;--ink:#eef0ff;--sub:#9ba1d4;--accent:#7c6cff;--accent2:#b3a8ff;--gold:#f6b93f;--ok:#3ddc97;--bad:#ff6b81;--stage:#0f1230}
+*{box-sizing:border-box}
+html,body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#1d2260 0%,var(--bg) 60%) fixed,var(--bg);color:var(--ink);font-family:'Pretendard','Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+.app{max-width:760px;margin:0 auto;padding:20px 16px 40px}
+.top{margin:6px 0 18px}
+.eyebrow{font-size:11px;letter-spacing:.32em;color:var(--sub);font-family:ui-monospace,Consolas,monospace}
+h1{margin:6px 0 0;font-size:clamp(24px,5vw,34px);letter-spacing:-.5px}
+h1 em{font-style:normal;color:var(--gold)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:20px}
+.panel h2{font-size:15px;margin:0 0 10px;color:var(--sub);font-weight:600}
+.panel h2 small{color:var(--accent2);font-weight:500;margin-left:6px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+.mode input,.cat input{position:absolute;opacity:0;pointer-events:none}
+.mode span{display:block;border:2px solid var(--line);background:var(--card);border-radius:16px;padding:14px 16px;cursor:pointer;transition:.15s}
+.mode b{display:block;font-size:17px}
+.mode small{color:var(--sub);font-size:13px}
+.mode input:checked+span{border-color:var(--accent);box-shadow:0 0 0 4px #7c6cff2a}
+.mode input:focus-visible+span,.cat input:focus-visible+span{outline:2px solid var(--gold)}
+.cats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.cat span{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;cursor:pointer;font-size:14px;transition:.15s}
+.cat span::before{content:'';width:14px;height:14px;border-radius:4px;border:2px solid var(--sub)}
+.cat input:checked+span{border-color:var(--accent)}
+.cat input:checked+span::before{background:var(--accent);border-color:var(--accent)}
+.bests{font-size:13px;color:var(--sub);margin-bottom:16px}
+.primary{background:var(--accent);border:0;border-radius:14px;padding:12px 20px;font-weight:700;color:#fff;box-shadow:0 8px 24px #7c6cff40}
+.primary:hover{filter:brightness(1.08)}
+.primary:disabled{opacity:.4;cursor:not-allowed}
+.primary.big{width:100%;padding:15px;font-size:17px}
+#btnStart{background:#c4bbff;color:#221a66;box-shadow:0 8px 22px #b3a8ff44}
+#btnAll{background:#4f39e8;color:#fff;box-shadow:0 0 0 2px #8f7dff inset,0 10px 28px #5b45f088}
+.ghost{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-size:14px}
+.ghost:hover{border-color:var(--accent)}
+.ghost:disabled{opacity:.45;cursor:default}
+.link{background:none;border:0;color:var(--sub);text-decoration:underline;font-size:14px;padding:6px}
+.credit{font-size:12px;color:var(--sub);margin-top:14px;line-height:1.6}
+.credit a{color:var(--accent2)}
+.qtop{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--sub);margin-bottom:12px}
+.qtop .bar{flex:1;height:6px;background:var(--card);border-radius:3px;overflow:hidden}
+.qtop .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.stage{position:relative;height:clamp(240px,46vw,320px);background:var(--stage);border:1px solid var(--line);border-radius:20px;overflow:hidden;touch-action:pan-y}
+.stage .try{position:absolute;right:10px;top:10px;z-index:5;font-size:12px;color:var(--sub);background:#0009;border-radius:999px;padding:4px 10px;pointer-events:none}
+.tools{display:flex;align-items:center;gap:8px;margin:12px 0;flex-wrap:wrap}
+.hint{color:var(--gold);font-size:14px}
+.ansrow{display:flex;gap:8px}
+.ansrow input{flex:1;min-width:0;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;font-size:17px;outline:none}
+.ansrow input:focus{border-color:var(--accent)}
+.choices{display:grid;gap:8px}
+.choice{display:flex;align-items:center;gap:12px;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;font-size:16px;font-weight:600}
+.choice:hover:not(:disabled){border-color:var(--accent)}
+.choice kbd{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--sub);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.choice.right{border-color:var(--ok);background:#3ddc9718}
+.choice.wrong{border-color:var(--bad);background:#ff6b8118}
+.choice:disabled{cursor:default}
+.feedback{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
+.feedback .verdict{font-size:19px;font-weight:800;margin-bottom:6px}
+.feedback .verdict.ok{color:var(--ok)}
+.feedback .verdict.bad{color:var(--bad)}
+.feedback .msg{color:var(--sub);font-size:14px;margin-bottom:10px}
+.feedback .name{font-size:22px;font-weight:800;color:var(--gold)}
+.feedback .name small{font-size:15px;color:var(--ink);font-weight:500;margin-left:6px}
+.feedback .nick{font-size:14px;color:var(--accent2);margin:4px 0}
+.feedback .desc{font-size:15px;line-height:1.55;margin-bottom:14px}
+.tag{display:inline-block;font-size:11px;border:1px solid var(--line);color:var(--sub);border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:middle}
+.score-big{font-size:46px;font-weight:900;margin:4px 0}
+.score-big small{font-size:20px;color:var(--sub)}
+.wrongs{display:grid;gap:6px;margin:14px 0}
+.wrongs button{text-align:left;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px}
+.wrongs button.on{border-color:var(--accent)}
+.wrongs b{color:var(--gold);font-size:16px}
+.wrongs small{color:var(--sub)}
+.rowbtns{display:flex;gap:8px;flex-wrap:wrap}
+.rowbtns .primary{flex:1}
+
+/* ---------- demo pieces ---------- */
+.d-root{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden}
+.d-root>*{grid-area:1/1}
+.d-root.nocur,.d-root.nocur *{cursor:none}
+.mcard{width:180px;height:96px;background:#f3f4ff;border-radius:14px;padding:16px;box-shadow:0 12px 30px #0007;display:flex;flex-direction:column;gap:9px}
+.mcard i{display:block;height:8px;width:80%;border-radius:4px;background:#2a2f5a}
+.mcard i.s{width:55%;background:#b9bce0}
+.mcard b{margin-top:auto;align-self:flex-end;width:46px;height:16px;border-radius:8px;background:var(--accent)}
+.pill{display:inline-block;padding:12px 26px;border-radius:14px;background:var(--accent);color:#fff;font-weight:700;box-shadow:0 8px 24px #7c6cff55;white-space:nowrap;user-select:none}
+.ibox{position:relative;width:76px;height:76px;border-radius:18px;background:#232a62;display:grid;place-items:center;box-shadow:0 10px 26px #0006}
+.badge{position:absolute;right:-10px;top:-10px;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:14px;display:grid;place-items:center}
+.track{position:absolute;height:2px;background:#2d3470;transform:translateY(-50%)}
+.gdot{position:absolute;left:0;width:24px;height:24px;border-radius:50%;box-shadow:0 0 18px currentColor}
+.gdot.ghost{width:10px;height:10px;opacity:.28;box-shadow:none}
+.ballbox{position:relative;width:200px;height:170px}
+.ball{position:absolute;left:80px;bottom:4px;width:40px;height:40px;border-radius:50%;background:var(--accent);box-shadow:0 0 22px #7c6cff88;display:grid;place-items:center;color:#fff;font-weight:900}
+.floor{position:absolute;left:0;right:0;bottom:2px;height:2px;background:#3a4190}
+.dd{display:grid;gap:14px;width:min(78%,300px)}
+.dd .row{height:14px;border-radius:7px;background:#1f2552;overflow:hidden}
+.dd .row i{display:block;height:100%;border-radius:7px;transform-origin:left;transform:scaleX(0)}
+.bigtxt{font-size:clamp(28px,7vw,42px);font-weight:800;letter-spacing:1px;white-space:pre}
+.caret{display:inline-block;width:3px;height:1em;background:var(--accent2);margin-left:4px;vertical-align:-.12em;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.scr .sc{color:var(--accent2)}
+.split span{display:inline-block;white-space:pre}
+.cnt{text-align:center}
+.cnt small{display:block;color:var(--sub);font-size:14px;margin-bottom:4px}
+.cnt b{font-size:clamp(36px,9vw,56px);font-weight:900;font-variant-numeric:tabular-nums}
+.burger{position:relative;width:70px;height:54px}
+.burger i{position:absolute;left:0;width:70px;height:7px;border-radius:4px;background:#fff}
+.burger i:nth-child(1){top:0}.burger i:nth-child(2){top:23.5px}.burger i:nth-child(3){top:47px}
+.mq{width:100%;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent);mask-image:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent)}
+.mq .belt{display:flex;width:max-content}
+.mq .belt span{font-size:22px;font-weight:800;color:#cfd3ff;padding:0 26px;white-space:nowrap}
+.mbox{position:absolute;left:0;top:0;width:40px;height:40px;border-radius:10px;background:var(--accent);box-shadow:0 0 20px #7c6cff99}
+.cart{position:absolute;color:#fff}
+.frame{position:relative;width:min(88%,400px);height:78%;border-radius:14px;background:#f3f4ff;overflow:hidden;box-shadow:0 14px 34px #0008;color:#222}
+.fbar{height:24px;background:#dfe2fb;display:flex;align-items:center;gap:5px;padding:0 10px}
+.fbar i{width:8px;height:8px;border-radius:50%;background:#b5b9e6}
+.fbody{position:absolute;left:0;right:0;top:24px;bottom:0;overflow:hidden}
+.pg{position:absolute;inset:0;padding:16px;display:flex;gap:12px}
+.ln{height:9px;border-radius:5px;background:#3a3f6e;margin-bottom:9px}
+.ln.s{background:#c2c5e8}
+.wipe{position:absolute;inset:0;background:var(--accent);transform:scaleX(0)}
+.slist{position:absolute;inset:0;padding:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-content:start}
+.slist .thumb{aspect-ratio:1;border-radius:10px;margin-bottom:8px}
+.sclone{position:absolute;border-radius:10px}
+.sdetail{position:absolute;right:14px;top:18px;width:42%;opacity:0}
+.scroller{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.scroller::-webkit-scrollbar{display:none}
+.tall{position:relative;height:400%}
+.strip{position:absolute;left:18px;top:0;bottom:0;width:54px;background:repeating-linear-gradient(180deg,#2a3170 0 10px,transparent 10px 34px);opacity:.7;border-radius:6px}
+.sticky{position:sticky;top:0;display:grid;place-items:center}
+.pinbox{width:130px;height:86px;border-radius:14px;background:var(--accent);border:3px solid #fff;display:grid;place-items:center;font-size:40px;font-weight:900;color:#fff;box-shadow:0 0 30px #7c6cff66}
+.ptrack{position:absolute;right:22%;top:50%;width:6px;height:110px;margin-top:-55px;border-radius:3px;background:#262c66}
+.ptrack i{position:absolute;left:0;top:0;width:100%;border-radius:3px;background:#5fe3ff}
+.hrow{position:absolute;left:96px;top:50%;display:flex;gap:14px;margin-top:-48px}
+.hrow i{width:130px;height:96px;border-radius:12px;flex:none}
+.mouse{position:absolute;left:22px;top:50%;margin-top:-34px;width:34px;height:52px;border:3px solid #d9dcff;border-radius:18px}
+.mouse::after{content:'';position:absolute;left:50%;top:8px;width:4px;height:9px;margin-left:-2px;border-radius:2px;background:#d9dcff}
+.chev{position:absolute;left:30px;top:50%;margin-top:24px;color:#9be8ff;font-size:18px}
+.mring{border:2px dashed #4d55a8;border-radius:50%}
+.fcur{position:absolute;left:0;top:0;z-index:4;pointer-events:none}
+.ccard{width:150px;height:110px;border-radius:16px;background:linear-gradient(160deg,#5b7cff,#2a2f6e);display:grid;place-items:center}
+.ccur{position:absolute;left:-18px;top:-18px;width:36px;height:36px;border-radius:50%;border:2px solid #fff;pointer-events:none;z-index:4;mix-blend-mode:difference;background:#ffffff10}
+.cdot{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:#fff;pointer-events:none;z-index:4}
+.tilt{perspective:800px}
+.tcard{position:relative;width:160px;height:210px;border-radius:20px;background:linear-gradient(150deg,#8f7dff,#4b3bd1);box-shadow:0 20px 40px #0008;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:22px;overflow:hidden;transform-style:preserve-3d}
+.tcard .p{font-size:26px;font-weight:900;color:#fff}
+.tcard .b{width:110px;height:24px;border-radius:8px;background:#fff}
+.tcard .shine{position:absolute;inset:0;pointer-events:none}
+.conf{position:absolute;left:50%;top:50%;width:8px;height:12px;border-radius:2px}
+.paybtn{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#1a1d3a;font-weight:800;border-radius:999px;padding:10px 20px;box-shadow:0 10px 24px #0007;cursor:pointer;user-select:none;z-index:2}
+.paybtn i{width:22px;height:22px;border-radius:50%;background:#2fbf71;color:#fff;font-style:normal;display:grid;place-items:center;font-size:13px}
+/* ---------- UI demo pieces ---------- */
+.frame .sc2{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.frame .sc2::-webkit-scrollbar{display:none}
+.hnav{height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;background:#fff}
+.hnav .logo{width:10px;height:10px;border-radius:50%;background:#7c6cff}
+.hnav span{width:24px;height:5px;border-radius:3px;background:#b9bce0}
+.hnav b{margin-left:auto;width:36px;height:12px;border-radius:6px;background:#7c6cff}
+.hero{display:flex;align-items:center;gap:14px;padding:0 16px;background:linear-gradient(135deg,#ece9ff,#f8f8ff)}
+.hero .hl{flex:1.2}
+.t1{height:14px;width:90%;border-radius:7px;background:#1d2246;margin-bottom:8px}
+.t2{height:14px;width:65%;border-radius:7px;background:#7c6cff;margin-bottom:12px}
+.cta{display:flex;gap:8px;margin-top:12px}
+.cta b{width:60px;height:20px;border-radius:10px;background:#7c6cff}
+.cta i{width:60px;height:20px;border-radius:10px;border:2px solid #7c6cff}
+.hero .hv{flex:1;height:62%;border-radius:12px;background:linear-gradient(135deg,#b4a9ff,#6b5cf0)}
+.below{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px}
+.below div{height:64px;border-radius:8px;background:#dfe2fb}
+.rgrid{position:absolute;inset:0;padding:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;align-content:start}
+.rgrid div{height:46px;border-radius:8px;display:flex;flex-direction:column;justify-content:flex-end;padding:6px;gap:4px}
+.rgrid div i{display:block;height:5px;border-radius:3px;background:#ffffffcc}
+.ucards{display:flex;gap:12px}
+.ucard{width:96px;height:126px;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:7px}
+.ucard>*{border-radius:5px}
+.ucard .th{height:52px;border-radius:8px}
+.ucard .a{height:7px;background:#3a3f6e}
+.ucard .b{height:7px;width:65%;background:#c2c5e8}
+.bento{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:8px;width:min(86%,330px);height:76%}
+.bento i{border-radius:12px}
+.side{position:absolute;left:0;top:0;bottom:0;width:30%;background:#1d2246;padding:12px 10px}
+.side .lg{width:12px;height:12px;border-radius:4px;background:#7c6cff;margin-bottom:14px}
+.side .mi{position:relative;height:22px;display:flex;align-items:center;padding-left:8px}
+.side .mi i{width:60%;height:5px;border-radius:3px;background:#6d73b0}
+.side .act{position:absolute;left:6px;right:6px;height:22px;border-radius:7px;background:#7c6cff55;transition:top .45s cubic-bezier(.5,0,.3,1)}
+.mainc{position:absolute;left:30%;right:0;top:0;bottom:0;overflow:hidden;padding:12px}
+.chart{display:flex;align-items:flex-end;gap:8px;height:90px;margin-bottom:12px}
+.chart i{flex:1;border-radius:4px 4px 0 0;background:#7c6cff}
+.blk{height:44px;border-radius:8px;background:#dfe2fb;margin-bottom:10px}
+.shead{position:sticky;top:0;z-index:2;height:30px;background:#7c6cff;display:flex;align-items:center;gap:8px;padding:0 12px;transition:box-shadow .2s}
+.shead i{width:10px;height:10px;border-radius:50%;background:#fff}
+.shead span{width:26px;height:5px;border-radius:3px;background:#ffffffaa}
+.shead span:first-of-type{margin-left:auto}
+.shead.sh{box-shadow:0 6px 14px #0004}
+.uitab{width:min(86%,320px);background:#f3f4ff;border-radius:14px;overflow:hidden;color:#222;box-shadow:0 12px 30px #0007}
+.uitab .bar{position:relative;display:flex;border-bottom:1px solid #d9dcf5}
+.uitab .bar button{flex:1;background:none;border:0;padding:11px 0;font-size:14px;font-weight:700;color:#8a8fb8}
+.uitab .bar button.on{color:#3b32b5}
+.uitab .ind{position:absolute;bottom:-1px;height:3px;background:#7c6cff;border-radius:2px;transition:left .35s cubic-bezier(.5,0,.3,1),width .35s}
+.uitab .panes{position:relative;height:110px}
+.uitab .pane{position:absolute;inset:0;padding:14px;opacity:0;transition:opacity .3s}
+.uitab .pane.on{opacity:1}
+.acc{width:min(84%,300px);display:grid;gap:8px}
+.acc .it{background:#f3f4ff;border-radius:12px;overflow:hidden;color:#222}
+.acc .hd{display:flex;align-items:center;padding:11px 14px;cursor:pointer}
+.acc .hd i{flex:1;height:6px;max-width:60%;border-radius:3px;background:#3a3f6e}
+.acc .hd b{margin-left:auto;font-size:12px;color:#6b5cf0;transition:transform .35s}
+.acc .it.open .hd b{transform:rotate(180deg)}
+.acc .bd{height:0;overflow:hidden;transition:height .4s cubic-bezier(.5,0,.3,1);padding:0 14px}
+.acc .bd>div{padding-top:4px}
+.acc .it.open .bd{height:58px}
+.dim{position:absolute;inset:0;background:#0a0c1e;opacity:0}
+.dialog{position:absolute;left:50%;top:50%;width:62%;padding:16px;border-radius:14px;background:#fff;box-shadow:0 20px 40px #0006;opacity:0;transform:translate(-50%,-50%) scale(.85)}
+.dialog .btns{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.dialog .btns i{width:52px;height:22px;border-radius:7px;background:#dfe2fb}
+.dialog .btns b{width:52px;height:22px;border-radius:7px;background:#7c6cff}
+.drawer{position:absolute;right:0;top:0;bottom:0;width:46%;background:#fff;padding:16px 14px;transform:translateX(105%);box-shadow:-10px 0 24px #0003}
+.tg{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.tg i{flex:1;height:5px;border-radius:3px;background:#3a3f6e}
+.tg b{width:30px;height:16px;border-radius:8px;background:#7c6cff;position:relative}
+.tg b::after{content:'';position:absolute;right:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#fff}
+.tg.off b{background:#c8cbe6}.tg.off b::after{right:auto;left:2px}
+.sel{position:relative;width:min(70%,240px)}
+.sel .box{display:flex;align-items:center;background:#f3f4ff;border-radius:10px;padding:11px 14px;color:#222}
+.sel .box i{height:6px;width:45%;border-radius:3px;background:#3a3f6e;transition:width .2s}
+.sel .box b{margin-left:auto;font-size:12px;color:#6b5cf0}
+.sel .list{position:absolute;left:0;right:0;top:calc(100% + 6px);background:#fff;border-radius:10px;padding:6px;box-shadow:0 14px 30px #0006;transform-origin:top;opacity:0;transform:scaleY(.6)}
+.sel .list div{height:26px;border-radius:6px;display:flex;align-items:center;padding-left:10px}
+.sel .list div i{height:5px;border-radius:3px;background:#8a8fb8}
+.sel .list div.hl{background:#ece9ff}
+.field{display:flex;align-items:center;gap:10px;width:min(78%,280px);background:#f3f4ff;border-radius:10px;padding:12px 14px;position:relative}
+.field i{flex:1;height:6px;border-radius:3px;background:#b9bce0;max-width:55%}
+.field .q{margin-left:auto;width:22px;height:22px;border-radius:50%;border:2px solid #6b5cf0;color:#6b5cf0;font-weight:800;font-size:12px;display:grid;place-items:center}
+.tip{position:absolute;right:-14px;bottom:calc(100% + 10px);background:#1d2246;color:#fff;font-size:12px;padding:7px 10px;border-radius:8px;white-space:nowrap;opacity:0;pointer-events:none}
+.tip::after{content:'';position:absolute;right:22px;top:100%;border:6px solid transparent;border-top-color:#1d2246}
+.field .q:hover+.tip{opacity:1}
+.toast{position:absolute;left:50%;bottom:14px;transform:translate(-50%,160%);background:#1d2246;color:#fff;font-size:13px;font-weight:700;padding:10px 16px;border-radius:10px;white-space:nowrap;display:flex;gap:8px;align-items:center;box-shadow:0 10px 20px #0005}
+.toast b{color:#3ddc97}
+.car{position:relative;width:100%;height:150px;overflow:hidden}
+.car .trk{position:absolute;left:50%;top:0;display:flex;gap:16px;transition:transform .55s cubic-bezier(.5,0,.3,1)}
+.car .trk i{flex:none;width:150px;height:130px;border-radius:14px;transition:transform .55s,opacity .55s;transform:scale(.82);opacity:.45}
+.car .trk i.on{transform:scale(1);opacity:1}
+.car .arr{position:absolute;top:50%;margin-top:-16px;width:32px;height:32px;border-radius:50%;background:#ffffff22;display:grid;place-items:center;font-weight:900}
+.dots{display:flex;gap:6px;justify-content:center;margin-top:10px}
+.dots i{width:7px;height:7px;border-radius:4px;background:#4a5090;transition:width .3s,background .3s}
+.dots i.on{width:20px;background:#fff}
+.skel{width:min(80%,300px);background:#1a1f45;border-radius:14px;padding:16px;position:relative}
+.skel .row{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+.skel .av{width:40px;height:40px;border-radius:50%}
+.skel .img{height:70px;border-radius:10px;margin-bottom:12px}
+.skel .l{height:9px;border-radius:5px;margin-bottom:8px}
+.skel .g{background:linear-gradient(90deg,#2a3062 0%,#3d4590 50%,#2a3062 100%);background-size:200% 100%;animation:shim 1.1s linear infinite}
+@keyframes shim{from{background-position:150% 0}to{background-position:-50% 0}}
+.skel .real{position:absolute;inset:0;padding:16px;opacity:0}
+.hcards{display:flex;gap:18px}
+.hcard{width:120px;height:140px;border-radius:14px;background:#1f2552;border:2px solid #2d3470;padding:12px;transition:transform .25s,box-shadow .25s,border-color .25s,background .25s}
+.hcard .th{height:56px;border-radius:8px;background:#3a4190;margin-bottom:10px;transition:background .25s}
+.hcard .a{height:7px;border-radius:4px;background:#5a61a8;margin-bottom:7px}
+.hcard.hov{transform:translateY(-10px);box-shadow:0 16px 30px #7c6cff44;border-color:#7c6cff;background:#262c66}
+.hcard.hov .th{background:linear-gradient(135deg,#8f7dff,#5fe3ff)}
+.rv{display:flex;gap:10px;align-items:center;margin:0 auto 14px;width:70%;padding:12px;border-radius:12px;background:#1f2552;opacity:0;transform:translateY(34px);transition:opacity .5s,transform .5s cubic-bezier(.2,.8,.3,1)}
+.rv.in{opacity:1;transform:none}
+.rv b{width:12px;height:12px;border-radius:4px}
+.rv i{flex:1;height:6px;border-radius:3px;background:#5a61a8}
+.stg{display:flex;gap:10px}
+.stg div{width:56px;height:80px;border-radius:10px;background:#1f2552;border:1px solid #2d3470;padding:7px;display:flex;flex-direction:column;gap:6px}
+.stg div b{height:26px;border-radius:6px}
+.stg div i{height:5px;border-radius:3px;background:#5a61a8}
+.sw{width:96px;height:52px;border-radius:26px;background:#3a4190;position:relative;cursor:pointer;transition:background .5s}
+.sw::after{content:'';position:absolute;left:6px;top:6px;width:40px;height:40px;border-radius:50%;background:#fff;transition:transform .5s cubic-bezier(.5,0,.2,1)}
+.sw.on{background:#7c6cff}.sw.on::after{transform:translateX(44px)}
+.stbar{height:40px;border-radius:12px;background:#3a4190;width:110px;transition:width .6s cubic-bezier(.5,0,.2,1),background .6s}
+.stbar.on{width:190px;background:#8f7dff}
+.blob{position:absolute;border-radius:50%;filter:blur(8px)}
+.glass{position:relative;width:min(70%,260px);height:140px;border-radius:18px;background:#ffffff1f;border:1px solid #ffffff55;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:18px;box-shadow:0 10px 30px #0004}
+.glass i{display:block;height:8px;border-radius:4px;background:#ffffffcc;margin-bottom:10px}
+.plx{position:absolute;left:0;right:0;bottom:0}
+.snap{scroll-snap-type:y mandatory}
+.snap section{height:100%;scroll-snap-align:start;display:grid;place-items:center}
+.snap section div{width:60%}
+.sdots{position:absolute;right:16px;top:50%;transform:translateY(-50%);display:grid;gap:7px;z-index:3}
+.sdots i{width:7px;height:7px;border-radius:50%;background:#ffffff55;transition:background .3s,transform .3s}
+.sdots i.on{background:#fff;transform:scale(1.4)}
+.likebox{display:flex;align-items:center;gap:12px;background:#1f2552;border-radius:999px;padding:12px 20px 12px 14px}
+.heart{position:relative;width:40px;height:40px;cursor:pointer}
+.heart svg{width:40px;height:40px;display:block}
+.likebox b{font-size:22px;font-variant-numeric:tabular-nums;min-width:44px}
+.spark{position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;border-radius:50%}
+@media (max-width:480px){.modes{grid-template-columns:1fr}.hrow i{width:100px;height:80px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="eyebrow">VIBE CODING CHEAT SHEET QUIZ</div>
+    <h1>이 화면, <em>이름</em>이 뭐게?</h1>
+  </header>
+
+  <section id="start" class="screen">
+    <div class="panel">
+      <h2>시험 종류</h2>
+      <div class="modes" id="sheets"></div>
+      <h2>모드</h2>
+      <div class="modes">
+        <label class="mode"><input type="radio" name="mode" value="subjective" checked><span><b>주관식</b><small>영어 또는 한글로 직접 입력</small></span></label>
+        <label class="mode"><input type="radio" name="mode" value="choice"><span><b>객관식 · 5지선다</b><small>보기 5개 중 하나 고르기</small></span></label>
+      </div>
+      <h2>출제 범위 <small id="poolCount"></small></h2>
+      <div id="cats" class="cats"></div>
+      <div id="bests" class="bests"></div>
+      <div class="rowbtns">
+        <button id="btnStart" class="primary big">시작</button>
+        <button id="btnAll" class="primary big">모든 문제 시작</button>
+      </div>
+    </div>
+    <p class="credit" id="credit"></p>
+  </section>
+
+  <section id="quiz" class="screen" hidden>
+    <div class="qtop"><span id="qNum"></span><div class="bar"><i id="qBar"></i></div><span id="qScore"></span></div>
+    <div class="stage" id="stage"><div class="try" hidden>🖱️ 마우스를 올려 직접 해보세요</div></div>
+    <div class="tools">
+      <button id="btnQuit" class="ghost">처음으로</button>
+      <button id="btnReplay" class="ghost">↻ 다시 보기</button>
+      <button id="btnHint" class="ghost">💡 힌트 (0.5점)</button>
+      <span id="hintText" class="hint"></span>
+    </div>
+    <div id="answerArea"></div>
+    <div id="feedback" class="feedback" hidden></div>
+  </section>
+
+  <section id="result" class="screen" hidden>
+    <div class="panel">
+      <h2 id="rTitle">결과</h2>
+      <div class="score-big" id="rScore"></div>
+      <div class="bests" id="rBest"></div>
+      <div id="rWrongWrap">
+        <h2>틀린 문제 <small>눌러서 움직임 다시 보기</small></h2>
+        <div class="stage" id="rStage"><div class="try" hidden>🖱️ 마우스를 올려 직접 해보세요</div></div>
+        <div class="wrongs" id="rWrongs"></div>
+      </div>
+      <div class="rowbtns">
+        <button id="btnRetry" class="primary">틀린 문제만 다시</button>
+        <button id="btnHome" class="ghost">처음으로</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ================= 데이터 ================= */
+// 시트를 추가하려면 SHEETS에 같은 형식으로 넣고 DEMOS에 데모를 등록하면 된다.
+function T(id, display, en, ko, nick, desc, opt){ return Object.assign({id, display, en, ko, nick, desc}, opt||{}); }
+const SHEETS = [{
+  id: 'motion',
+  short: '모션 용어',
+  title: '애니메이션 필수 용어',
+  nickLabel: '별명',
+  credit: '모션 용어: 「<a href="https://youtu.be/r7iS0Gw3Jq4?t=735" target="_blank" rel="noopener">바이브코더가 반드시 알아야 할 필수 용어 24가지 2탄</a>」 12:15 치트시트 · Ease-in / Ease-out은 시트 외 추가 문항',
+  categories: [
+    { id: 'basics', name: '기본', terms: [
+      T('fade', 'Fade', ['Fade'], ['페이드'], '스르륵', '투명도(opacity)가 서서히 바뀌며 나타나거나 사라지는 효과'),
+      T('slide', 'Slide', ['Slide'], ['슬라이드'], '슈욱', '요소가 한쪽 방향에서 미끄러지듯 들어오거나 나가는 효과'),
+      T('scale', 'Scale', ['Scale'], ['스케일'], '뿅', '크기가 커지거나 작아지며 나타나는 효과'),
+      T('easing', 'Easing', ['Easing'], ['이징'], '사뿐', '움직임의 속도 곡선. 일정한 속도(linear) 대신 가속·감속을 줘서 자연스럽게 만든다'),
+      T('ease-in', 'Ease-in', ['Ease-in'], ['이즈인', '이징인'], '슬금슬금 → 쌩', '천천히 출발해 점점 빨라지는 속도 곡선. 화면 밖으로 나갈 때 주로 쓴다', {extra: true}),
+      T('ease-out', 'Ease-out', ['Ease-out'], ['이즈아웃', '이징아웃'], '쌩 → 사뿐', '빠르게 출발해 천천히 멈추는 속도 곡선. 화면에 들어올 때 주로 쓴다', {extra: true}),
+      T('spring', 'Spring', ['Spring'], ['스프링'], '띠용', '용수철처럼 목표 지점을 살짝 지나쳤다가 되돌아오며 멈추는 움직임'),
+      T('bounce', 'Bounce', ['Bounce'], ['바운스'], '통통', '공처럼 바닥에 닿아 점점 낮게 튕기다 멈추는 움직임'),
+      T('duration-delay', 'Duration · Delay', ['Duration', 'Delay', 'Duration Delay'], ['듀레이션', '딜레이', '듀레이션 딜레이'], '휙 / 느릿', 'Duration은 움직임이 걸리는 시간, Delay는 시작 전에 기다리는 시간', {koDisplay: '듀레이션 · 딜레이'}),
+      T('loop', 'Loop', ['Loop'], ['루프'], '둥실둥실', '같은 움직임이 끝없이 반복되는 것'),
+    ]},
+    { id: 'text', name: '글자와 그림', terms: [
+      T('typewriter', 'Typewriter', ['Typewriter'], ['타잎라이터', '타입라이터', '타이프라이터'], '타닥타닥', '글자가 타자기처럼 한 글자씩 찍히는 효과', {koDisplay: '타입라이터'}),
+      T('text-scramble', 'Text Scramble', ['Text Scramble'], ['텍스트 스크램블'], '좌르륵', '무작위 문자가 뒤섞이다가 원래 글자로 맞춰지는 효과'),
+      T('split-text', 'Split Text', ['Split Text'], ['스플릿 텍스트'], '차르르', '문장을 글자·단어 단위로 쪼개 하나씩 시간차로 움직이는 효과'),
+      T('count-up', 'Count-up', ['Count-up'], ['카운트업'], '촤라락', '숫자가 0부터 목표값까지 빠르게 올라가는 효과'),
+      T('line-drawing', 'Line Drawing', ['Line Drawing'], ['라인 드로잉'], '쓱싹', '선이 펜으로 그리듯 따라 그려지는 효과 (SVG stroke)'),
+      T('morphing', 'Morphing', ['Morphing'], ['모핑'], '스르르', '한 모양이 다른 모양으로 자연스럽게 변형되는 효과 (☰ → ✕)'),
+      T('marquee', 'Marquee', ['Marquee'], ['마퀴', '마키', '마르퀴'], '줄줄', '글자나 로고가 띠처럼 끝없이 흘러가는 효과'),
+      T('motion-path', 'Motion Path', ['Motion Path'], ['모션패스'], '슝', '요소가 정해진 곡선 경로를 따라 이동하는 효과'),
+    ]},
+    { id: 'screen', name: '화면과 마우스', terms: [
+      T('page-transition', 'Page Transition', ['Page Transition'], ['페이지 트랜지션'], '휘릭', '페이지가 바뀔 때 화면 전체에 주는 전환 효과'),
+      T('shared-element', 'Shared Element', ['Shared Element'], ['셰어드 엘리먼트', '쉐어드 엘리먼트', '셰어드 엘레먼트', '요소 공유', '공유 요소'], '쭈욱', '두 화면에 공통으로 있는 요소가 끊기지 않고 이어지며 커지거나 이동하는 전환'),
+      T('pin-scrollytelling', 'Pin · Scrollytelling', ['Pin', 'Scrollytelling', 'Pin Scrollytelling'], ['핀', '스크롤리텔링', '스크롤텔링', '핀 스크롤리텔링', '핀 스크롤텔링'], '착착', 'Pin은 스크롤하는 동안 요소를 화면에 고정하는 것, Scrollytelling은 스크롤에 맞춰 이야기가 전개되는 연출', {koDisplay: '핀 · 스크롤리텔링'}),
+      T('horizontal-scroll', 'Horizontal Scroll', ['Horizontal Scroll'], ['해리존탈 스크롤', '하리존털 스크롤', '호라이즌탈 스크롤', '호리존탈 스크롤', '호리존털 스크롤'], '옆으로 스르륵', '세로로 스크롤하면 콘텐츠가 가로로 이동하는 효과', {koDisplay: '호리존탈 스크롤'}),
+      T('magnetic-button', 'Magnetic Button', ['Magnetic Button'], ['마그네틱 버튼'], '착', '커서가 가까이 오면 버튼이 자석처럼 끌려오는 효과'),
+      T('custom-cursor', 'Custom Cursor', ['Custom Cursor'], ['커스텀 커서'], '졸졸', '기본 화살표 대신 직접 디자인한 커서가 마우스를 따라다니는 효과'),
+      T('3d-tilt', '3D Tilt', ['3D Tilt'], ['3d 틸트', '쓰리디 틸트'], '갸우뚱', '커서 위치에 따라 카드가 입체적으로 기울어지는 효과', {koDisplay: '3D 틸트'}),
+      T('confetti', 'Confetti', ['Confetti'], ['컨페티', '콘페티', '콘페티이'], '빵', '성공·완료 순간에 색종이가 터지는 축하 효과', {koDisplay: '컨페티'}),
+    ]},
+  ],
+}, {
+  id: 'ui',
+  short: 'UI 용어',
+  title: '바이브 코딩 UI 필수 용어',
+  nickLabel: '한 줄 뜻',
+  credit: 'UI 용어: 「<a href="https://youtu.be/mlhKEy-2bgI?t=697" target="_blank" rel="noopener">바이브코더가 반드시 알아야 할 필수 용어 24가지</a>」(1탄) 11:37 치트시트',
+  categories: [
+    { id: 'layout', name: '레이아웃', terms: [
+      T('hero-section', 'Hero Section', ['Hero Section', 'Hero'], ['히어로 섹션', '히로 섹션', '히어로'], '첫 화면의 대표 영역', '페이지에 들어오자마자 보이는 첫 화면의 큰 대표 영역. 핵심 문구와 행동 버튼(CTA)이 들어간다'),
+      T('responsive-layout', 'Responsive Layout', ['Responsive Layout', 'Responsive'], ['반응형 레이아웃', '리스폰시브 레이아웃', '반응형'], '화면 폭에 맞춘 배치', '화면 폭이 바뀌면 배치가 자동으로 바뀌는 레이아웃 (PC는 3열, 모바일은 1열)', {koDisplay: '반응형 레이아웃'}),
+      T('card-layout', 'Card Layout', ['Card Layout'], ['카드 레이아웃'], '정보를 카드로 나누기', '정보를 카드라는 네모 단위로 묶어서 나란히 배치하는 방식'),
+      T('bento-grid', 'Bento Grid', ['Bento Grid'], ['벤토 그리드', '도시락 그리드'], '크기 다른 카드 격자', '도시락(벤토) 칸처럼 크기가 서로 다른 카드를 격자에 빈틈없이 채우는 배치'),
+      T('sidebar-layout', 'Sidebar Layout', ['Sidebar Layout', 'Sidebar'], ['사이드바 레이아웃', '사이드바'], '옆에 고정된 메뉴', '한쪽 옆에 메뉴가 고정돼 있고 나머지 영역에 본문이 나오는 배치 (관리자 화면에 흔함)'),
+      T('sticky-header', 'Sticky Header', ['Sticky Header'], ['스티키 헤더', '고정 헤더'], '스크롤해도 남는 헤더', '스크롤을 내려도 화면 위쪽에 붙어서 계속 보이는 헤더'),
+      T('split-layout', 'Split Layout', ['Split Layout'], ['스플릿 레이아웃', '분할 레이아웃'], '좌우 분할 배치', '화면을 좌우로 나눠 한쪽은 이미지, 한쪽은 글처럼 배치하는 방식'),
+    ]},
+    { id: 'component', name: '컴포넌트', terms: [
+      T('tabs', 'Tabs', ['Tabs', 'Tab'], ['탭', '탭스'], '같은 자리 내용 전환', '탭 버튼을 누르면 같은 자리에서 내용만 바뀌는 컴포넌트'),
+      T('accordion', 'Accordion', ['Accordion'], ['아코디언', '어코디언'], '펼치고 접는 목록', '제목을 누르면 아래 내용이 펼쳐지고 다시 누르면 접히는 목록 (FAQ에 흔함)'),
+      T('modal-dialog', 'Modal / Dialog', ['Modal', 'Dialog', 'Modal Dialog'], ['모달', '다이얼로그', '다이알로그', '모달 다이얼로그'], '화면 위 확인 창', '화면 위에 떠서 뒤를 어둡게 가리고 확인·취소 같은 응답을 받는 창', {koDisplay: '모달 · 다이얼로그'}),
+      T('drawer', 'Drawer', ['Drawer'], ['드로어', '드로워', '서랍'], '옆에서 열리는 패널', '서랍처럼 화면 옆에서 스르륵 밀려 나오는 패널 (메뉴·설정에 흔함)'),
+      T('dropdown', 'Dropdown', ['Dropdown'], ['드롭다운', '드랍다운'], '아래로 펼치는 목록', '누르면 아래로 선택지 목록이 펼쳐지고 하나를 고르는 컴포넌트'),
+      T('tooltip', 'Tooltip', ['Tooltip'], ['툴팁'], '작은 설명 말풍선', '마우스를 올리면 잠깐 뜨는 작은 설명 말풍선'),
+      T('toast-snackbar', 'Toast / Snackbar', ['Toast', 'Snackbar', 'Toast Snackbar'], ['토스트', '스낵바', '스넥바', '토스트 스낵바'], '잠깐 나타나는 알림', '"저장됐어요"처럼 화면 구석에 잠깐 떴다가 저절로 사라지는 알림', {koDisplay: '토스트 · 스낵바'}),
+      T('carousel', 'Carousel', ['Carousel'], ['캐러셀', '캐로셀', '카루셀', '캐러솔'], '옆으로 넘기는 카드', '카드나 이미지를 옆으로 한 장씩 넘겨 보는 컴포넌트 (회전목마)'),
+      T('skeleton-loading', 'Skeleton Loading', ['Skeleton Loading', 'Skeleton'], ['스켈레톤 로딩', '스켈레톤', '스캘레톤 로딩'], '로딩 중 윤곽 먼저', '내용을 불러오는 동안 회색 윤곽(뼈대)을 먼저 보여주는 로딩 방식'),
+    ]},
+    { id: 'effect', name: '효과', terms: [
+      T('hover-effect', 'Hover Effect', ['Hover Effect', 'Hover'], ['호버 이펙트', '호버 효과', '호버'], '마우스를 올리면 반응', '마우스를 올리면 요소가 떠오르거나 색이 바뀌는 등 반응하는 효과'),
+      T('scroll-reveal', 'Scroll Reveal', ['Scroll Reveal'], ['스크롤 리빌', '스크롤 리벨'], '스크롤하며 등장', '스크롤해서 요소가 화면에 들어오는 순간 나타나는 효과'),
+      T('stagger-animation', 'Stagger Animation', ['Stagger Animation', 'Stagger'], ['스태거 애니메이션', '스테거 애니메이션', '스태거'], '시간차 순차 등장', '여러 요소가 한꺼번에가 아니라 조금씩 시간차를 두고 차례로 등장하는 효과'),
+      T('smooth-transition', 'Smooth Transition', ['Smooth Transition'], ['스무스 트랜지션', '스무드 트랜지션'], '부드러운 상태 전환', '켜짐/꺼짐처럼 상태가 바뀔 때 뚝 끊기지 않고 부드럽게 이어지는 전환'),
+      T('glassmorphism', 'Glassmorphism', ['Glassmorphism'], ['글래스모피즘', '글라스모피즘'], '반투명 유리 스타일', '뒤가 흐릿하게 비치는 반투명 젖빛 유리 같은 스타일 (backdrop-filter: blur)'),
+      T('parallax-scrolling', 'Parallax Scrolling', ['Parallax Scrolling', 'Parallax'], ['패럴랙스 스크롤링', '패럴렉스 스크롤링', '패럴랙스', '시차 스크롤'], '깊이감 있는 시차', '스크롤할 때 앞 배경과 뒤 배경이 서로 다른 속도로 움직여 깊이감을 주는 효과', {koDisplay: '패럴랙스 스크롤링'}),
+      T('scroll-snap', 'Scroll Snap', ['Scroll Snap'], ['스크롤 스냅'], '섹션 단위로 착 정렬', '스크롤을 멈추면 섹션 단위로 딱 맞춰 정렬되는 효과'),
+      T('micro-interaction', 'Micro-interaction', ['Micro-interaction'], ['마이크로 인터랙션', '마이크로 인터렉션'], '작은 반응 애니메이션', '좋아요 하트가 톡 터지는 것처럼 작은 행동에 돌려주는 작은 반응 애니메이션'),
+    ]},
+  ],
+}];
+
+// 객관식에서 반드시 오답 보기로 함께 내는 헷갈리는 짝
+const FORCED = {
+  'easing': ['ease-in', 'ease-out'], 'ease-in': ['ease-out', 'easing'], 'ease-out': ['ease-in', 'easing'],
+  'accordion': ['dropdown'], 'dropdown': ['accordion'], 'modal-dialog': ['drawer'], 'drawer': ['modal-dialog'],
+  'scroll-reveal': ['stagger-animation'], 'stagger-animation': ['scroll-reveal'],
+};
+
+/* ================= 채점 ================= */
+const CHO = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
+const JUNG = 'ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ';
+const JONG = ['', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+const norm = s => s.normalize('NFC').toLowerCase().replace(/[^a-z0-9가-힣ㄱ-ㅎㅏ-ㅣ]/g, '');
+function jamo(s){
+  let o = '';
+  for (const ch of s){
+    const c = ch.charCodeAt(0) - 0xAC00;
+    o += (c >= 0 && c < 11172) ? CHO[Math.floor(c / 588)] + JUNG[Math.floor(c % 588 / 28)] + JONG[c % 28] : ch;
+  }
+  return o;
+}
+// 편집 거리 (인접한 두 글자 순서 바뀜도 1로 센다)
+function lev(a, b){
+  const m = a.length, n = b.length, d = Array.from({length: m + 1}, (_, i) => [i]);
+  for (let j = 1; j <= n; j++) d[0][j] = j;
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++){
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+  }
+  return d[m][n];
+}
+const ALL = [], BYID = {};
+SHEETS.forEach(sh => sh.categories.forEach(cat => cat.terms.forEach(t => {
+  t.sheet = sh; t.cat = cat;
+  t.keys = [...new Set([...t.en, ...t.ko].map(norm))];
+  t.jkeys = t.keys.map(jamo);
+  t.nickKeys = t.nick.split(/[\/→]/).map(norm).filter(Boolean).concat(norm(t.nick));
+  t.koDisplay = t.koDisplay || t.ko[0];
+  ALL.push(t); BYID[t.id] = t;
+})));
+
+function grade(input, term){
+  const n = norm(input);
+  if (!n) return {ok: false, kind: 'empty'};
+  if (term.keys.includes(n)) return {ok: true, kind: 'exact'};
+  const others = ALL.filter(t => t !== term);
+  const exactOther = others.find(t => t.keys.includes(n));
+  if (exactOther) return {ok: false, kind: 'other', other: exactOther};
+  if (ALL.some(t => t.nickKeys.includes(n))) return {ok: false, kind: 'nick'};
+  const nj = jamo(n);
+  let best = Infinity;
+  term.jkeys.forEach(k => { const d = lev(nj, k); if (d <= (k.length <= 6 ? 1 : 2) && d < best) best = d; });
+  if (best === Infinity) return {ok: false, kind: 'wrong'};
+  const otherBest = Math.min(...others.flatMap(t => t.jkeys.map(k => lev(nj, k))));
+  if (otherBest <= best) return {ok: false, kind: 'wrong'};
+  return {ok: true, kind: 'typo'};
+}
+
+/* ================= 데모 플레이어 ================= */
+const $ = s => document.querySelector(s);
+function h(tag, cls, parent, html){ const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; if (parent) parent.appendChild(e); return e; }
+function css(e, o){ Object.assign(e.style, o); return e; }
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--){ const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+function makeCtx(){
+  const timers = [], anims = [];
+  return {
+    alive: true,
+    timeout(fn, ms){ timers.push(setTimeout(() => { if (this.alive) fn(); }, ms)); },
+    loop(fn){
+      const self = this; let last = performance.now();
+      (function f(now){ if (!self.alive) return; const dt = Math.min(50, now - last); last = now; fn(now, dt); requestAnimationFrame(f); })(last);
+    },
+    anim(node, kf, opt){ const a = node.animate(kf, opt); anims.push(a); return a; },
+    manual: () => Player.manual,
+    ptr: () => Player.ptr.inside ? [Player.ptr.x, Player.ptr.y] : null,
+    dispose(){ this.alive = false; timers.forEach(clearTimeout); anims.forEach(a => a.cancel()); },
+  };
+}
+
+const Player = {
+  stage: null, root: null, ctx: null, id: null, manual: false, ptr: {x: 0, y: 0, inside: false},
+  bind(stage){
+    if (stage._bound) return; stage._bound = true;
+    const set = e => { if (this.stage !== stage) return; const r = stage.getBoundingClientRect(); this.ptr.x = e.clientX - r.left; this.ptr.y = e.clientY - r.top; this.ptr.inside = true; this.manual = true; };
+    stage.addEventListener('pointerenter', set);
+    stage.addEventListener('pointermove', set);
+    stage.addEventListener('pointerleave', () => { if (this.stage === stage){ this.manual = false; this.ptr.inside = false; } });
+  },
+  start(stage, id){
+    this.stop(); this.bind(stage); this.stage = stage; this.id = id;
+    this.manual = stage.matches(':hover'); this.ptr.inside = this.manual;
+    stage.querySelector('.try').hidden = !DEMOS[id].interactive;
+    this.run();
+  },
+  run(){
+    if (this.ctx) this.ctx.dispose();
+    if (this.root) this.root.remove();
+    const root = this.root = h('div', 'd-root', this.stage);
+    const c = this.ctx = makeCtx();
+    const ms = DEMOS[this.id].fn(root, c, root.clientWidth, root.clientHeight);
+    if (ms > 0) c.timeout(() => this.run(), ms + 800);
+  },
+  stop(){ if (this.ctx) this.ctx.dispose(); if (this.root) this.root.remove(); this.ctx = this.root = null; },
+  replay(){ if (this.stage && this.id) this.run(); },
+};
+
+/* ================= 데모 26개 ================= */
+const EASE = { lin: t => t, in: t => t * t * t, out: t => 1 - Math.pow(1 - t, 3), inout: t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2 };
+const CURSOR = '<svg width="22" height="24" viewBox="0 0 22 24"><path d="M3 2l15 9-6.5 1.6L8.5 20z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+const CART = '<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h3l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.1L21 7H6"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>';
+const miniCard = p => h('div', 'mcard', p, '<i></i><i class="s"></i><b></b>');
+function wayPos(pts, seg, t){
+  const n = pts.length, tt = (t / seg) % n, i = Math.floor(tt), f = tt - i;
+  const a = pts[i], b = pts[(i + 1) % n], e = EASE.inout(f);
+  return [a[0] + (b[0] - a[0]) * e, a[1] + (b[1] - a[1]) * e];
+}
+const kf = (frames, easing) => frames.map(f => Object.assign({easing}, f));
+
+// 속도 곡선 데모: 일정 시간마다 잔상을 찍어 간격으로 가속·감속을 보여준다
+function ghostRun(r, c, W, H, rows){
+  const pad = Math.max(30, W * .1), len = W - pad * 2, dur = 1700;
+  const items = rows.map((row, i) => {
+    const y = H / 2 + (i - (rows.length - 1) / 2) * 76;
+    css(h('div', 'track', r), {left: pad + 'px', top: y + 'px', width: len + 'px'});
+    const dot = css(h('div', 'gdot', r), {background: row.color, color: row.color, top: y + 'px'});
+    return {row, y, dot};
+  });
+  let t0 = null, lastG = -1;
+  c.loop(now => {
+    if (t0 === null) t0 = now;
+    const el = now - t0 - 300, p = Math.max(0, Math.min(1, el / dur));
+    const gi = Math.floor(Math.max(0, el) / 110), spawn = el >= 0 && el <= dur + 60 && gi !== lastG;
+    items.forEach(it => {
+      const x = pad + it.row.fn(p) * len, tf = `translate(${x}px,0) translate(-50%,-50%)`;
+      it.dot.style.transform = tf;
+      if (spawn) css(h('div', 'gdot ghost', r), {background: it.row.color, top: it.y + 'px', transform: tf});
+    });
+    if (spawn) lastG = gi;
+  });
+  return dur + 300 + 900;
+}
+
+// 스크롤 데모 공용: 자동 모드면 스크롤을 직접 움직이고, 마우스를 올리면 사용자가 휠로 조작
+function autoScroll(c, sc, onScroll){
+  let t = 0;
+  sc.addEventListener('scroll', () => onScroll(sc.scrollTop / Math.max(1, sc.scrollHeight - sc.clientHeight)));
+  c.loop((now, dt) => {
+    if (c.manual()) return;
+    t = (t + dt) % 4800;
+    const max = sc.scrollHeight - sc.clientHeight;
+    let p;
+    if (t < 600) p = 0; else if (t < 3600) p = EASE.inout((t - 600) / 3000); else if (t < 4200) p = 1; else p = 1 - EASE.inout((t - 4200) / 600);
+    sc.scrollTop = p * max;
+  });
+  onScroll(0);
+}
+
+function confettiBurst(r, c, x, y){
+  const colors = ['#7c6cff', '#f6b93f', '#3ddc97', '#ff6b81', '#5fe3ff', '#ffffff'];
+  for (let i = 0; i < 70; i++){
+    const p = css(h('i', 'conf', r), {background: colors[i % colors.length], left: x + 'px', top: y + 'px'});
+    const ang = -Math.PI / 2 + (Math.random() - .5) * Math.PI * 1.2, v = 260 + Math.random() * 300, rot = (Math.random() - .5) * 1400;
+    const frames = [];
+    for (let k = 0; k <= 10; k++){
+      const t = k / 10 * 1.5;
+      frames.push({transform: `translate(${Math.cos(ang) * v * t * .8}px,${Math.sin(ang) * v * t + 420 * t * t}px) rotate(${rot * k / 10}deg)`, opacity: k > 7 ? 1 - (k - 7) / 3 : 1});
+    }
+    c.anim(p, frames, {duration: 1500, fill: 'both'});
+  }
+}
+
+const DEMOS = {};
+const D = (id, fn, interactive) => { DEMOS[id] = {fn, interactive: !!interactive}; };
+
+D('fade', (r, c) => {
+  c.anim(miniCard(r), [{opacity: 0}, {opacity: 1, offset: .3}, {opacity: 1, offset: .7}, {opacity: 0}], {duration: 2600, fill: 'both', easing: 'ease-in-out'});
+  return 2600;
+});
+D('slide', (r, c, W) => {
+  const d = W / 2 + 120;
+  c.anim(miniCard(r), [{transform: `translateX(${-d}px)`, easing: 'cubic-bezier(.2,.8,.3,1)'}, {transform: 'translateX(0)', offset: .3}, {transform: 'translateX(0)', offset: .7, easing: 'cubic-bezier(.7,0,.8,.2)'}, {transform: `translateX(${d}px)`}], {duration: 2600, fill: 'both'});
+  return 2600;
+});
+D('scale', (r, c) => {
+  const box = h('div', 'ibox', r, CART); box.style.color = '#fff';
+  const b = h('div', 'badge', box, '3');
+  c.anim(box, [{transform: 'scale(.2)', opacity: 0}, {transform: 'scale(1)', opacity: 1, offset: .25}, {transform: 'scale(1)', opacity: 1, offset: .8}, {transform: 'scale(.2)', opacity: 0}], {duration: 2600, fill: 'both', easing: 'ease-out'});
+  c.anim(b, [{transform: 'scale(0)'}, {transform: 'scale(0)', offset: .3}, {transform: 'scale(1)', offset: .42}, {transform: 'scale(1)'}], {duration: 2600, fill: 'both', easing: 'ease-out'});
+  return 2600;
+});
+D('easing', (r, c, W, H) => ghostRun(r, c, W, H, [{fn: EASE.lin, color: '#8a90c4'}, {fn: EASE.inout, color: '#7c6cff'}]));
+D('ease-in', (r, c, W, H) => ghostRun(r, c, W, H, [{fn: EASE.in, color: '#5fe3ff'}]));
+D('ease-out', (r, c, W, H) => ghostRun(r, c, W, H, [{fn: EASE.out, color: '#f6b93f'}]));
+D('spring', (r, c, W) => {
+  const b = h('div', 'pill', r, '→'), d = Math.min(W * .32, 180);
+  c.anim(b, kf([{transform: `translateX(${-d}px)`, opacity: 0}, {transform: 'translateX(30px)', opacity: 1, offset: .36}, {transform: 'translateX(-15px)', offset: .54}, {transform: 'translateX(7px)', offset: .7}, {transform: 'translateX(-3px)', offset: .84}, {transform: 'translateX(0)'}], 'ease-in-out'), {duration: 1500, fill: 'both'});
+  return 2300;
+});
+D('bounce', (r, c) => {
+  const box = h('div', 'ballbox', r); h('div', 'floor', box); const ball = h('div', 'ball', box, '✓');
+  c.anim(ball, [
+    {transform: 'translateY(-125px)', easing: 'ease-in'}, {transform: 'translateY(0)', offset: .32, easing: 'ease-out'},
+    {transform: 'translateY(-60px)', offset: .5, easing: 'ease-in'}, {transform: 'translateY(0)', offset: .66, easing: 'ease-out'},
+    {transform: 'translateY(-24px)', offset: .77, easing: 'ease-in'}, {transform: 'translateY(0)', offset: .86, easing: 'ease-out'},
+    {transform: 'translateY(-7px)', offset: .93, easing: 'ease-in'}, {transform: 'translateY(0)'},
+  ], {duration: 1700, fill: 'both'});
+  return 2400;
+});
+D('duration-delay', (r, c) => {
+  const wrap = h('div', 'dd', r), cfg = [[0, 450, '#5fe3ff'], [400, 900, '#7c6cff'], [800, 1500, '#f6b93f']];
+  cfg.forEach(([delay, dur, col]) => { const bar = h('i', '', h('div', 'row', wrap)); bar.style.background = col; c.anim(bar, [{transform: 'scaleX(0)'}, {transform: 'scaleX(1)'}], {duration: dur, delay: delay + 300, fill: 'both', easing: 'ease-in-out'}); });
+  return 300 + 800 + 1500 + 900;
+});
+D('loop', (r, c) => {
+  const k = miniCard(r);
+  c.anim(k, [{transform: 'translateY(10px) rotate(-1deg)'}, {transform: 'translateY(-14px) rotate(1deg)'}], {duration: 1200, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out'});
+  return 0;
+});
+D('typewriter', (r, c) => {
+  const t = h('div', 'bigtxt', r), span = h('span', '', t); h('span', 'caret', t);
+  const txt = '할 일 정리하기';
+  [...txt].forEach((ch, i) => c.timeout(() => { span.textContent += ch; }, 300 + i * 150));
+  return 300 + txt.length * 150 + 1400;
+});
+D('text-scramble', (r, c) => {
+  const target = '빈틈없는 보안', pool = '!#$%*+=?@^_~/[]{}0123456789ABCDEFXYZ', el = h('div', 'bigtxt scr', r);
+  let t0 = null, last = 0;
+  c.loop(now => {
+    if (t0 === null) t0 = now;
+    if (now - last < 45) return; last = now;
+    const e = now - t0;
+    el.innerHTML = [...target].map((ch, i) => ch === ' ' ? ' ' : e >= 300 + i * 140 ? ch : `<span class="sc">${pool[Math.random() * pool.length | 0]}</span>`).join('');
+  });
+  return 300 + target.length * 140 + 1300;
+});
+D('split-text', (r, c) => {
+  const el = h('div', 'bigtxt split', r), txt = '흩어진 일을';
+  [...txt].forEach((ch, i) => {
+    const s = h('span', '', el); s.textContent = ch;
+    c.anim(s, [{opacity: 0, transform: 'translateY(36px) rotate(12deg)'}, {opacity: 1, transform: 'none'}], {duration: 520, delay: 250 + i * 110, fill: 'both', easing: 'cubic-bezier(.2,.8,.3,1)'});
+  });
+  return 250 + txt.length * 110 + 520 + 1100;
+});
+D('count-up', (r, c) => {
+  const box = h('div', 'cnt', r, '<small>함께 쓰는 팀</small><b>0</b>'), num = box.querySelector('b');
+  let t0 = null;
+  c.loop(now => { if (t0 === null) t0 = now; const p = Math.min(1, Math.max(0, now - t0 - 200) / 1600); num.textContent = Math.round(EASE.out(p) * 2033).toLocaleString() + (p >= 1 ? '+' : ''); });
+  return 200 + 1600 + 1100;
+});
+D('line-drawing', (r, c) => {
+  const wrap = h('div', '', r, '<svg width="300" height="130" viewBox="0 0 300 130" style="max-width:90%"><path d="M10 100 C 60 20, 100 120, 150 70 S 240 10, 290 40" fill="none" stroke="#7c6cff" stroke-width="5" stroke-linecap="round"/></svg>');
+  const path = wrap.querySelector('path'), len = path.getTotalLength();
+  path.style.strokeDasharray = len;
+  c.anim(path, [{strokeDashoffset: len}, {strokeDashoffset: 0}], {duration: 1600, delay: 200, fill: 'both', easing: 'ease-in-out'});
+  return 200 + 1600 + 1000;
+});
+D('morphing', (r, c) => {
+  const b = h('div', 'burger', r, '<i></i><i></i><i></i>'), [a, m, z] = b.children, o = {duration: 2600, fill: 'both', easing: 'cubic-bezier(.6,0,.3,1)'};
+  c.anim(a, [{transform: 'none'}, {transform: 'none', offset: .15}, {transform: 'translateY(23.5px) rotate(45deg)', offset: .45}, {transform: 'translateY(23.5px) rotate(45deg)', offset: .75}, {transform: 'none'}], o);
+  c.anim(m, [{opacity: 1, transform: 'none'}, {opacity: 1, transform: 'none', offset: .15}, {opacity: 0, transform: 'scaleX(0)', offset: .45}, {opacity: 0, transform: 'scaleX(0)', offset: .75}, {opacity: 1, transform: 'none'}], o);
+  c.anim(z, [{transform: 'none'}, {transform: 'none', offset: .15}, {transform: 'translateY(-23.5px) rotate(-45deg)', offset: .45}, {transform: 'translateY(-23.5px) rotate(-45deg)', offset: .75}, {transform: 'none'}], o);
+  return 2600;
+});
+D('marquee', (r, c) => {
+  const items = ['● ondolab', '▲ HANUL', '◆ mokri', '■ orbit', '★ pinetree'].map(s => `<span>${s}</span>`).join('');
+  const belt = h('div', 'belt', h('div', 'mq', r), items + items);
+  c.anim(belt, [{transform: 'translateX(0)'}, {transform: 'translateX(-50%)'}], {duration: 7000, iterations: Infinity});
+  return 0;
+});
+D('motion-path', (r, c, W, H) => {
+  const x1 = W * .2, y1 = H * .7, x2 = W * .78, y2 = H * .3;
+  const d = `M ${x1} ${y1} C ${x1 + W * .08} ${y1 - H * .55}, ${x2 - W * .3} ${y2 - H * .2}, ${x2} ${y2}`;
+  h('div', '', r, `<svg width="${W}" height="${H}" style="position:absolute;left:0;top:0"><path d="${d}" fill="none" stroke="#4d55a8" stroke-width="2" stroke-dasharray="6 7"/></svg>`).style.cssText = 'position:absolute;inset:0';
+  const cart = css(h('div', 'cart', r, CART), {left: x2 + 'px', top: y2 + 'px', transform: 'translate(-50%,-50%)'});
+  const box = h('div', 'mbox', r);
+  box.style.offsetPath = `path('${d}')`; box.style.offsetRotate = '0deg';
+  c.anim(box, [{offsetDistance: '0%', transform: 'scale(1)', opacity: 1}, {offsetDistance: '100%', transform: 'scale(.45)', opacity: 1, offset: .9}, {offsetDistance: '100%', transform: 'scale(.3)', opacity: 0}], {duration: 1500, delay: 300, fill: 'both', easing: 'ease-in-out'});
+  c.anim(cart, [{transform: 'translate(-50%,-50%) scale(1)'}, {transform: 'translate(-50%,-50%) scale(1.3)'}, {transform: 'translate(-50%,-50%) scale(1)'}], {duration: 380, delay: 1700, fill: 'both'});
+  return 300 + 1500 + 900;
+});
+D('page-transition', (r, c) => {
+  const f = h('div', 'frame', r, '<div class="fbar"><i></i><i></i><i></i></div>'), body = h('div', 'fbody', f);
+  const pa = h('div', 'pg', body, '<div style="flex:1;padding-top:10px"><div class="ln" style="width:85%"></div><div class="ln s" style="width:65%"></div><div class="ln s" style="width:50%"></div><div style="width:70px;height:22px;border-radius:8px;background:#7c6cff;margin-top:14px"></div></div><div style="flex:1;border-radius:12px;background:linear-gradient(135deg,#b4a9ff,#6b5cf0)"></div>');
+  const pb = h('div', 'pg', body, ['#5fe3ff', '#f6b93f', '#ff6b81'].map(col => `<div style="flex:1"><div style="height:60%;border-radius:10px;background:${col};margin-bottom:10px"></div><div class="ln" style="width:80%"></div><div class="ln s" style="width:55%"></div></div>`).join(''));
+  pb.style.opacity = 0;
+  const w = h('div', 'wipe', body);
+  c.anim(w, [{transform: 'scaleX(0)', transformOrigin: 'left', easing: 'cubic-bezier(.7,0,.3,1)'}, {transform: 'scaleX(1)', transformOrigin: 'left', offset: .5}, {transform: 'scaleX(1)', transformOrigin: 'right', offset: .501, easing: 'cubic-bezier(.7,0,.3,1)'}, {transform: 'scaleX(0)', transformOrigin: 'right'}], {duration: 1000, delay: 700, fill: 'both'});
+  c.timeout(() => { pa.style.opacity = 0; pb.style.opacity = 1; }, 1200);
+  return 700 + 1000 + 1200;
+});
+D('shared-element', (r, c) => {
+  const f = h('div', 'frame', r, '<div class="fbar"><i></i><i></i><i></i></div>'), body = h('div', 'fbody', f);
+  const cols = ['#f6b93f', '#5fe3ff', '#ff6b81'];
+  const list = h('div', 'slist', body, cols.map(col => `<div><div class="thumb" style="background:${col}"></div><div class="ln" style="width:80%"></div><div class="ln s" style="width:55%"></div></div>`).join(''));
+  const detail = h('div', 'sdetail', body, '<div class="ln" style="width:90%;height:12px"></div><div class="ln s"></div><div class="ln s" style="width:80%"></div><div class="ln s" style="width:60%"></div><div style="width:80px;height:24px;border-radius:8px;background:#7c6cff;margin-top:12px"></div>');
+  c.timeout(() => {
+    const th = list.querySelector('.thumb'), fb = body.getBoundingClientRect(), tr = th.getBoundingClientRect();
+    const from = {left: tr.left - fb.left + 'px', top: tr.top - fb.top + 'px', width: tr.width + 'px', height: tr.height + 'px'};
+    const to = {left: '14px', top: '14px', width: fb.width * .46 + 'px', height: fb.height - 28 + 'px'};
+    const clone = css(h('div', 'sclone', body), Object.assign({background: cols[0]}, from));
+    th.style.visibility = 'hidden';
+    const o = {duration: 700, fill: 'both', easing: 'cubic-bezier(.6,0,.2,1)'};
+    c.anim(clone, [from, to], o);
+    c.anim(list, [{opacity: 1}, {opacity: 0}], {duration: 250, fill: 'both'});
+    c.anim(detail, [{opacity: 0, transform: 'translateX(20px)'}, {opacity: 1, transform: 'none'}], {duration: 400, delay: 450, fill: 'both'});
+    c.timeout(() => {
+      c.anim(clone, [to, from], o);
+      c.anim(detail, [{opacity: 1}, {opacity: 0}], {duration: 200, fill: 'both'});
+      c.anim(list, [{opacity: 0}, {opacity: 1}], {duration: 300, delay: 450, fill: 'both'});
+    }, 1900);
+  }, 600);
+  return 600 + 1900 + 700 + 400;
+});
+D('pin-scrollytelling', (r, c, W, H) => {
+  const sc = h('div', 'scroller', r), tall = h('div', 'tall', sc);
+  h('div', 'strip', tall);
+  const st = css(h('div', 'sticky', tall), {height: H + 'px'});
+  const box = h('div', 'pinbox', st, '1');
+  const fill = h('i', '', h('div', 'ptrack', st));
+  let step = 1;
+  autoScroll(c, sc, p => {
+    fill.style.height = p * 100 + '%';
+    const s = Math.min(3, 1 + Math.floor(p * 3));
+    if (s !== step){ step = s; box.textContent = s; c.anim(box, [{transform: 'scale(.85)', opacity: .5}, {transform: 'scale(1)', opacity: 1}], {duration: 260, easing: 'ease-out'}); }
+  });
+  return 0;
+}, true);
+D('horizontal-scroll', (r, c, W, H) => {
+  const sc = h('div', 'scroller', r), tall = h('div', 'tall', sc);
+  const st = css(h('div', 'sticky', tall), {height: H + 'px', overflow: 'hidden'});
+  h('div', 'mouse', st); const chev = h('div', 'chev', st, '⌄');
+  const row = h('div', 'hrow', st, ['#5fe3ff', '#ff6b81', '#b3a8ff', '#f6b93f', '#3ddc97', '#7c6cff', '#5fe3ff', '#ff6b81', '#b3a8ff', '#f6b93f'].map(col => `<i style="background:${col}"></i>`).join(''));
+  c.anim(chev, [{transform: 'translateY(-3px)'}, {transform: 'translateY(4px)'}], {duration: 600, iterations: Infinity, direction: 'alternate'});
+  autoScroll(c, sc, p => { const span = Math.max(0, row.scrollWidth - (W - 96) + 20); row.style.transform = `translateX(${-p * span}px)`; });
+  return 0;
+}, true);
+D('magnetic-button', (r, c, W, H) => {
+  const cx = W / 2, cy = H / 2, R = Math.min(W, H) * .36;
+  css(h('div', 'mring', r), {width: R * 2 + 'px', height: R * 2 + 'px'});
+  const btn = h('div', 'pill', r, '시작하기'), cur = h('div', 'fcur', r, CURSOR);
+  const pts = [[.12, .25], [.4, .42], [.47, .54], [.56, .46], [.88, .8], [.6, .58], [.28, .78]];
+  let bx = 0, by = 0, t = 0;
+  c.loop((now, dt) => {
+    let p;
+    if (c.manual()){ cur.style.display = 'none'; p = c.ptr(); }
+    else { cur.style.display = ''; t += dt; const q = wayPos(pts, 900, t); p = [q[0] * W, q[1] * H]; cur.style.transform = `translate(${p[0]}px,${p[1]}px)`; }
+    let tx = 0, ty = 0;
+    if (p){ const dx = p[0] - cx, dy = p[1] - cy; if (Math.hypot(dx, dy) < R){ tx = dx * .4; ty = dy * .4; } }
+    bx += (tx - bx) * .15; by += (ty - by) * .15;
+    btn.style.transform = `translate(${bx}px,${by}px)`;
+  });
+  return 0;
+}, true);
+D('custom-cursor', (r, c, W, H) => {
+  const card = h('div', 'ccard', r), btn = h('div', 'pill', card, '보기');
+  const ring = h('div', 'ccur', r), dot = h('div', 'cdot', r);
+  const pts = [[.2, .3], [.5, .5], [.52, .52], [.82, .28], [.72, .78], [.3, .72]];
+  let x = W * .2, y = H * .3, s = 1, t = 0;
+  c.loop((now, dt) => {
+    r.classList.toggle('nocur', c.manual());
+    let p;
+    if (c.manual()) p = c.ptr(); else { t += dt; const q = wayPos(pts, 950, t); p = [q[0] * W, q[1] * H]; }
+    ring.style.opacity = dot.style.opacity = p ? 1 : 0;
+    if (!p) return;
+    x += (p[0] - x) * .16; y += (p[1] - y) * .16;
+    const rr = r.getBoundingClientRect(), b = btn.getBoundingClientRect();
+    const over = p[0] > b.left - rr.left - 6 && p[0] < b.right - rr.left + 6 && p[1] > b.top - rr.top - 6 && p[1] < b.bottom - rr.top + 6;
+    s += ((over ? 2.4 : 1) - s) * .18;
+    ring.style.transform = `translate(${x}px,${y}px) scale(${s})`;
+    dot.style.transform = `translate(${p[0]}px,${p[1]}px)`;
+  });
+  return 0;
+}, true);
+D('3d-tilt', (r, c, W, H) => {
+  const wrap = h('div', 'tilt', r), card = h('div', 'tcard', wrap, '<div class="p">9,900원</div><div class="b"></div><div class="shine"></div>'), shine = card.querySelector('.shine');
+  const cur = h('div', 'fcur', r, CURSOR);
+  const pts = [[.42, .3], [.58, .36], [.6, .68], [.4, .66], [.5, .5], [.85, .5]];
+  let rx = 0, ry = 0, t = 0;
+  c.loop((now, dt) => {
+    let p;
+    if (c.manual()){ cur.style.display = 'none'; p = c.ptr(); }
+    else { cur.style.display = ''; t += dt; const q = wayPos(pts, 850, t); p = [q[0] * W, q[1] * H]; cur.style.transform = `translate(${p[0]}px,${p[1]}px)`; }
+    let tx = 0, ty = 0, sx = 50, sy = 50, on = false;
+    if (p){
+      const ux = (p[0] - W / 2) / 160, uy = (p[1] - H / 2) / 210;
+      if (Math.abs(ux) < .65 && Math.abs(uy) < .65){ on = true; ty = ux * 30; tx = -uy * 30; sx = 50 + ux * 100; sy = 50 + uy * 100; }
+    }
+    rx += (tx - rx) * .12; ry += (ty - ry) * .12;
+    card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+    shine.style.background = on ? `radial-gradient(circle at ${sx}% ${sy}%, #ffffff55, transparent 55%)` : 'none';
+  });
+  return 0;
+}, true);
+D('confetti', (r, c, W, H) => {
+  const btn = h('div', 'paybtn', r, '<i>✓</i>결제 완료');
+  const fire = () => confettiBurst(r, c, W / 2, H / 2);
+  btn.addEventListener('click', fire);
+  c.anim(btn, [{transform: 'scale(1)'}, {transform: 'scale(.88)'}, {transform: 'scale(1)'}], {duration: 260, delay: 400});
+  c.timeout(fire, 520);
+  return 520 + 1500 + 600;
+});
+
+/* ----- UI 용어 데모 ----- */
+function frameBox(r, w){ const f = h('div', 'frame', r, '<div class="fbar"><i></i><i></i><i></i></div>'); if (w) f.style.width = w; return [f, h('div', 'fbody', f)]; }
+const relC = (el, r) => { const a = el.getBoundingClientRect(), b = r.getBoundingClientRect(); return [a.left - b.left + a.width / 2, a.top - b.top + a.height / 2]; };
+function fakeCursor(r, x, y){
+  const el = h('div', 'fcur', r, CURSOR);
+  el.style.transform = `translate(${x}px,${y}px)`;
+  el.style.transition = 'transform .6s cubic-bezier(.5,0,.3,1)';
+  return {
+    to(p){ el.style.transform = `translate(${p[0]}px,${p[1]}px)`; },
+    click(c){ c.anim(el.firstChild, [{transform: 'scale(1)'}, {transform: 'scale(.75)'}, {transform: 'scale(1)'}], {duration: 220}); },
+  };
+}
+// 일정 간격으로 fn 실행. pauseOnManual이면 마우스를 올린 동안 멈춘다
+function ticker(c, ms, fn, pauseOnManual){ let t = 0; c.loop((now, dt) => { if (pauseOnManual && c.manual()) return; t += dt; if (t >= ms){ t = 0; fn(); } }); }
+const PAGE = '<div style="padding:14px"><div class="t1" style="width:60%"></div><div class="blk"></div><div class="blk"></div><div class="blk"></div></div>';
+
+D('hero-section', (r, c) => {
+  const [, body] = frameBox(r), page = css(h('div', '', body), {position: 'absolute', left: 0, right: 0, top: 0});
+  h('div', 'hnav', page, '<i class="logo"></i><span></span><span></span><span></span><b></b>');
+  const hh = body.clientHeight - 26;
+  const hero = css(h('div', 'hero', page, '<div class="hl"><div class="t1"></div><div class="t2"></div><div class="ln s" style="width:80%"></div><div class="ln s" style="width:60%"></div><div class="cta"><b></b><i></i></div></div><div class="hv"></div>'), {height: hh + 'px'});
+  h('div', 'below', page, '<div></div><div></div><div></div><div></div><div></div><div></div>');
+  [...hero.querySelectorAll('.t1,.t2,.ln,.cta,.hv')].forEach((p, i) => c.anim(p, [{opacity: 0, transform: 'translateY(14px)'}, {opacity: 1, transform: 'none'}], {duration: 450, delay: 200 + i * 110, fill: 'both', easing: 'ease-out'}));
+  c.anim(page, kf([{transform: 'translateY(0)'}, {transform: `translateY(${-hh * .7}px)`, offset: .35}, {transform: `translateY(${-hh * .7}px)`, offset: .7}, {transform: 'translateY(0)'}], 'ease-in-out'), {duration: 2000, delay: 1800, fill: 'both'});
+  return 1800 + 2000 + 200;
+});
+D('responsive-layout', (r, c) => {
+  const [f, body] = frameBox(r, '92%');
+  h('div', 'rgrid', body, ['#7c6cff', '#5fe3ff', '#f6b93f', '#ff6b81', '#3ddc97', '#b3a8ff'].map(col => `<div style="background:${col}"><i style="width:70%"></i><i style="width:45%"></i></div>`).join(''));
+  c.anim(f, kf([{width: '92%'}, {width: '92%', offset: .12}, {width: '24%', offset: .45}, {width: '24%', offset: .65}, {width: '92%', offset: .95}, {width: '92%'}], 'ease-in-out'), {duration: 4400});
+  return 4400;
+});
+D('card-layout', (r, c) => {
+  const wrap = h('div', 'ucards', r);
+  ['#7c6cff', '#5fe3ff', '#f6b93f'].forEach((col, ci) => {
+    const k = h('div', 'ucard', wrap, `<div class="th" style="background:${col}"></div><div class="a"></div><div class="b"></div><div class="a" style="width:80%"></div>`);
+    c.anim(k, [{background: 'rgba(243,244,255,0)', boxShadow: '0 0 0 #0000'}, {background: 'rgba(243,244,255,0)', boxShadow: '0 0 0 #0000', offset: .5}, {background: 'rgba(243,244,255,1)', boxShadow: '0 12px 30px #0007'}], {duration: 1400, fill: 'both', easing: 'ease-out'});
+    [...k.children].forEach((p, i) => {
+      const dx = (Math.random() - .5) * 260, dy = (Math.random() - .5) * 160, rot = (Math.random() - .5) * 90;
+      c.anim(p, [{transform: `translate(${dx}px,${dy}px) rotate(${rot}deg)`, opacity: .3}, {transform: 'none', opacity: 1}], {duration: 900, delay: 200 + ci * 80 + i * 40, fill: 'both', easing: 'cubic-bezier(.2,.8,.3,1)'});
+    });
+  });
+  return 2800;
+});
+D('bento-grid', (r, c) => {
+  const g = h('div', 'bento', r);
+  [['1/3', '1/3', '#7c6cff'], ['3/5', '1/2', '#5fe3ff'], ['3/4', '2/3', '#f6b93f'], ['4/5', '2/4', '#ff6b81'], ['1/2', '3/4', '#3ddc97'], ['2/4', '3/4', '#b3a8ff']].forEach(([col, row, bg]) => css(h('i', '', g), {gridColumn: col, gridRow: row, background: bg}));
+  c.anim(g, [{opacity: 0, transform: 'scale(.92)'}, {opacity: 1, transform: 'none'}], {duration: 500, delay: 200, fill: 'both', easing: 'ease-out'});
+  return 200 + 500 + 1800;
+});
+D('sidebar-layout', (r, c) => {
+  const [, body] = frameBox(r), side = h('div', 'side', body, '<div class="lg"></div>'), act = h('div', 'act', side);
+  const items = [0, 1, 2, 3, 4].map(() => h('div', 'mi', side, '<i></i>'));
+  const col = h('div', '', h('div', 'mainc', body), '<div class="chart">' + [50, 80, 35, 95, 60].map(v => `<i style="height:${v}%"></i>`).join('') + '</div><div class="blk"></div><div class="blk"></div><div class="chart">' + [70, 40, 90, 55, 30].map(v => `<i style="height:${v}%;background:#5fe3ff"></i>`).join('') + '</div><div class="blk"></div>');
+  let k = 0; const place = () => { act.style.top = items[k].offsetTop + 'px'; }; place();
+  c.anim(col, [{transform: 'translateY(0)'}, {transform: 'translateY(-45%)'}], {duration: 2600, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out'});
+  ticker(c, 1300, () => { k = (k + 1) % items.length; place(); });
+  return 0;
+});
+D('sticky-header', (r, c) => {
+  const [, body] = frameBox(r), sc = h('div', 'sc2', body);
+  const head = h('div', 'shead', sc, '<i></i><span></span><span></span><span></span>');
+  h('div', '', sc, '<div style="padding:14px"><div class="t1" style="width:70%"></div><div class="ln s" style="width:90%"></div><div class="ln s" style="width:75%"></div>' + '<div class="blk"></div>'.repeat(8) + '</div>');
+  autoScroll(c, sc, () => head.classList.toggle('sh', sc.scrollTop > 4));
+  return 0;
+}, true);
+D('split-layout', (r, c) => {
+  const [, body] = frameBox(r);
+  const L = css(h('div', '', body), {position: 'absolute', left: 0, top: 0, bottom: 0, width: '50%', background: 'linear-gradient(150deg,#b4a9ff,#ff8fb1)'});
+  const R = css(h('div', '', body, '<div class="t1" style="width:80%"></div><div class="ln s" style="width:90%"></div><div class="ln s" style="width:70%"></div><div class="ln s" style="width:80%"></div><div class="cta"><b></b></div>'), {position: 'absolute', right: 0, top: 0, bottom: 0, width: '50%', padding: '26px 18px'});
+  const o = {duration: 700, delay: 300, fill: 'both', easing: 'cubic-bezier(.2,.8,.3,1)'};
+  c.anim(L, [{transform: 'translateX(-100%)'}, {transform: 'none'}], o);
+  c.anim(R, [{transform: 'translateX(100%)', opacity: 0}, {transform: 'none', opacity: 1}], o);
+  return 300 + 700 + 1600;
+});
+D('tabs', (r, c) => {
+  const w = h('div', 'uitab', r), bar = h('div', 'bar', w), btns = ['개요', '리뷰', '문의'].map(n => h('button', '', bar, n)), ind = h('div', 'ind', bar);
+  const panes = h('div', 'panes', w);
+  const ps = [
+    '<div style="display:flex;gap:10px"><div style="width:70px;height:70px;border-radius:10px;background:#7c6cff"></div><div style="flex:1"><div class="ln"></div><div class="ln s"></div><div class="ln s" style="width:60%"></div></div></div>',
+    '<div style="color:#f6b93f;font-size:20px;margin-bottom:8px">★★★★☆</div><div class="ln s"></div><div class="ln s" style="width:70%"></div>',
+    '<div class="ln s"></div><div class="ln s" style="width:80%"></div><div style="width:90px;height:26px;border-radius:8px;background:#3ddc97;margin-top:12px"></div>',
+  ].map(html => h('div', 'pane', panes, html));
+  let k = 0;
+  const set = i => { k = i; btns.forEach((b, j) => b.classList.toggle('on', j === i)); ps.forEach((p, j) => p.classList.toggle('on', j === i)); ind.style.left = btns[i].offsetLeft + 'px'; ind.style.width = btns[i].offsetWidth + 'px'; };
+  btns.forEach((b, i) => b.addEventListener('click', () => set(i)));
+  set(0); ticker(c, 1300, () => set((k + 1) % 3), true);
+  return 0;
+}, true);
+D('accordion', (r, c) => {
+  const w = h('div', 'acc', r);
+  const its = [0, 1, 2].map(() => h('div', 'it', w, '<div class="hd"><i></i><b>▼</b></div><div class="bd"><div><div class="ln s"></div><div class="ln s" style="width:70%"></div></div></div>'));
+  let k = -1; const set = i => { k = i; its.forEach((it, j) => it.classList.toggle('open', j === i)); };
+  its.forEach((it, i) => it.querySelector('.hd').addEventListener('click', () => set(k === i ? -1 : i)));
+  c.timeout(() => set(0), 300); ticker(c, 1500, () => set((k + 1) % 3), true);
+  return 0;
+}, true);
+D('modal-dialog', (r, c) => {
+  const [, body] = frameBox(r); h('div', '', body, PAGE);
+  const dim = h('div', 'dim', body), dlg = h('div', 'dialog', body, '<div class="t1" style="width:70%;height:10px"></div><div class="ln s"></div><div class="ln s" style="width:75%"></div><div class="btns"><i></i><b></b></div>');
+  const cur = fakeCursor(r, r.clientWidth * .25, r.clientHeight * .85), o = {duration: 300, fill: 'both', easing: 'ease-out'};
+  c.timeout(() => { c.anim(dim, [{opacity: 0}, {opacity: .55}], o); c.anim(dlg, [{opacity: 0, transform: 'translate(-50%,-50%) scale(.85)'}, {opacity: 1, transform: 'translate(-50%,-50%) scale(1)'}], o); }, 400);
+  c.timeout(() => cur.to(relC(dlg.querySelector('.btns b'), r)), 1000);
+  c.timeout(() => cur.click(c), 1700);
+  c.timeout(() => { c.anim(dim, [{opacity: .55}, {opacity: 0}], o); c.anim(dlg, [{opacity: 1, transform: 'translate(-50%,-50%) scale(1)'}, {opacity: 0, transform: 'translate(-50%,-50%) scale(.9)'}], o); }, 1850);
+  return 2700;
+});
+D('drawer', (r, c) => {
+  const [, body] = frameBox(r); h('div', '', body, PAGE);
+  const dim = h('div', 'dim', body), dr = h('div', 'drawer', body, '<div class="t1" style="width:60%;height:10px;margin-bottom:18px"></div>' + ['', 'off', '', ''].map(x => `<div class="tg ${x}"><i></i><b></b></div>`).join(''));
+  const o = {duration: 450, fill: 'both', easing: 'cubic-bezier(.2,.8,.3,1)'};
+  c.timeout(() => { c.anim(dim, [{opacity: 0}, {opacity: .45}], o); c.anim(dr, [{transform: 'translateX(105%)'}, {transform: 'none'}], o); }, 400);
+  c.timeout(() => { c.anim(dim, [{opacity: .45}, {opacity: 0}], o); c.anim(dr, [{transform: 'none'}, {transform: 'translateX(105%)'}], Object.assign({}, o, {easing: 'cubic-bezier(.7,0,.8,.3)'})); }, 2100);
+  return 2800;
+});
+D('dropdown', (r, c) => {
+  const s = css(h('div', 'sel', r), {marginBottom: '110px'}), box = h('div', 'box', s, '<i></i><b>▼</b>');
+  const list = h('div', 'list', s, [60, 45, 70, 50].map(w => `<div><i style="width:${w}%"></i></div>`).join('')), items = [...list.children];
+  const cur = fakeCursor(r, r.clientWidth * .8, r.clientHeight * .85);
+  c.timeout(() => cur.to(relC(box, r)), 200);
+  c.timeout(() => { cur.click(c); c.anim(list, [{opacity: 0, transform: 'scaleY(.6)'}, {opacity: 1, transform: 'scaleY(1)'}], {duration: 250, fill: 'both', easing: 'ease-out'}); }, 800);
+  c.timeout(() => cur.to(relC(items[2], r)), 1150);
+  c.timeout(() => items[2].classList.add('hl'), 1550);
+  c.timeout(() => { cur.click(c); box.querySelector('i').style.width = '70%'; c.anim(list, [{opacity: 1, transform: 'scaleY(1)'}, {opacity: 0, transform: 'scaleY(.6)'}], {duration: 200, fill: 'both'}); }, 1950);
+  return 2700;
+});
+D('tooltip', (r, c) => {
+  const fl = h('div', 'field', r, '<i></i><span class="q">?</span>'), tip = h('div', 'tip', fl, '8자 이상 입력하세요'), q = fl.querySelector('.q');
+  const cur = fakeCursor(r, r.clientWidth * .3, r.clientHeight * .8);
+  c.timeout(() => cur.to(relC(q, r)), 300);
+  c.timeout(() => c.anim(tip, [{opacity: 0, transform: 'translateY(6px)'}, {opacity: 1, transform: 'none'}], {duration: 220, fill: 'both'}), 950);
+  c.timeout(() => { cur.to([r.clientWidth * .3, r.clientHeight * .85]); c.anim(tip, [{opacity: 1}, {opacity: 0}], {duration: 200, fill: 'both'}); }, 2300);
+  return 2900;
+});
+D('toast-snackbar', (r, c) => {
+  const [, body] = frameBox(r); h('div', '', body, PAGE);
+  const t = h('div', 'toast', body, '<b>✓</b>저장되었어요');
+  c.anim(t, kf([{transform: 'translate(-50%,160%)'}, {transform: 'translate(-50%,0)', offset: .15}, {transform: 'translate(-50%,0)', offset: .82}, {transform: 'translate(-50%,160%)'}], 'cubic-bezier(.3,.8,.3,1)'), {duration: 2800, delay: 300, fill: 'both'});
+  return 3100;
+});
+D('carousel', (r, c) => {
+  const box = css(h('div', '', r), {width: '100%'}), car = h('div', 'car', box), trk = h('div', 'trk', car);
+  const cols = ['#7c6cff', '#5fe3ff', '#f6b93f', '#ff6b81', '#3ddc97'];
+  const cards = cols.map(col => css(h('i', '', trk), {background: `linear-gradient(160deg,${col},#1d2246)`}));
+  css(h('div', 'arr', car, '‹'), {left: '10px'}); css(h('div', 'arr', car, '›'), {right: '10px'});
+  const dots = h('div', 'dots', box, cols.map(() => '<i></i>').join(''));
+  let k = 0;
+  const set = i => { k = i; trk.style.transform = `translateX(${-(75 + i * 166)}px)`; cards.forEach((cd, j) => cd.classList.toggle('on', j === i)); [...dots.children].forEach((d, j) => d.classList.toggle('on', j === i)); };
+  set(0); ticker(c, 1300, () => set((k + 1) % cols.length));
+  return 0;
+});
+D('skeleton-loading', (r, c) => {
+  const sk = h('div', 'skel', r, '<div class="row"><div class="av g"></div><div style="flex:1"><div class="l g" style="width:60%"></div><div class="l g" style="width:40%;margin:0"></div></div></div><div class="img g"></div><div class="l g"></div><div class="l g" style="width:75%"></div>');
+  const real = css(h('div', 'real', sk, '<div class="row"><div class="av" style="background:linear-gradient(135deg,#f6b93f,#ff6b81)"></div><div style="flex:1"><div class="l" style="width:60%;background:#fff"></div><div class="l" style="width:40%;margin:0;background:#9ba1d4"></div></div></div><div class="img" style="background:linear-gradient(135deg,#8f7dff,#5fe3ff)"></div><div class="l" style="background:#d9dcff"></div><div class="l" style="width:75%;background:#9ba1d4"></div>'), {background: '#1a1f45', borderRadius: '14px'});
+  c.anim(real, [{opacity: 0}, {opacity: 1}], {duration: 400, delay: 2000, fill: 'both'});
+  return 2000 + 400 + 1200;
+});
+D('hover-effect', (r, c, W, H) => {
+  const wrap = h('div', 'hcards', r), cards = [0, 1].map(() => h('div', 'hcard', wrap, '<div class="th"></div><div class="a"></div><div class="a" style="width:60%"></div>'));
+  const cur = h('div', 'fcur', r, CURSOR), A = relC(cards[0], r), B = relC(cards[1], r);
+  const pts = [[W * .12, H * .85], A, [A[0] + 4, A[1] + 4], B, [B[0] + 4, B[1] - 4], [W * .88, H * .85]];
+  let t = 0;
+  c.loop((now, dt) => {
+    let p;
+    if (c.manual()){ cur.style.display = 'none'; p = c.ptr(); }
+    else { cur.style.display = ''; t += dt; p = wayPos(pts, 800, t); cur.style.transform = `translate(${p[0]}px,${p[1]}px)`; }
+    const rr = r.getBoundingClientRect();
+    cards.forEach(cd => { const b = cd.getBoundingClientRect(); cd.classList.toggle('hov', !!p && p[0] > b.left - rr.left && p[0] < b.right - rr.left && p[1] > b.top - rr.top - 12 && p[1] < b.bottom - rr.top); });
+  });
+  return 0;
+}, true);
+D('scroll-reveal', (r, c) => {
+  const sc = h('div', 'scroller', r), inner = css(h('div', '', sc), {padding: `${r.clientHeight * .25}px 0 ${r.clientHeight * .6}px`});
+  const rows = ['#7c6cff', '#5fe3ff', '#f6b93f', '#ff6b81', '#3ddc97', '#b3a8ff', '#7c6cff', '#f6b93f'].map(col => h('div', 'rv', inner, `<b style="background:${col}"></b><i></i>`));
+  autoScroll(c, sc, () => { const lim = sc.scrollTop + sc.clientHeight * .88; rows.forEach(rw => rw.classList.toggle('in', rw.offsetTop < lim)); });
+  return 0;
+}, true);
+D('stagger-animation', (r, c) => {
+  const w = h('div', 'stg', r);
+  ['#7c6cff', '#3ddc97', '#ff6b81', '#5fe3ff', '#b3a8ff'].forEach((col, i) => {
+    const d = h('div', '', w, `<b style="background:${col}"></b><i></i><i style="width:60%"></i>`);
+    c.anim(d, [{opacity: 0, transform: 'translateY(30px)'}, {opacity: 1, transform: 'none'}], {duration: 450, delay: 250 + i * 160, fill: 'both', easing: 'cubic-bezier(.2,.8,.3,1)'});
+  });
+  return 250 + 5 * 160 + 450 + 1300;
+});
+D('smooth-transition', (r, c) => {
+  const box = css(h('div', '', r), {display: 'flex', alignItems: 'center', gap: '22px'}), sw = h('div', 'sw', box), bar = h('div', 'stbar', box);
+  let on = false; const tog = () => { on = !on; sw.classList.toggle('on', on); bar.classList.toggle('on', on); };
+  sw.addEventListener('click', tog); c.timeout(tog, 400); ticker(c, 1500, tog, true);
+  return 0;
+}, true);
+D('glassmorphism', (r, c, W, H) => {
+  const bg = css(h('div', '', r), {position: 'absolute', inset: 0});
+  [['#7c6cff', 160, .3, .35], ['#ff6b81', 130, .68, .62], ['#5fe3ff', 110, .55, .25]].forEach(([col, s, x, y], i) => {
+    const b = css(h('div', 'blob', bg), {width: s + 'px', height: s + 'px', background: col, left: x * W - s / 2 + 'px', top: y * H - s / 2 + 'px'});
+    c.anim(b, [{transform: 'translate(0,0)'}, {transform: `translate(${(i % 2 ? -1 : 1) * W * .18}px,${(i ? 1 : -1) * H * .15}px)`}], {duration: 2600 + i * 500, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out'});
+  });
+  h('div', 'glass', r, '<i style="width:50%"></i><i style="width:85%;opacity:.7"></i><i style="width:65%;opacity:.7"></i>');
+  return 0;
+});
+D('parallax-scrolling', (r, c, W, H) => {
+  const sc = h('div', 'scroller', r), tall = css(h('div', 'tall', sc), {height: '300%'});
+  const st = css(h('div', 'sticky', tall), {height: H + 'px', overflow: 'hidden', background: 'linear-gradient(180deg,#2a1f6e,#5b3f9e)'});
+  const moon = css(h('div', '', st), {position: 'absolute', width: '46px', height: '46px', borderRadius: '50%', background: '#f3e9ff', left: '72%', top: '14%', boxShadow: '0 0 30px #fff8'});
+  const txt = css(h('div', '', st, '<div class="t1" style="background:#fff;width:140px"></div><div class="ln s" style="width:100px;background:#ffffffaa"></div>'), {position: 'absolute', left: '10%', top: '16%'});
+  const layer = (d, col, hgt) => css(h('div', 'plx', st, `<svg viewBox="0 0 100 40" preserveAspectRatio="none" style="width:100%;height:100%;display:block"><path d="${d}" fill="${col}"/></svg>`), {height: hgt});
+  const far = layer('M0 40 L0 22 L15 12 L30 20 L45 8 L62 18 L78 6 L100 16 L100 40Z', '#6d58c4', '70%');
+  const mid = layer('M0 40 L0 26 L20 18 L38 28 L55 16 L75 26 L100 18 L100 40Z', '#45358f', '55%');
+  const near = layer('M0 40 L0 30 Q25 20 50 30 T100 28 L100 40Z', '#1d1648', '40%');
+  autoScroll(c, sc, p => {
+    moon.style.transform = `translateY(${p * 16}px)`;
+    far.style.transform = `translateY(${p * H * .08}px)`;
+    mid.style.transform = `translateY(${p * H * .22}px)`;
+    near.style.transform = `translateY(${p * H * .45}px)`;
+    txt.style.transform = `translateY(${-p * H * .5}px)`;
+  });
+  return 0;
+}, true);
+D('scroll-snap', (r, c) => {
+  const sc = h('div', 'scroller snap', r), cols = ['#3b2f8f', '#1f4f7a', '#6b2f5f', '#2f6b4f'];
+  cols.forEach(col => css(h('section', '', sc, '<div><div class="t1" style="background:#fff;width:70%"></div><div class="ln s" style="background:#ffffff99"></div><div class="ln s" style="background:#ffffff99;width:60%"></div></div>'), {background: col}));
+  const dots = h('div', 'sdots', r, cols.map(() => '<i></i>').join(''));
+  const upd = () => { const i = Math.round(sc.scrollTop / sc.clientHeight); [...dots.children].forEach((d, j) => d.classList.toggle('on', j === i)); };
+  sc.addEventListener('scroll', upd); upd();
+  // 자동 시연: 스냅을 끈 채 40%만 끌었다가, 놓으면 다음 섹션으로 착 붙는다
+  let k = 0, phase = 0, t = 0, from = 0;
+  c.loop((now, dt) => {
+    if (c.manual()){ sc.style.scrollSnapType = ''; return; }
+    t += dt;
+    const Hc = sc.clientHeight, dir = k === cols.length - 1 ? -1 : 1;
+    if (phase === 0 && t > 900){ phase = 1; t = 0; sc.style.scrollSnapType = 'none'; from = k * Hc; }
+    else if (phase === 1){ const p = Math.min(1, t / 450); sc.scrollTop = from + dir * EASE.out(p) * Hc * .4; if (p >= 1){ phase = 2; t = 0; } }
+    else if (phase === 2 && t > 250){ k = dir > 0 ? k + 1 : 0; sc.style.scrollSnapType = ''; sc.scrollTo({top: k * Hc, behavior: 'smooth'}); phase = 0; t = 0; }
+  });
+  return 0;
+}, true);
+D('micro-interaction', (r, c) => {
+  const box = h('div', 'likebox', r);
+  const ht = h('div', 'heart', box, '<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.1 0 3.6 1.2 5.2 3 1.6-1.8 3.1-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z" fill="none" stroke="#ff6b81" stroke-width="2"/></svg>');
+  const num = h('b', '', box, '128'), path = ht.querySelector('path');
+  let liked = false;
+  const like = () => {
+    liked = !liked; path.setAttribute('fill', liked ? '#ff6b81' : 'none'); num.textContent = liked ? '129' : '128';
+    if (!liked) return;
+    c.anim(ht, kf([{transform: 'scale(1)'}, {transform: 'scale(.7)', offset: .25}, {transform: 'scale(1.35)', offset: .6}, {transform: 'scale(1)'}], 'ease-out'), {duration: 500});
+    for (let i = 0; i < 8; i++){
+      const a = i / 8 * Math.PI * 2, s = css(h('i', 'spark', ht), {background: i % 2 ? '#f6b93f' : '#ff6b81'});
+      c.anim(s, [{transform: 'translate(0,0) scale(1)', opacity: 1}, {transform: `translate(${Math.cos(a) * 34}px,${Math.sin(a) * 34}px) scale(.2)`, opacity: 0}], {duration: 550, delay: 120, fill: 'both', easing: 'ease-out'});
+    }
+    c.anim(num, [{transform: 'translateY(8px)', opacity: 0}, {transform: 'none', opacity: 1}], {duration: 300});
+  };
+  ht.addEventListener('click', like);
+  const cur = fakeCursor(r, r.clientWidth * .7, r.clientHeight * .85);
+  c.timeout(() => cur.to(relC(ht, r)), 200);
+  c.timeout(() => { cur.click(c); like(); }, 900);
+  return 2400;
+});
+
+/* ================= 퀴즈 진행 ================= */
+const BEST_KEY = (sheetId, m, all) => `${sheetId}Quiz.best.${m}${all ? '.all' : ''}`;
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v){ try { localStorage.setItem(k, v); } catch (e) {} },
+};
+const fmt = n => (Math.round(n * 10) / 10).toString();
+const S = {mode: 'subjective', queue: [], idx: 0, score: 0, results: [], ranked: false, phase: 'idle', hint: false, total: 0};
+const show = id => document.querySelectorAll('.screen').forEach(s => { s.hidden = s.id !== id; });
+const mode = () => document.querySelector('input[name=mode]:checked').value;
+const curSheet = () => SHEETS.find(s => s.id === document.querySelector('input[name=sheet]:checked').value);
+
+function renderStart(){
+  $('#sheets').innerHTML = SHEETS.map((sh, i) => `<label class="mode"><input type="radio" name="sheet" value="${sh.id}"${i ? '' : ' checked'}><span><b>${sh.short}</b><small>${sh.title} · ${sh.categories.reduce((n, c) => n + c.terms.length, 0)}개</small></span></label>`).join('');
+  $('#sheets').addEventListener('change', renderSheet);
+  $('#cats').addEventListener('change', updatePool);
+  renderSheet();
+}
+function renderSheet(){
+  const sh = curSheet();
+  $('#cats').innerHTML = sh.categories.map(cat => `<label class="cat"><input type="checkbox" value="${cat.id}" checked><span>${cat.name} (${cat.terms.length})</span></label>`).join('');
+  $('#credit').innerHTML = '문제 출처: 유튜브 코드깎는노인<br>' + [...SHEETS].reverse().map(s => s === sh ? `<b>${s.credit}</b>` : s.credit).join('<br>');
+  updatePool(); renderBests();
+}
+function selectedPool(){
+  const sh = curSheet(), ids = [...document.querySelectorAll('#cats input:checked')].map(i => i.value);
+  return sh.categories.filter(c => ids.includes(c.id)).flatMap(c => c.terms);
+}
+function updatePool(){
+  const n = selectedPool().length, q = Math.min(10, n);
+  $('#poolCount').textContent = `${n}개 용어`;
+  $('#btnStart').disabled = $('#btnAll').disabled = n === 0;
+  $('#btnStart').textContent = n ? `${q}문제 시작` : '범위를 하나 이상 골라주세요';
+  $('#btnAll').textContent = n ? `모든 문제 시작 (${n}문제)` : '모든 문제 시작';
+  $('#btnAll').hidden = n === 0;
+}
+const sheetSize = sh => sh.categories.reduce((n, c) => n + c.terms.length, 0);
+function renderBests(){
+  const sh = curSheet(), b = (m, all) => { const v = store.get(BEST_KEY(sh.id, m, all)); return v == null ? '–' : `${fmt(+v)} / ${all ? sheetSize(sh) : 10}`; };
+  $('#bests').innerHTML = `🏆 ${sh.short} 최고 점수<br>주관식 10문제 ${b('subjective')} · 전체 ${b('subjective', true)}<br>객관식 10문제 ${b('choice')} · 전체 ${b('choice', true)}`;
+}
+
+// all: 고른 범위의 문제를 전부 낸다. 최고 점수는 10문제 판과 시트 전체 판만 기록한다
+function startRound(terms, ranked, all){
+  S.mode = mode(); S.sheet = terms[0].sheet; S.queue = shuffle(terms).slice(0, all ? terms.length : 10); S.total = S.queue.length;
+  S.idx = 0; S.score = 0; S.results = [];
+  S.all = !!all && S.total === sheetSize(S.sheet);
+  S.ranked = ranked && (S.all || (!all && S.total === 10));
+  show('quiz'); ask();
+}
+
+function buildChoices(term){
+  const same = term.cat.terms.filter(t => t !== term);
+  const others = term.sheet.categories.flatMap(c => c.terms).filter(t => t.cat !== term.cat);
+  const pick = (FORCED[term.id] || []).map(id => BYID[id]);
+  shuffle(same.filter(t => !pick.includes(t))).forEach(t => { if (pick.length < 3) pick.push(t); });
+  pick.push(...shuffle(others).slice(0, 4 - pick.length));
+  return shuffle([term, ...pick]);
+}
+
+function ask(){
+  const term = S.queue[S.idx];
+  S.phase = 'asking'; S.hint = false;
+  $('#qNum').textContent = `${S.idx + 1} / ${S.total}`;
+  $('#qBar').style.width = S.idx / S.total * 100 + '%';
+  $('#qScore').textContent = `${fmt(S.score)}점`;
+  $('#hintText').textContent = '';
+  $('#btnHint').disabled = false;
+  $('#feedback').hidden = true;
+  const area = $('#answerArea');
+  if (S.mode === 'subjective'){
+    area.innerHTML = '<form class="ansrow" id="ansForm"><input id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="효과 이름을 영어 또는 한글로 입력"><button class="primary">제출</button></form><button class="link" id="btnSkip" type="button">모르겠어요</button>';
+    $('#ansForm').addEventListener('submit', e => { e.preventDefault(); if ($('#ans').value.trim()) answer($('#ans').value); });
+    $('#btnSkip').addEventListener('click', () => answer(''));
+    $('#ans').focus();
+  } else {
+    S.choices = buildChoices(term);
+    area.innerHTML = '<div class="choices">' + S.choices.map((t, i) => `<button class="choice" data-i="${i}"><kbd>${i + 1}</kbd>${t.display}</button>`).join('') + '</div>';
+    area.querySelectorAll('.choice').forEach(b => b.addEventListener('click', () => choose(+b.dataset.i)));
+  }
+  Player.start($('#stage'), term.id);
+}
+
+function choose(i){
+  if (S.phase !== 'asking') return;
+  const term = S.queue[S.idx], picked = S.choices[i];
+  document.querySelectorAll('.choice').forEach((b, j) => {
+    b.disabled = true;
+    if (S.choices[j] === term) b.classList.add('right');
+    else if (j === i) b.classList.add('wrong');
+  });
+  finishAnswer(picked === term ? {ok: true, kind: 'exact'} : {ok: false, kind: 'pick'}, picked.display);
+}
+function answer(text){
+  if (S.phase !== 'asking') return;
+  const g = grade(text, S.queue[S.idx]);
+  if (!text) g.kind = 'skip';
+  $('#ans').disabled = true;
+  document.querySelectorAll('#ansForm button, #btnSkip').forEach(b => b.disabled = true);
+  finishAnswer(g, text.trim());
+}
+
+function finishAnswer(g, given){
+  const term = S.queue[S.idx];
+  S.phase = 'answered';
+  const pts = g.ok ? (S.hint ? .5 : 1) : 0;
+  S.score += pts;
+  S.results.push({term, ok: g.ok, hint: S.hint, given});
+  $('#qScore').textContent = `${fmt(S.score)}점`;
+  $('#btnHint').disabled = true;
+  const msg = {
+    exact: S.hint ? '힌트를 써서 0.5점이에요.' : '',
+    typo: `오타는 봐드렸어요${S.hint ? ' (힌트 사용 0.5점)' : ''}. 올바른 철자를 확인하세요.`,
+    other: g.other ? `입력한 답은 다른 효과(${g.other.display})예요.` : '',
+    nick: `${S.sheet.nickLabel}은(는) 정답으로 인정하지 않아요. 용어 이름으로 답해주세요.`,
+    skip: '괜찮아요, 정답을 확인해보세요.',
+    empty: '', wrong: given ? `내 답: ${esc(given)}` : '',
+    pick: `고른 답: ${esc(given)}`,
+  }[g.kind] || '';
+  const last = S.idx === S.total - 1;
+  const fb = $('#feedback');
+  fb.innerHTML = `<div class="verdict ${g.ok ? 'ok' : 'bad'}">${g.ok ? (g.kind === 'typo' ? '✅ 정답! (오타 인정)' : '✅ 정답!') : '❌ 아쉬워요'}</div>
+    ${msg ? `<div class="msg">${msg}</div>` : ''}
+    <div class="name">${term.display}<small>(${term.koDisplay})</small>${term.extra ? '<span class="tag">시트 외 추가</span>' : ''}</div>
+    <div class="nick">${S.sheet.nickLabel} “${term.nick}”</div>
+    <div class="desc">${term.desc}</div>
+    <button class="primary" id="btnNext">${last ? '결과 보기' : '다음 →'}</button>`;
+  fb.hidden = false;
+  $('#btnNext').addEventListener('click', next);
+  $('#btnNext').focus({preventScroll: true});
+  fb.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+}
+const esc = s => s.replace(/[&<>"]/g, ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[ch]));
+
+function next(){
+  if (S.phase !== 'answered') return;
+  S.idx++;
+  if (S.idx < S.total) ask(); else finish();
+}
+
+function finish(){
+  S.phase = 'done';
+  Player.stop();
+  show('result');
+  $('#rScore').innerHTML = `${fmt(S.score)}<small> / ${S.total}</small>`;
+  const key = BEST_KEY(S.sheet.id, S.mode, S.all), prev = store.get(key);
+  let bestTxt;
+  if (S.ranked){
+    if (prev == null || S.score > +prev){ store.set(key, S.score); bestTxt = '🎉 최고 점수 갱신!'; }
+    else bestTxt = `🏆 최고 점수 ${fmt(+prev)} / ${S.total}`;
+  } else bestTxt = '연습 라운드(범위를 좁혔거나 틀린 문제 다시 풀기)는 최고 점수에 반영되지 않아요.';
+  $('#rTitle').textContent = `결과 · ${S.sheet.short} · ${S.mode === 'subjective' ? '주관식' : '객관식'}`;
+  $('#rBest').textContent = bestTxt;
+  const wrong = S.results.filter(x => !x.ok);
+  $('#rWrongWrap').hidden = !wrong.length;
+  $('#btnRetry').hidden = !wrong.length;
+  if (!wrong.length){ $('#rBest').textContent += ' · 전부 맞혔어요!'; return; }
+  const list = $('#rWrongs');
+  list.innerHTML = wrong.map((x, i) => `<button data-i="${i}"><b>${x.term.display}</b> ${x.term.koDisplay} · ${S.sheet.nickLabel} “${x.term.nick}”${x.given ? `<br><small>내 답: ${esc(x.given)}</small>` : ''}</button>`).join('');
+  const play = i => { list.querySelectorAll('button').forEach((b, j) => b.classList.toggle('on', i === j)); Player.start($('#rStage'), wrong[i].term.id); };
+  list.querySelectorAll('button').forEach(b => b.addEventListener('click', () => play(+b.dataset.i)));
+  play(0);
+}
+
+document.addEventListener('keydown', e => {
+  if (S.phase === 'answered' && e.key === 'Enter'){ e.preventDefault(); next(); return; }
+  if (S.phase === 'asking' && S.mode === 'choice' && /^[1-5]$/.test(e.key)) choose(+e.key - 1);
+});
+$('#btnStart').addEventListener('click', () => startRound(selectedPool(), true));
+$('#btnAll').addEventListener('click', () => startRound(selectedPool(), true, true));
+$('#btnReplay').addEventListener('click', () => Player.replay());
+$('#btnHint').addEventListener('click', () => {
+  if (S.phase !== 'asking') return;
+  S.hint = true; $('#btnHint').disabled = true;
+  $('#hintText').textContent = `${S.sheet.nickLabel}: “${S.queue[S.idx].nick}”`;
+  if ($('#ans')) $('#ans').focus();
+});
+$('#btnRetry').addEventListener('click', () => startRound(S.results.filter(x => !x.ok).map(x => x.term), false, true));
+const goHome = () => { Player.stop(); S.phase = 'idle'; renderBests(); show('start'); };
+$('#btnHome').addEventListener('click', goHome);
+$('#btnQuit').addEventListener('click', goHome);
+renderStart();
+</script>
+</body>
+</html>
