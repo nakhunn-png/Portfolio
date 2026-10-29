@@ -81,6 +81,25 @@ h1 em{font-style:normal;color:var(--gold)}
 .rowbtns{display:flex;gap:8px;flex-wrap:wrap}
 .rowbtns .primary{flex:1}
 
+/* ---------- 전체 보기 (치트시트) ---------- */
+.app.wide{max-width:1320px}
+#btnSheet{width:100%;margin-top:10px;padding:14px;font-size:16px;font-weight:800;color:#2a1a00;background:linear-gradient(135deg,#ffd36b,#f6a93f);border:0;border-radius:14px;box-shadow:0 8px 24px #f6b93f55}
+#btnSheet:hover{filter:brightness(1.06);border:0}
+.sv-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}
+.sv-head h2{margin:4px 0 0;font-size:clamp(20px,3vw,26px)}
+.sv-cats{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));align-items:start}
+.sv-cat{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px}
+.sv-cat h3{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 12px;font-size:17px}
+.sv-cat h3 span{color:var(--sub);font-size:13px;font-weight:500;margin-left:6px}
+.sv-cat h3 small{font-family:ui-monospace,Consolas,monospace;font-size:11px;letter-spacing:.25em;color:var(--sub)}
+.sv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sv-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 8px 10px}
+.mini{position:relative;aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:var(--stage)}
+.mini .stage{position:absolute;left:0;top:0;width:480px;height:300px;transform-origin:0 0;border:0;border-radius:0}
+.sv-card b{display:block;color:var(--gold);font-size:15px;margin-top:8px;line-height:1.25}
+.sv-card .meta{display:flex;justify-content:space-between;gap:6px;font-size:12px;color:var(--sub);margin-top:2px}
+.sv-card .meta i{font-style:normal;font-family:ui-monospace,Consolas,monospace;opacity:.7}
+
 /* ---------- demo pieces ---------- */
 .d-root{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden}
 .d-root>*{grid-area:1/1}
@@ -317,6 +336,7 @@ h1 em{font-style:normal;color:var(--gold)}
         <button id="btnStart" class="primary big">시작</button>
         <button id="btnAll" class="primary big">모든 문제 시작</button>
       </div>
+      <button id="btnSheet" class="ghost">📋 전체 보기</button>
     </div>
     <p class="credit" id="credit"></p>
   </section>
@@ -332,6 +352,14 @@ h1 em{font-style:normal;color:var(--gold)}
     </div>
     <div id="answerArea"></div>
     <div id="feedback" class="feedback" hidden></div>
+  </section>
+
+  <section id="sheetView" class="screen" hidden>
+    <div class="sv-head">
+      <div><div class="eyebrow" id="svEyebrow"></div><h2 id="svTitle"></h2></div>
+      <button id="btnSvHome" class="ghost">처음으로</button>
+    </div>
+    <div id="svBody" class="sv-cats"></div>
   </section>
 
   <section id="result" class="screen" hidden>
@@ -499,7 +527,10 @@ function h(tag, cls, parent, html){ const e = document.createElement(tag); if (c
 function css(e, o){ Object.assign(e.style, o); return e; }
 const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--){ const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
-function makeCtx(){
+// 데모가 축소(transform: scale)된 무대에 그려질 때 화면 좌표 → 무대 좌표 비율
+const scaleOf = el => el.getBoundingClientRect().width / el.offsetWidth || 1;
+
+function makeCtx(owner){
   const timers = [], anims = [];
   return {
     alive: true,
@@ -509,17 +540,18 @@ function makeCtx(){
       (function f(now){ if (!self.alive) return; const dt = Math.min(50, now - last); last = now; fn(now, dt); requestAnimationFrame(f); })(last);
     },
     anim(node, kf, opt){ const a = node.animate(kf, opt); anims.push(a); return a; },
-    manual: () => Player.manual,
-    ptr: () => Player.ptr.inside ? [Player.ptr.x, Player.ptr.y] : null,
+    manual: () => owner.manual,
+    ptr: () => owner.ptr.inside ? [owner.ptr.x, owner.ptr.y] : null,
     dispose(){ this.alive = false; timers.forEach(clearTimeout); anims.forEach(a => a.cancel()); },
   };
 }
 
-const Player = {
+// 데모 하나를 무대 하나에서 반복 재생한다. 전체 보기 화면은 용어마다 하나씩 만든다
+const createPlayer = () => ({
   stage: null, root: null, ctx: null, id: null, manual: false, ptr: {x: 0, y: 0, inside: false},
   bind(stage){
     if (stage._bound) return; stage._bound = true;
-    const set = e => { if (this.stage !== stage) return; const r = stage.getBoundingClientRect(); this.ptr.x = e.clientX - r.left; this.ptr.y = e.clientY - r.top; this.ptr.inside = true; this.manual = true; };
+    const set = e => { if (this.stage !== stage) return; const r = stage.getBoundingClientRect(), k = scaleOf(stage); this.ptr.x = (e.clientX - r.left) / k; this.ptr.y = (e.clientY - r.top) / k; this.ptr.inside = true; this.manual = true; };
     stage.addEventListener('pointerenter', set);
     stage.addEventListener('pointermove', set);
     stage.addEventListener('pointerleave', () => { if (this.stage === stage){ this.manual = false; this.ptr.inside = false; } });
@@ -527,20 +559,22 @@ const Player = {
   start(stage, id){
     this.stop(); this.bind(stage); this.stage = stage; this.id = id;
     this.manual = stage.matches(':hover'); this.ptr.inside = this.manual;
-    stage.querySelector('.try').hidden = !DEMOS[id].interactive;
+    const tryBadge = stage.querySelector('.try');
+    if (tryBadge) tryBadge.hidden = !DEMOS[id].interactive;
     this.run();
   },
   run(){
     if (this.ctx) this.ctx.dispose();
     if (this.root) this.root.remove();
     const root = this.root = h('div', 'd-root', this.stage);
-    const c = this.ctx = makeCtx();
+    const c = this.ctx = makeCtx(this);
     const ms = DEMOS[this.id].fn(root, c, root.clientWidth, root.clientHeight);
     if (ms > 0) c.timeout(() => this.run(), ms + 800);
   },
   stop(){ if (this.ctx) this.ctx.dispose(); if (this.root) this.root.remove(); this.ctx = this.root = null; },
   replay(){ if (this.stage && this.id) this.run(); },
-};
+});
+const Player = createPlayer();
 
 /* ================= 데모 26개 ================= */
 const EASE = { lin: t => t, in: t => t * t * t, out: t => 1 - Math.pow(1 - t, 3), inout: t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2 };
@@ -732,9 +766,9 @@ D('shared-element', (r, c) => {
   const list = h('div', 'slist', body, cols.map(col => `<div><div class="thumb" style="background:${col}"></div><div class="ln" style="width:80%"></div><div class="ln s" style="width:55%"></div></div>`).join(''));
   const detail = h('div', 'sdetail', body, '<div class="ln" style="width:90%;height:12px"></div><div class="ln s"></div><div class="ln s" style="width:80%"></div><div class="ln s" style="width:60%"></div><div style="width:80px;height:24px;border-radius:8px;background:#7c6cff;margin-top:12px"></div>');
   c.timeout(() => {
-    const th = list.querySelector('.thumb'), fb = body.getBoundingClientRect(), tr = th.getBoundingClientRect();
-    const from = {left: tr.left - fb.left + 'px', top: tr.top - fb.top + 'px', width: tr.width + 'px', height: tr.height + 'px'};
-    const to = {left: '14px', top: '14px', width: fb.width * .46 + 'px', height: fb.height - 28 + 'px'};
+    const th = list.querySelector('.thumb'), fb = body.getBoundingClientRect(), tr = th.getBoundingClientRect(), k = scaleOf(r);
+    const from = {left: (tr.left - fb.left) / k + 'px', top: (tr.top - fb.top) / k + 'px', width: tr.width / k + 'px', height: tr.height / k + 'px'};
+    const to = {left: '14px', top: '14px', width: body.clientWidth * .46 + 'px', height: body.clientHeight - 28 + 'px'};
     const clone = css(h('div', 'sclone', body), Object.assign({background: cols[0]}, from));
     th.style.visibility = 'hidden';
     const o = {duration: 700, fill: 'both', easing: 'cubic-bezier(.6,0,.2,1)'};
@@ -801,8 +835,8 @@ D('custom-cursor', (r, c, W, H) => {
     ring.style.opacity = dot.style.opacity = p ? 1 : 0;
     if (!p) return;
     x += (p[0] - x) * .16; y += (p[1] - y) * .16;
-    const rr = r.getBoundingClientRect(), b = btn.getBoundingClientRect();
-    const over = p[0] > b.left - rr.left - 6 && p[0] < b.right - rr.left + 6 && p[1] > b.top - rr.top - 6 && p[1] < b.bottom - rr.top + 6;
+    const rr = r.getBoundingClientRect(), b = btn.getBoundingClientRect(), k = scaleOf(r);
+    const over = p[0] > (b.left - rr.left) / k - 6 && p[0] < (b.right - rr.left) / k + 6 && p[1] > (b.top - rr.top) / k - 6 && p[1] < (b.bottom - rr.top) / k + 6;
     s += ((over ? 2.4 : 1) - s) * .18;
     ring.style.transform = `translate(${x}px,${y}px) scale(${s})`;
     dot.style.transform = `translate(${p[0]}px,${p[1]}px)`;
@@ -840,7 +874,7 @@ D('confetti', (r, c, W, H) => {
 
 /* ----- UI 용어 데모 ----- */
 function frameBox(r, w){ const f = h('div', 'frame', r, '<div class="fbar"><i></i><i></i><i></i></div>'); if (w) f.style.width = w; return [f, h('div', 'fbody', f)]; }
-const relC = (el, r) => { const a = el.getBoundingClientRect(), b = r.getBoundingClientRect(); return [a.left - b.left + a.width / 2, a.top - b.top + a.height / 2]; };
+const relC = (el, r) => { const a = el.getBoundingClientRect(), b = r.getBoundingClientRect(), k = scaleOf(r); return [(a.left - b.left + a.width / 2) / k, (a.top - b.top + a.height / 2) / k]; };
 function fakeCursor(r, x, y){
   const el = h('div', 'fcur', r, CURSOR);
   el.style.transform = `translate(${x}px,${y}px)`;
@@ -1004,8 +1038,8 @@ D('hover-effect', (r, c, W, H) => {
     let p;
     if (c.manual()){ cur.style.display = 'none'; p = c.ptr(); }
     else { cur.style.display = ''; t += dt; p = wayPos(pts, 800, t); cur.style.transform = `translate(${p[0]}px,${p[1]}px)`; }
-    const rr = r.getBoundingClientRect();
-    cards.forEach(cd => { const b = cd.getBoundingClientRect(); cd.classList.toggle('hov', !!p && p[0] > b.left - rr.left && p[0] < b.right - rr.left && p[1] > b.top - rr.top - 12 && p[1] < b.bottom - rr.top); });
+    const rr = r.getBoundingClientRect(), k = scaleOf(r);
+    cards.forEach(cd => { const b = cd.getBoundingClientRect(); cd.classList.toggle('hov', !!p && p[0] > (b.left - rr.left) / k && p[0] < (b.right - rr.left) / k && p[1] > (b.top - rr.top) / k - 12 && p[1] < (b.bottom - rr.top) / k); });
   });
   return 0;
 }, true);
@@ -1117,6 +1151,7 @@ function renderStart(){
 function renderSheet(){
   const sh = curSheet();
   $('#cats').innerHTML = sh.categories.map(cat => `<label class="cat"><input type="checkbox" value="${cat.id}" checked><span>${cat.name} (${cat.terms.length})</span></label>`).join('');
+  $('#btnSheet').textContent = `📋 전체 보기 (${sh.short} ${sheetSize(sh)}개 한눈에)`;
   $('#credit').innerHTML = '문제 출처: 유튜브 코드깎는노인<br>' + [...SHEETS].reverse().map(s => s === sh ? `<b>${s.credit}</b>` : s.credit).join('<br>');
   updatePool(); renderBests();
 }
@@ -1274,9 +1309,42 @@ $('#btnHint').addEventListener('click', () => {
   if ($('#ans')) $('#ans').focus();
 });
 $('#btnRetry').addEventListener('click', () => startRound(S.results.filter(x => !x.ok).map(x => x.term), false, true));
-const goHome = () => { Player.stop(); S.phase = 'idle'; renderBests(); show('start'); };
+// 전체 보기: 시트의 용어를 카테고리별로 한 화면에 모두 띄우고, 카드마다 데모를 따로 재생한다
+const SV = {players: [], ro: null};
+const SV_CODE = {motion: 'MOTION CHEAT SHEET', ui: 'UI CHEAT SHEET'};
+function stopSheet(){
+  SV.players.forEach(p => p.stop()); SV.players = [];
+  if (SV.ro) SV.ro.disconnect(); SV.ro = null;
+  $('#svBody').innerHTML = '';
+  document.querySelector('.app').classList.remove('wide');
+}
+function showSheet(){
+  const sh = curSheet();
+  Player.stop(); stopSheet();
+  document.querySelector('.app').classList.add('wide');
+  $('#svEyebrow').textContent = SV_CODE[sh.id] || 'CHEAT SHEET';
+  $('#svTitle').textContent = `${sh.title} ${sheetSize(sh)}`;
+  let n = 0;
+  $('#svBody').innerHTML = sh.categories.map(cat => {
+    const from = n + 1; n += cat.terms.length;
+    return `<div class="sv-cat"><h3><div>${cat.name}<span>${from}–${n}</span></div><small>${cat.id.toUpperCase()}</small></h3><div class="sv-grid">` +
+      cat.terms.map((t, i) => `<div class="sv-card" data-id="${t.id}"><div class="mini"><div class="stage"></div></div><b>${t.display}</b><div class="meta"><span>${t.nick}</span><i>${String(from + i).padStart(2, '0')}</i></div></div>`).join('') +
+      '</div></div>';
+  }).join('');
+  show('sheetView'); window.scrollTo(0, 0);
+  // 데모는 480×300 무대에 그린 뒤 카드 폭에 맞게 줄인다
+  const fit = mini => { mini.firstChild.style.transform = `scale(${mini.clientWidth / 480})`; };
+  SV.ro = new ResizeObserver(es => es.forEach(e => fit(e.target)));
+  document.querySelectorAll('#svBody .sv-card').forEach(card => {
+    const mini = card.querySelector('.mini'); fit(mini); SV.ro.observe(mini);
+    const p = createPlayer(); p.start(mini.firstChild, card.dataset.id); SV.players.push(p);
+  });
+}
+const goHome = () => { Player.stop(); stopSheet(); S.phase = 'idle'; renderBests(); show('start'); };
 $('#btnHome').addEventListener('click', goHome);
 $('#btnQuit').addEventListener('click', goHome);
+$('#btnSvHome').addEventListener('click', goHome);
+$('#btnSheet').addEventListener('click', showSheet);
 renderStart();
 </script>
 </body>
