@@ -1,0 +1,10 @@
+{
+  "name": "냠냠 탈출 대작전",
+  "short_name": "냠냠 탈출",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#bfe3ff",
+  "theme_color": "#bfe3ff",
+  "icons": [{ "src": "img/yeongyang.png", "sizes": "256x256", "type": "image/png" }]
+}
