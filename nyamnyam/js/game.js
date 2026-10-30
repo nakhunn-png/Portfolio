@@ -231,7 +231,7 @@ export class Game {
     Sound.caught();
     g.cool = 4; g.state = 'wander'; g.path = null;
     for (const o of this.germs) if (o.state === 'chase') { o.state = 'wander'; o.path = null; }
-    if (this.tut) { this.respawn(); this.ui.toast(`${g.def.name}에게 잡혔어요! 연습이라 괜찮아요. 처음 자리에서 다시 해요.`); return; }
+    if (this.tut) { this.respawn(); this.ui.toast(`${g.def.name}에게 잡혔어요! 튜토리얼이라 괜찮아요. 처음 자리에서 다시 해요.`); return; }
     if (this.run.lives > 0) this.run.lives--;
     this.dirty = true;
     this.paused = true;
