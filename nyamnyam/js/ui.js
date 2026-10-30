@@ -63,7 +63,7 @@ function renderClass() {
 function progressText(s) {
   if (!s) return '';
   if (s.finished) return '🏆 완주';
-  if (s.inTutorial) return '연습 층';
+  if (s.inTutorial) return '튜토리얼';
   const st = COURSES[s.course]?.stages[s.stageIdx];
   return st ? `${st}층` : '';
 }
@@ -88,7 +88,7 @@ function renderResume() {
   const s = S.save, d = DIFFS[s.diff] || DIFFS.easy;
   $('resumeTitle').textContent = `${S.cls}반 ${S.num}번, 이어 할까요?`;
   $('resumeInfo').innerHTML = `학년: <b>${BANDS[s.band].name}</b> · ${COURSES[s.course].name}<br>
-    진행: <b>${s.finished ? '🏆 모두 탈출!' : s.inTutorial ? '연습 층' : esc(STAGES[COURSES[s.course].stages[s.stageIdx]].name)}</b><br>
+    진행: <b>${s.finished ? '🏆 모두 탈출!' : s.inTutorial ? '🎓 튜토리얼' : esc(STAGES[COURSES[s.course].stages[s.stageIdx]].name)}</b><br>
     난이도: <b>${d.icon} ${d.name}</b> · 모은 별 ⭐ <b>${totalStars(s)}</b>`;
   $('contBtn').disabled = !!s.finished;
   $('contBtn').onclick = () => startPlay();
@@ -148,12 +148,31 @@ async function startPlay() {
   const resumed = !!(s.run && s.run.stageId === stageId);
   S.game = new Game($('cv'), { stageId, band: s.band, diff: s.diff, char: s.char, pool: poolFor(stageId), run: resumed ? s.run : null, ui: UI });
   $('stageName').textContent = st.name;
-  $('tutBox').hidden = stageId !== 0;
+  $('tutBox').hidden = $('tutFrame').hidden = stageId !== 0;
+  $('hud').classList.toggle('tut', stageId === 0);
   if (stageId === 0) UI.tutorial(S.game.run.tut);
   const intro = STAGE_INTRO[stageId];
   UI.say(resumed ? '이어서 해 보자! 균을 조심해!' : (intro.all || intro[s.band]));
   if (!resumed) { s.run = S.game.serialize(); persist(); }
   updateHud();
+  if (stageId === 0) tutorialIntro(resumed);
+}
+
+// 튜토리얼 시작 안내: 진짜 게임 전 연습이고, 문제는 일부러 쉽다
+function tutorialIntro(resumed) {
+  const g = S.game; g.paused = true;
+  const sh = openModal(`<div class="tut-intro"><span class="tut-badge">🎓 튜토리얼</span>
+    <h3>${resumed ? '튜토리얼을 이어서 해요' : '진짜 탈출 전에 연습해요!'}</h3>
+    <p class="q">여기는 <b>튜토리얼(연습 층)</b>이에요.<br>탈출하는 방법을 영양이가 하나씩 알려 줘요.</p>
+    <ul class="crit">
+      <li>✏️ 문제는 <b>일부러 아주 쉽게</b> 냈어요. 방법만 익혀요!</li>
+      <li>❤️ 균에게 잡혀도 목숨이 줄지 않아요.</li>
+      <li>⏭ 이미 알면 언제든 <b>건너뛰기</b>를 눌러 1층으로 갈 수 있어요.</li>
+      <li>📚 1층부터는 학년에 맞는 진짜 영양 문제가 나와요.</li>
+    </ul></div>
+    <div class="acts"><button class="big alt" id="tiSkip">건너뛰고 1층으로</button><button class="big" id="tiGo">튜토리얼 시작!</button></div>`);
+  sh.querySelector('#tiGo').onclick = () => { closeModal(); g.paused = false; };
+  sh.querySelector('#tiSkip').onclick = () => { closeModal(); finishTutorial(); };
 }
 
 let hudT = 0;
@@ -170,7 +189,7 @@ function updateHud() {
   const g = S.game; if (!g) return;
   const r = g.run;
   $('roomName').textContent = '📍 ' + g.currentRoom();
-  $('lives').textContent = g.tut ? '연습 중' : g.lives === Infinity ? `${DIFFS[r.diff].icon} ${DIFFS[r.diff].name} · ❤️ 무한` : `${DIFFS[r.diff].icon} ${DIFFS[r.diff].name} · ${'❤️'.repeat(g.lives)}${'🤍'.repeat(Math.max(0, DIFFS[r.diff].lives - g.lives))}`;
+  $('lives').textContent = g.tut ? '🎓 연습이라 잡혀도 괜찮아요' : g.lives === Infinity ? `${DIFFS[r.diff].icon} ${DIFFS[r.diff].name} · ❤️ 무한` : `${DIFFS[r.diff].icon} ${DIFFS[r.diff].name} · ${'❤️'.repeat(g.lives)}${'🤍'.repeat(Math.max(0, DIFFS[r.diff].lives - g.lives))}`;
   const d = g.detector();
   const det = $('detector'); det.dataset.l = d ? d.level : 0; $('detText').textContent = d ? d.text : '';
   $('compass').hidden = !r.exitOpen;
@@ -199,7 +218,7 @@ press($('detector'), () => {
   else if (!d.room) UI.say('조각을 다 모았어! 📜 쪽지 단추를 눌러 순서대로 붙여 봐!');
   else UI.say(`쪽지 조각은 <b>${esc(d.room)}</b> 쪽에 있어! 감지기가 "가까워요"로 바뀌는 곳을 찾아봐.`);
 });
-$('tutSkip').onclick = () => { if (S.game) { S.game.pausedBefore = S.game.paused; S.game.paused = true; } confirmBox('연습을 건너뛰고 바로 1층으로 갈까요?', '건너뛰기', () => finishTutorial()); };
+$('tutSkip').onclick = () => { if (S.game) { S.game.pausedBefore = S.game.paused; S.game.paused = true; } confirmBox('튜토리얼을 건너뛰고 바로 1층으로 갈까요?', '건너뛰기', () => finishTutorial()); };
 
 addEventListener('keydown', (e) => {
   const g = S.game; if (!g || !$('modal').hidden) { if (e.code === 'Escape') closeModal(); return; }
@@ -248,9 +267,9 @@ const UI = {
   toast(text) { const el = document.createElement('div'); el.className = 'toast'; el.textContent = text; $('toasts').appendChild(el); setTimeout(() => el.remove(), 3500); },
   tutorial(i) {
     if (i >= TUTORIAL.length) { $('tutBox').hidden = true; return; }
-    $('tutStep').textContent = `연습 ${i + 1}/${TUTORIAL.length}`;
+    $('tutStep').textContent = `${i + 1} / ${TUTORIAL.length} 단계`;
     $('tutText').innerHTML = TUTORIAL[i].text.replace('{hide}', hideName(S.save.band));
-    if (i === 0) $('tutText').innerHTML += '<br><small>💡 ?가구 10개 중 4개에만 진짜 쪽지 조각이 있어요. (연습에서는 4개 중 2개) 문제를 틀리면 6초 동안 그 가구를 뒤질 수 없어요!</small>';
+    if (i === 0) $('tutText').innerHTML += '<br><small>💡 ?가구 10개 중 4개에만 진짜 쪽지 조각이 있어요. (튜토리얼에서는 4개 중 2개) 문제를 틀리면 6초 동안 그 가구를 뒤질 수 없어요!</small>';
   },
   openQuiz,
   onCaught,
@@ -273,7 +292,8 @@ function choiceButtons(q, disabled) {
 }
 
 function openQuiz({ title, q }, cb) {
-  const sh = openModal(`<h3>${esc(title)}</h3><p class="q">${esc(q.q)}</p><div class="choices">${choiceButtons(q, [])}</div>`);
+  const tutTag = S.game?.tut ? '<p class="tut-tag">🎓 튜토리얼 문제 · 일부러 쉽게 냈어요</p>' : '';
+  const sh = openModal(`${tutTag}<h3>${esc(title)}</h3><p class="q">${esc(q.q)}</p><div class="choices">${choiceButtons(q, [])}</div>`);
   let done = false;
   sh.querySelectorAll('.choices button').forEach(b => b.onclick = () => {
     if (done) return; done = true;
@@ -388,7 +408,7 @@ function finishTutorial() {
 function onClear(res) {
   const s = S.save;
   if (res.stageId === 0) {
-    const sh = openModal(`<h3>🎉 연습 끝!</h3><p class="q">잘했어요! 이제 진짜 탈출을 시작해요.<br>균을 피해서 쪽지 조각 4개를 모아요!</p><div class="acts"><button class="big" id="go">1층으로 출발!</button></div>`);
+    const sh = openModal(`<h3>🎉 튜토리얼 끝!</h3><p class="q">잘했어요! 이제 진짜 탈출을 시작해요.<br>균을 피해서 쪽지 조각 4개를 모아요!</p><p class="hint">지금부터는 일부러 쉬운 문제가 아니라, 학년에 맞는 진짜 영양 문제가 나와요.</p><div class="acts"><button class="big" id="go">1층으로 출발!</button></div>`);
     sh.querySelector('#go').onclick = () => finishTutorial();
     return;
   }

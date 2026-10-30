@@ -101,7 +101,7 @@
   };
   var STAGES = {
     0: {
-      name: "\uC5F0\uC2B5 \uCE35",
+      name: "\u{1F393} \uD29C\uD1A0\uB9AC\uC5BC",
       place: "\uC601\uC591\uC774\uC758 \uC5F0\uC2B5\uC2E4",
       theme: "practice",
       cols: 2,
@@ -194,7 +194,7 @@
     { q: "\uACE8\uACE0\uB8E8 \uBA39\uB294\uB2E4\uB294 \uAC83\uC740 \uC5B4\uB5A4 \uB73B\uC77C\uAE4C\uC694?", c: ["\uC5EC\uB7EC \uAC00\uC9C0 \uC74C\uC2DD\uC744 \uACE0\uB974\uAC8C \uBA39\uAE30", "\uC88B\uC544\uD558\uB294 \uAC83\uB9CC \uBA39\uAE30", "\uD55C \uAC00\uC9C0\uB9CC \uB9CE\uC774 \uBA39\uAE30", "\uAD76\uAE30"], h: "\uD3B8\uC2DD\uC758 \uBC18\uB300\uC608\uC694." }
   ];
   var STAGE_INTRO = {
-    0: { all: "\uC548\uB155! \uB098\uB294 \uC601\uC591\uC774\uC57C. \uC5EC\uAE30\uC11C \uD0C8\uCD9C\uD558\uB294 \uBC29\uBC95\uC744 \uD558\uB098\uC529 \uC54C\uB824 \uC904\uAC8C!" },
+    0: { all: "\uC548\uB155! \uB098\uB294 \uC601\uC591\uC774\uC57C. \uC5EC\uAE30\uB294 \uD29C\uD1A0\uB9AC\uC5BC\uC774\uC57C. \uBB38\uC81C\uB294 \uC77C\uBD80\uB7EC \uC27D\uAC8C \uB0C8\uC73C\uB2C8 \uBC29\uBC95\uB9CC \uC775\uD600 \uBD10!" },
     1: { low: "\uAE09\uC2DD\uC2E4\uC774\uC57C! \uBC18\uCC2C\uC744 \uACE8\uACE0\uB8E8 \uBA39\uC73C\uBA74 \uADE0\uB3C4 \uC774\uAE38 \uC218 \uC788\uC5B4!", mid: "\uAE09\uC2DD\uC2E4\uC774\uC57C! \uC2DD\uB2E8\uC5D0\uB294 \uC5EC\uB7EC \uC2DD\uD488\uAD70\uC774 \uACE8\uACE0\uB8E8 \uB4E4\uC5B4 \uC788\uC5B4.", high: "\uAE09\uC2DD\uC2E4\uC774\uC57C! \uC601\uC591\uC0AC \uC120\uC0DD\uB2D8\uC774 \uADE0\uD615 \uC7A1\uD78C \uC2DD\uB2E8\uC744 \uC9DC \uC8FC\uC2DC\uC9C0." },
     2: { low: "\uB0C9\uC7A5\uACE0 \uCC44\uC18C\uCE78\uC774\uC57C! \uCC44\uC18C\uC640 \uACFC\uC77C\uC740 \uC0C9\uAE54\uC774 \uCC38 \uB2E4\uC591\uD558\uC9C0?", mid: "\uCC44\uC18C\uCE78\uC774\uC57C! \uCC44\uC18C\uC640 \uACFC\uC77C\uC5D0\uB294 \uBE44\uD0C0\uBBFC\uACFC \uBB34\uAE30\uC9C8\uC774 \uB9CE\uC544.", high: "\uCC44\uC18C\uCE78\uC774\uC57C! \uC2DD\uC774\uC12C\uC720\uB294 \uC7A5\uC744 \uD2BC\uD2BC\uD558\uAC8C \uD574 \uC918." },
     3: { low: "\uC6B0\uC720\xB7\uACE0\uAE30\uCE78\uC774\uC57C! \uC6B0\uC720\uB97C \uB9C8\uC2DC\uBA74 \uBF08\uAC00 \uD2BC\uD2BC\uD574\uC838!", mid: "\uC5EC\uAE30\uC5D4 \uB2E8\uBC31\uC9C8\uACFC \uCE7C\uC298\uC774 \uAC00\uB4DD\uD574!", high: "5\uB300 \uC601\uC591\uC18C\uAC00 \uD558\uB294 \uC77C\uC744 \uB5A0\uC62C\uB9AC\uBA70 \uD0C8\uCD9C\uD574 \uBCF4\uC790!" },
@@ -1318,7 +1318,7 @@
       }
       if (this.tut) {
         this.respawn();
-        this.ui.toast(`${g.def.name}\uC5D0\uAC8C \uC7A1\uD614\uC5B4\uC694! \uC5F0\uC2B5\uC774\uB77C \uAD1C\uCC2E\uC544\uC694. \uCC98\uC74C \uC790\uB9AC\uC5D0\uC11C \uB2E4\uC2DC \uD574\uC694.`);
+        this.ui.toast(`${g.def.name}\uC5D0\uAC8C \uC7A1\uD614\uC5B4\uC694! \uD29C\uD1A0\uB9AC\uC5BC\uC774\uB77C \uAD1C\uCC2E\uC544\uC694. \uCC98\uC74C \uC790\uB9AC\uC5D0\uC11C \uB2E4\uC2DC \uD574\uC694.`);
         return;
       }
       if (this.run.lives > 0) this.run.lives--;
@@ -1934,7 +1934,7 @@
     var _a;
     if (!s) return "";
     if (s.finished) return "\u{1F3C6} \uC644\uC8FC";
-    if (s.inTutorial) return "\uC5F0\uC2B5 \uCE35";
+    if (s.inTutorial) return "\uD29C\uD1A0\uB9AC\uC5BC";
     const st = (_a = COURSES[s.course]) == null ? void 0 : _a.stages[s.stageIdx];
     return st ? `${st}\uCE35` : "";
   }
@@ -1969,7 +1969,7 @@
     const s = S.save, d = DIFFS[s.diff] || DIFFS.easy;
     $("resumeTitle").textContent = `${S.cls}\uBC18 ${S.num}\uBC88, \uC774\uC5B4 \uD560\uAE4C\uC694?`;
     $("resumeInfo").innerHTML = `\uD559\uB144: <b>${BANDS[s.band].name}</b> \xB7 ${COURSES[s.course].name}<br>
-    \uC9C4\uD589: <b>${s.finished ? "\u{1F3C6} \uBAA8\uB450 \uD0C8\uCD9C!" : s.inTutorial ? "\uC5F0\uC2B5 \uCE35" : esc(STAGES[COURSES[s.course].stages[s.stageIdx]].name)}</b><br>
+    \uC9C4\uD589: <b>${s.finished ? "\u{1F3C6} \uBAA8\uB450 \uD0C8\uCD9C!" : s.inTutorial ? "\u{1F393} \uD29C\uD1A0\uB9AC\uC5BC" : esc(STAGES[COURSES[s.course].stages[s.stageIdx]].name)}</b><br>
     \uB09C\uC774\uB3C4: <b>${d.icon} ${d.name}</b> \xB7 \uBAA8\uC740 \uBCC4 \u2B50 <b>${totalStars(s)}</b>`;
     $("contBtn").disabled = !!s.finished;
     $("contBtn").onclick = () => startPlay();
@@ -2050,7 +2050,8 @@
     const resumed = !!(s.run && s.run.stageId === stageId);
     S.game = new Game($("cv"), { stageId, band: s.band, diff: s.diff, char: s.char, pool: poolFor(stageId), run: resumed ? s.run : null, ui: UI });
     $("stageName").textContent = st.name;
-    $("tutBox").hidden = stageId !== 0;
+    $("tutBox").hidden = $("tutFrame").hidden = stageId !== 0;
+    $("hud").classList.toggle("tut", stageId === 0);
     if (stageId === 0) UI.tutorial(S.game.run.tut);
     const intro = STAGE_INTRO[stageId];
     UI.say(resumed ? "\uC774\uC5B4\uC11C \uD574 \uBCF4\uC790! \uADE0\uC744 \uC870\uC2EC\uD574!" : intro.all || intro[s.band]);
@@ -2059,6 +2060,29 @@
       persist();
     }
     updateHud();
+    if (stageId === 0) tutorialIntro(resumed);
+  }
+  function tutorialIntro(resumed) {
+    const g = S.game;
+    g.paused = true;
+    const sh = openModal(`<div class="tut-intro"><span class="tut-badge">\u{1F393} \uD29C\uD1A0\uB9AC\uC5BC</span>
+    <h3>${resumed ? "\uD29C\uD1A0\uB9AC\uC5BC\uC744 \uC774\uC5B4\uC11C \uD574\uC694" : "\uC9C4\uC9DC \uD0C8\uCD9C \uC804\uC5D0 \uC5F0\uC2B5\uD574\uC694!"}</h3>
+    <p class="q">\uC5EC\uAE30\uB294 <b>\uD29C\uD1A0\uB9AC\uC5BC(\uC5F0\uC2B5 \uCE35)</b>\uC774\uC5D0\uC694.<br>\uD0C8\uCD9C\uD558\uB294 \uBC29\uBC95\uC744 \uC601\uC591\uC774\uAC00 \uD558\uB098\uC529 \uC54C\uB824 \uC918\uC694.</p>
+    <ul class="crit">
+      <li>\u270F\uFE0F \uBB38\uC81C\uB294 <b>\uC77C\uBD80\uB7EC \uC544\uC8FC \uC27D\uAC8C</b> \uB0C8\uC5B4\uC694. \uBC29\uBC95\uB9CC \uC775\uD600\uC694!</li>
+      <li>\u2764\uFE0F \uADE0\uC5D0\uAC8C \uC7A1\uD600\uB3C4 \uBAA9\uC228\uC774 \uC904\uC9C0 \uC54A\uC544\uC694.</li>
+      <li>\u23ED \uC774\uBBF8 \uC54C\uBA74 \uC5B8\uC81C\uB4E0 <b>\uAC74\uB108\uB6F0\uAE30</b>\uB97C \uB20C\uB7EC 1\uCE35\uC73C\uB85C \uAC08 \uC218 \uC788\uC5B4\uC694.</li>
+      <li>\u{1F4DA} 1\uCE35\uBD80\uD130\uB294 \uD559\uB144\uC5D0 \uB9DE\uB294 \uC9C4\uC9DC \uC601\uC591 \uBB38\uC81C\uAC00 \uB098\uC640\uC694.</li>
+    </ul></div>
+    <div class="acts"><button class="big alt" id="tiSkip">\uAC74\uB108\uB6F0\uACE0 1\uCE35\uC73C\uB85C</button><button class="big" id="tiGo">\uD29C\uD1A0\uB9AC\uC5BC \uC2DC\uC791!</button></div>`);
+    sh.querySelector("#tiGo").onclick = () => {
+      closeModal();
+      g.paused = false;
+    };
+    sh.querySelector("#tiSkip").onclick = () => {
+      closeModal();
+      finishTutorial();
+    };
   }
   var hudT = 0;
   function hudLoop(t) {
@@ -2085,7 +2109,7 @@
     if (!g) return;
     const r = g.run;
     $("roomName").textContent = "\u{1F4CD} " + g.currentRoom();
-    $("lives").textContent = g.tut ? "\uC5F0\uC2B5 \uC911" : g.lives === Infinity ? `${DIFFS[r.diff].icon} ${DIFFS[r.diff].name} \xB7 \u2764\uFE0F \uBB34\uD55C` : `${DIFFS[r.diff].icon} ${DIFFS[r.diff].name} \xB7 ${"\u2764\uFE0F".repeat(g.lives)}${"\u{1F90D}".repeat(Math.max(0, DIFFS[r.diff].lives - g.lives))}`;
+    $("lives").textContent = g.tut ? "\u{1F393} \uC5F0\uC2B5\uC774\uB77C \uC7A1\uD600\uB3C4 \uAD1C\uCC2E\uC544\uC694" : g.lives === Infinity ? `${DIFFS[r.diff].icon} ${DIFFS[r.diff].name} \xB7 \u2764\uFE0F \uBB34\uD55C` : `${DIFFS[r.diff].icon} ${DIFFS[r.diff].name} \xB7 ${"\u2764\uFE0F".repeat(g.lives)}${"\u{1F90D}".repeat(Math.max(0, DIFFS[r.diff].lives - g.lives))}`;
     const d = g.detector();
     const det = $("detector");
     det.dataset.l = d ? d.level : 0;
@@ -2134,7 +2158,7 @@
       S.game.pausedBefore = S.game.paused;
       S.game.paused = true;
     }
-    confirmBox("\uC5F0\uC2B5\uC744 \uAC74\uB108\uB6F0\uACE0 \uBC14\uB85C 1\uCE35\uC73C\uB85C \uAC08\uAE4C\uC694?", "\uAC74\uB108\uB6F0\uAE30", () => finishTutorial());
+    confirmBox("\uD29C\uD1A0\uB9AC\uC5BC\uC744 \uAC74\uB108\uB6F0\uACE0 \uBC14\uB85C 1\uCE35\uC73C\uB85C \uAC08\uAE4C\uC694?", "\uAC74\uB108\uB6F0\uAE30", () => finishTutorial());
   };
   addEventListener("keydown", (e) => {
     const g = S.game;
@@ -2252,9 +2276,9 @@
         $("tutBox").hidden = true;
         return;
       }
-      $("tutStep").textContent = `\uC5F0\uC2B5 ${i + 1}/${TUTORIAL.length}`;
+      $("tutStep").textContent = `${i + 1} / ${TUTORIAL.length} \uB2E8\uACC4`;
       $("tutText").innerHTML = TUTORIAL[i].text.replace("{hide}", hideName(S.save.band));
-      if (i === 0) $("tutText").innerHTML += "<br><small>\u{1F4A1} ?\uAC00\uAD6C 10\uAC1C \uC911 4\uAC1C\uC5D0\uB9CC \uC9C4\uC9DC \uCABD\uC9C0 \uC870\uAC01\uC774 \uC788\uC5B4\uC694. (\uC5F0\uC2B5\uC5D0\uC11C\uB294 4\uAC1C \uC911 2\uAC1C) \uBB38\uC81C\uB97C \uD2C0\uB9AC\uBA74 6\uCD08 \uB3D9\uC548 \uADF8 \uAC00\uAD6C\uB97C \uB4A4\uC9C8 \uC218 \uC5C6\uC5B4\uC694!</small>";
+      if (i === 0) $("tutText").innerHTML += "<br><small>\u{1F4A1} ?\uAC00\uAD6C 10\uAC1C \uC911 4\uAC1C\uC5D0\uB9CC \uC9C4\uC9DC \uCABD\uC9C0 \uC870\uAC01\uC774 \uC788\uC5B4\uC694. (\uD29C\uD1A0\uB9AC\uC5BC\uC5D0\uC11C\uB294 4\uAC1C \uC911 2\uAC1C) \uBB38\uC81C\uB97C \uD2C0\uB9AC\uBA74 6\uCD08 \uB3D9\uC548 \uADF8 \uAC00\uAD6C\uB97C \uB4A4\uC9C8 \uC218 \uC5C6\uC5B4\uC694!</small>";
     },
     openQuiz,
     onCaught,
@@ -2286,7 +2310,9 @@
     return opts.map((c, i) => `<button data-c="${esc(c)}" ${disabled.includes(c) ? "disabled" : ""}><i>${i + 1}</i><span>${esc(c)}</span></button>`).join("");
   }
   function openQuiz({ title, q }, cb) {
-    const sh = openModal(`<h3>${esc(title)}</h3><p class="q">${esc(q.q)}</p><div class="choices">${choiceButtons(q, [])}</div>`);
+    var _a;
+    const tutTag = ((_a = S.game) == null ? void 0 : _a.tut) ? '<p class="tut-tag">\u{1F393} \uD29C\uD1A0\uB9AC\uC5BC \uBB38\uC81C \xB7 \uC77C\uBD80\uB7EC \uC27D\uAC8C \uB0C8\uC5B4\uC694</p>' : "";
+    const sh = openModal(`${tutTag}<h3>${esc(title)}</h3><p class="q">${esc(q.q)}</p><div class="choices">${choiceButtons(q, [])}</div>`);
     let done = false;
     sh.querySelectorAll(".choices button").forEach((b) => b.onclick = () => {
       if (done) return;
@@ -2444,7 +2470,7 @@
   function onClear(res) {
     const s = S.save;
     if (res.stageId === 0) {
-      const sh2 = openModal(`<h3>\u{1F389} \uC5F0\uC2B5 \uB05D!</h3><p class="q">\uC798\uD588\uC5B4\uC694! \uC774\uC81C \uC9C4\uC9DC \uD0C8\uCD9C\uC744 \uC2DC\uC791\uD574\uC694.<br>\uADE0\uC744 \uD53C\uD574\uC11C \uCABD\uC9C0 \uC870\uAC01 4\uAC1C\uB97C \uBAA8\uC544\uC694!</p><div class="acts"><button class="big" id="go">1\uCE35\uC73C\uB85C \uCD9C\uBC1C!</button></div>`);
+      const sh2 = openModal(`<h3>\u{1F389} \uD29C\uD1A0\uB9AC\uC5BC \uB05D!</h3><p class="q">\uC798\uD588\uC5B4\uC694! \uC774\uC81C \uC9C4\uC9DC \uD0C8\uCD9C\uC744 \uC2DC\uC791\uD574\uC694.<br>\uADE0\uC744 \uD53C\uD574\uC11C \uCABD\uC9C0 \uC870\uAC01 4\uAC1C\uB97C \uBAA8\uC544\uC694!</p><p class="hint">\uC9C0\uAE08\uBD80\uD130\uB294 \uC77C\uBD80\uB7EC \uC26C\uC6B4 \uBB38\uC81C\uAC00 \uC544\uB2C8\uB77C, \uD559\uB144\uC5D0 \uB9DE\uB294 \uC9C4\uC9DC \uC601\uC591 \uBB38\uC81C\uAC00 \uB098\uC640\uC694.</p><div class="acts"><button class="big" id="go">1\uCE35\uC73C\uB85C \uCD9C\uBC1C!</button></div>`);
       sh2.querySelector("#go").onclick = () => finishTutorial();
       return;
     }

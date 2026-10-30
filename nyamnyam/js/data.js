@@ -85,7 +85,7 @@ export const THEMES = {
 
 // 층. grid: 방 배치(열×행), rooms: 방 이름(왼쪽 위부터)
 export const STAGES = {
-  0: { name: '연습 층', place: '영양이의 연습실', theme: 'practice', cols: 2, rows: 1, rw: 10, rh: 8,
+  0: { name: '🎓 튜토리얼', place: '영양이의 연습실', theme: 'practice', cols: 2, rows: 1, rw: 10, rh: 8,
        rooms: ['연습실 왼쪽', '연습실 오른쪽'], germs: [], seed: 7 },
   1: { name: '1층 학교 급식실', place: '학교 급식실', theme: 'cafeteria', cols: 3, rows: 2, rw: 11, rh: 8,
        rooms: ['입구', '식탁 구역', '배식대', '손 씻는 곳', '식판 반납대', '조리실 앞'], germs: ['basic', 'basic', 'mold'], seed: 101 },
@@ -113,7 +113,7 @@ export const PRACTICE_QUESTIONS = [
 
 // 영양이 대사: 층 시작(학년군별), 조각 찾았을 때
 export const STAGE_INTRO = {
-  0: { all: '안녕! 나는 영양이야. 여기서 탈출하는 방법을 하나씩 알려 줄게!' },
+  0: { all: '안녕! 나는 영양이야. 여기는 튜토리얼이야. 문제는 일부러 쉽게 냈으니 방법만 익혀 봐!' },
   1: { low: '급식실이야! 반찬을 골고루 먹으면 균도 이길 수 있어!', mid: '급식실이야! 식단에는 여러 식품군이 골고루 들어 있어.', high: '급식실이야! 영양사 선생님이 균형 잡힌 식단을 짜 주시지.' },
   2: { low: '냉장고 채소칸이야! 채소와 과일은 색깔이 참 다양하지?', mid: '채소칸이야! 채소와 과일에는 비타민과 무기질이 많아.', high: '채소칸이야! 식이섬유는 장을 튼튼하게 해 줘.' },
   3: { low: '우유·고기칸이야! 우유를 마시면 뼈가 튼튼해져!', mid: '여기엔 단백질과 칼슘이 가득해!', high: '5대 영양소가 하는 일을 떠올리며 탈출해 보자!' },

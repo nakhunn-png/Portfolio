@@ -1,6 +1,6 @@
 // 오프라인 작동: 한 번 열면 모든 파일을 저장해 두고, 인터넷이 끊겨도 저장된 파일로 연다.
 // 파일을 고치면 VERSION을 올린다. 새 버전은 다음에 열 때(또는 새로고침 두 번) 적용된다.
-const VERSION = 'nyam-v4';
+const VERSION = 'nyam-v5';
 const FILES = [
   './', 'index.html', 'style.css', 'manifest.webmanifest',
   'js/app.js',
