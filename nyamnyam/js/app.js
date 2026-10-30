@@ -1,0 +1,2599 @@
+(() => {
+  // js/data.js
+  var SAVE_VERSION = 1;
+  var TEACHER_PIN = "0303";
+  var BANDS = {
+    low: { name: "\uC800\uD559\uB144", sub: "1~2\uD559\uB144" },
+    mid: { name: "\uC911\uD559\uB144", sub: "3~4\uD559\uB144" },
+    high: { name: "\uACE0\uD559\uB144", sub: "5~6\uD559\uB144" }
+  };
+  var hideName = (band) => band === "high" ? "\uC258\uD130" : "\uC228\uB294 \uACF3";
+  var COURSES = {
+    short: { name: "1\uC2DC\uAC04\uC6A9", stages: [1, 2, 5], sub: "3\uAC1C \uCE35 \xB7 \uC57D 40\uBD84" },
+    long: { name: "2\uC2DC\uAC04\uC6A9", stages: [1, 2, 3, 4, 5, 6], sub: "6\uAC1C \uCE35 \xB7 \uC57D 80\uBD84" }
+  };
+  var DIFFS = {
+    easy: { name: "\uC26C\uC6C0", icon: "\u{1F642}", lives: Infinity, speed: 0.75, extraGerms: 0, desc: "\uBAA9\uC228 \uBB34\uD55C \xB7 \uADE0\uC774 \uB290\uB824\uC694" },
+    hard: { name: "\uC5B4\uB824\uC6C0", icon: "\u{1F4AA}", lives: 3, speed: 1, extraGerms: 2, desc: "\uBAA9\uC228 3\uAC1C \xB7 \uADE0\uC774 \uBE60\uB974\uACE0 \uB9CE\uC544\uC694" },
+    hell: { name: "\uBD88\uC9C0\uC625", icon: "\u{1F525}", lives: 1, speed: 1, extraGerms: 2, desc: "\uBAA9\uC228 1\uAC1C \xB7 \uCABD\uC9C0 \uBB38\uC81C\uB97C \uD2C0\uB9AC\uBA74 \uC870\uAC01\uC774 \uD769\uC5B4\uC838\uC694" }
+  };
+  var CHARS = [
+    { id: "boy1", name: "\uD558\uB298" },
+    { id: "boy2", name: "\uB3C4\uC724" },
+    { id: "girl1", name: "\uBCF4\uB78C" },
+    { id: "girl2", name: "\uC218\uC544" }
+  ];
+  var GERMS = {
+    basic: { name: "\uAF2C\uBB3C\uC774", img: "germ_basic", walk: 1.3, run: 2.5, sight: 5, size: 1 },
+    mold: { name: "\uACF0\uD321\uB3CC\uC774", img: "germ_mold", walk: 0.9, run: 1.9, sight: 7, size: 1.1 },
+    cavity: { name: "\uCDA9\uCE58\uC7C1\uC774", img: "germ_cavity", walk: 1.5, run: 3.2, sight: 4.5, size: 0.95, tires: true }
+  };
+  var PLAYER_SPEED = 3.4;
+  var SEARCH_LOCK = 6;
+  var STUN_TIME = 4;
+  var WATER_TIME = 5;
+  var MASK_TIME = 6;
+  var THROW_RANGE = 7;
+  var THEMES = {
+    practice: {
+      floor: ["#fff7e6", "#fdeecf"],
+      wall: "#f6b26b",
+      wallTop: "#fbd3a5",
+      line: "#e89a4f",
+      decor: ["\u{1FAB4}", "\u{1F4DA}", "\u{1F9F8}"],
+      search: [["\u{1F5C4}\uFE0F", "\uC11C\uB78D\uC7A5"], ["\u{1F4E6}", "\uC0C1\uC790"], ["\u{1F9FA}", "\uBC14\uAD6C\uB2C8"], ["\u{1FA91}", "\uC758\uC790"]],
+      hide: ["\u{1F6CB}\uFE0F", "\uC18C\uD30C \uB4A4"]
+    },
+    cafeteria: {
+      floor: ["#fff6dc", "#fbecc4"],
+      wall: "#f4a259",
+      wallTop: "#f9cb94",
+      line: "#e08a3c",
+      decor: ["\u{1F371}", "\u{1F962}", "\u{1FAB4}", "\u{1F37D}\uFE0F"],
+      search: [["\u{1F37D}\uFE0F", "\uC2DD\uD0C1"], ["\u{1F958}", "\uBC30\uC2DD\uB300"], ["\u{1F6D2}", "\uC2DD\uD310 \uC218\uB808"], ["\u{1F5C4}\uFE0F", "\uC218\uC800\uD1B5"], ["\u{1F9C3}", "\uC74C\uB8CC \uB0C9\uC7A5\uACE0"]],
+      hide: ["\u{1F9FA}", "\uBC30\uC2DD\uB300 \uC544\uB798"]
+    },
+    veggie: {
+      floor: ["#eefaf0", "#dff3e3"],
+      wall: "#9ad0ec",
+      wallTop: "#cdeaf7",
+      line: "#6fb3d6",
+      decor: ["\u{1F96C}", "\u{1F955}", "\u{1F952}", "\u{1F345}", "\u{1F34E}", "\u{1F347}"],
+      search: [["\u{1F96C}", "\uBC30\uCD94 \uB354\uBBF8"], ["\u{1F955}", "\uB2F9\uADFC \uC0C1\uC790"], ["\u{1F34E}", "\uC0AC\uACFC \uBC14\uAD6C\uB2C8"], ["\u{1F9CA}", "\uC5BC\uC74C \uD2C0"], ["\u{1F349}", "\uC218\uBC15"]],
+      hide: ["\u{1F4E6}", "\uD070 \uC0C1\uC790 \uB4A4"]
+    },
+    dairy: {
+      floor: ["#eef5ff", "#dde9fb"],
+      wall: "#a8b8f0",
+      wallTop: "#d4dcfa",
+      line: "#8193d8",
+      decor: ["\u{1F95B}", "\u{1F9C0}", "\u{1F95A}", "\u{1F41F}", "\u{1FAD8}"],
+      search: [["\u{1F95B}", "\uC6B0\uC720 \uC0C1\uC790"], ["\u{1F9C0}", "\uCE58\uC988 \uD1B5"], ["\u{1F95A}", "\uB2EC\uAC40\uD310"], ["\u{1F41F}", "\uC0DD\uC120 \uC0C1\uC790"], ["\u{1F357}", "\uACE0\uAE30 \uCE78"]],
+      hide: ["\u{1F4E6}", "\uD070 \uC0C1\uC790 \uB4A4"]
+    },
+    garden: {
+      floor: ["#eaf7d9", "#dcf0c4"],
+      wall: "#7cc36a",
+      wallTop: "#a9dc98",
+      line: "#5ea84d",
+      decor: ["\u{1F33B}", "\u{1F33D}", "\u{1F353}", "\u{1F331}", "\u{1FAA8}"],
+      search: [["\u{1F333}", "\uB098\uBB34"], ["\u{1FAA3}", "\uBB3C\uBFCC\uB9AC\uAC1C \uD1B5"], ["\u{1F9D1}\u200D\u{1F33E}", "\uD5C8\uC218\uC544\uBE44"], ["\u{1F954}", "\uAC10\uC790 \uBC2D"], ["\u{1FAB5}", "\uD1B5\uB098\uBB34"]],
+      hide: ["\u{1F333}", "\uB364\uBD88 \uC18D"]
+    },
+    market: {
+      floor: ["#fff1e6", "#fbe2cf"],
+      wall: "#e88a7d",
+      wallTop: "#f5b9b0",
+      line: "#cf6b5d",
+      decor: ["\u{1F34E}", "\u{1F41F}", "\u{1F956}", "\u{1F34A}", "\u{1F9FA}"],
+      search: [["\u{1F34E}", "\uACFC\uC77C \uAC00\uAC8C"], ["\u{1F41F}", "\uC0DD\uC120 \uAC00\uAC8C"], ["\u{1F956}", "\uBE75 \uAC00\uAC8C"], ["\u{1F96C}", "\uCC44\uC18C \uAC00\uAC8C"], ["\u{1F9FE}", "\uACC4\uC0B0\uB300"]],
+      hide: ["\u{1F9FA}", "\uD070 \uBC14\uAD6C\uB2C8 \uB4A4"]
+    },
+    kitchen: {
+      floor: ["#f7f3ff", "#ece5fb"],
+      wall: "#c3a6e8",
+      wallTop: "#e0d2f5",
+      line: "#a283d0",
+      decor: ["\u{1F373}", "\u{1F944}", "\u{1F9C2}", "\u{1FAD6}", "\u{1FAB4}"],
+      search: [["\u{1F9CA}", "\uB0C9\uC7A5\uACE0"], ["\u{1F373}", "\uAC00\uC2A4\uB808\uC778\uC9C0"], ["\u{1F6B0}", "\uAC1C\uC218\uB300"], ["\u{1F5C4}\uFE0F", "\uCC2C\uC7A5"], ["\u{1F9FA}", "\uC2DD\uB8CC\uD488 \uBC14\uAD6C\uB2C8"]],
+      hide: ["\u{1F6AA}", "\uD070 \uCC2C\uC7A5 \uC548"]
+    }
+  };
+  var STAGES = {
+    0: {
+      name: "\uC5F0\uC2B5 \uCE35",
+      place: "\uC601\uC591\uC774\uC758 \uC5F0\uC2B5\uC2E4",
+      theme: "practice",
+      cols: 2,
+      rows: 1,
+      rw: 10,
+      rh: 8,
+      rooms: ["\uC5F0\uC2B5\uC2E4 \uC67C\uCABD", "\uC5F0\uC2B5\uC2E4 \uC624\uB978\uCABD"],
+      germs: [],
+      seed: 7
+    },
+    1: {
+      name: "1\uCE35 \uD559\uAD50 \uAE09\uC2DD\uC2E4",
+      place: "\uD559\uAD50 \uAE09\uC2DD\uC2E4",
+      theme: "cafeteria",
+      cols: 3,
+      rows: 2,
+      rw: 11,
+      rh: 8,
+      rooms: ["\uC785\uAD6C", "\uC2DD\uD0C1 \uAD6C\uC5ED", "\uBC30\uC2DD\uB300", "\uC190 \uC53B\uB294 \uACF3", "\uC2DD\uD310 \uBC18\uB0A9\uB300", "\uC870\uB9AC\uC2E4 \uC55E"],
+      germs: ["basic", "basic", "mold"],
+      seed: 101
+    },
+    2: {
+      name: "2\uCE35 \uB0C9\uC7A5\uACE0 \uCC44\uC18C\uCE78",
+      place: "\uB0C9\uC7A5\uACE0 \uCC44\uC18C\uCE78",
+      theme: "veggie",
+      cols: 3,
+      rows: 2,
+      rw: 11,
+      rh: 8,
+      rooms: ["\uBB38 \uCABD \uC120\uBC18", "\uC78E\uCC44\uC18C \uCE78", "\uBFCC\uB9AC\uCC44\uC18C \uCE78", "\uACFC\uC77C \uCE78", "\uC5BC\uC74C \uCE78", "\uB9E8 \uC544\uB798 \uC11C\uB78D"],
+      germs: ["basic", "mold", "cavity"],
+      seed: 202
+    },
+    3: {
+      name: "3\uCE35 \uB0C9\uC7A5\uACE0 \uC6B0\uC720\xB7\uACE0\uAE30\uCE78",
+      place: "\uB0C9\uC7A5\uACE0 \uC6B0\uC720\xB7\uACE0\uAE30\uCE78",
+      theme: "dairy",
+      cols: 3,
+      rows: 2,
+      rw: 11,
+      rh: 8,
+      rooms: ["\uC6B0\uC720 \uC120\uBC18", "\uCE58\uC988 \uC120\uBC18", "\uB2EC\uAC40 \uCE78", "\uB450\uBD80\xB7\uCF69 \uCE78", "\uC0DD\uC120 \uCE78", "\uACE0\uAE30 \uCE78"],
+      germs: ["basic", "mold", "cavity"],
+      seed: 303
+    },
+    4: {
+      name: "4\uCE35 \uD143\uBC2D",
+      place: "\uD559\uAD50 \uD143\uBC2D",
+      theme: "garden",
+      cols: 3,
+      rows: 2,
+      rw: 11,
+      rh: 8,
+      rooms: ["\uD143\uBC2D \uC785\uAD6C", "\uC0C1\uCD94 \uBC2D", "\uAC10\uC790 \uBC2D", "\uB538\uAE30 \uBC2D", "\uC625\uC218\uC218 \uBC2D", "\uBB3C \uC8FC\uB294 \uACF3"],
+      germs: ["basic", "mold", "cavity", "basic"],
+      seed: 404
+    },
+    5: {
+      name: "5\uCE35 \uB3D9\uB124 \uC2DC\uC7A5",
+      place: "\uB3D9\uB124 \uC2DC\uC7A5",
+      theme: "market",
+      cols: 3,
+      rows: 2,
+      rw: 11,
+      rh: 8,
+      rooms: ["\uC2DC\uC7A5 \uC785\uAD6C", "\uACFC\uC77C \uACE8\uBAA9", "\uCC44\uC18C \uACE8\uBAA9", "\uC0DD\uC120 \uACE8\uBAA9", "\uBE75 \uACE8\uBAA9", "\uACC4\uC0B0\uB300 \uC55E"],
+      germs: ["basic", "cavity", "mold", "cavity"],
+      seed: 505
+    },
+    6: {
+      name: "6\uCE35 \uC6B0\uB9AC \uC9D1 \uC8FC\uBC29",
+      place: "\uC6B0\uB9AC \uC9D1 \uC8FC\uBC29",
+      theme: "kitchen",
+      cols: 3,
+      rows: 2,
+      rw: 11,
+      rh: 8,
+      rooms: ["\uD604\uAD00", "\uC2DD\uD0C1", "\uAC1C\uC218\uB300", "\uB0C9\uC7A5\uACE0 \uC55E", "\uAC00\uC2A4\uB808\uC778\uC9C0", "\uCC2C\uC7A5 \uC55E"],
+      germs: ["basic", "mold", "cavity", "cavity"],
+      seed: 606
+    }
+  };
+  var PRACTICE_QUESTIONS = [
+    { q: "\uBC25\uC744 \uBA39\uAE30 \uC804\uC5D0 \uAF2D \uD574\uC57C \uD558\uB294 \uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", c: ["\uC190 \uC53B\uAE30", "\uB0AE\uC7A0 \uC790\uAE30", "\uAC8C\uC784 \uD558\uAE30", "\uB6F0\uC5B4\uB2E4\uB2C8\uAE30"], h: "\uBE44\uB204\uB85C \uAE68\uB057\uC774!" },
+    { q: "\uB2F9\uADFC\uC740 \uBB34\uC2A8 \uC0C9\uC77C\uAE4C\uC694?", c: ["\uC8FC\uD669\uC0C9", "\uD30C\uB780\uC0C9", "\uAC80\uC740\uC0C9", "\uBCF4\uB77C\uC0C9"], h: "\uD1A0\uB07C\uAC00 \uC88B\uC544\uD558\uB294 \uCC44\uC18C\uC608\uC694." },
+    { q: "\uC6B0\uC720\uB97C \uB9C8\uC2DC\uBA74 \uBB34\uC5C7\uC774 \uD2BC\uD2BC\uD574\uC9C8\uAE4C\uC694?", c: ["\uBF08\uC640 \uC774", "\uBA38\uB9AC\uCE74\uB77D \uC0C9", "\uBAA9\uC18C\uB9AC", "\uB208\uC379"], h: "\uCE7C\uC298\uC774 \uB9CE\uC544\uC694." },
+    { q: "\uC0AC\uACFC\uB294 \uC5B4\uB5A4 \uC74C\uC2DD\uC5D0 \uC18D\uD560\uAE4C\uC694?", c: ["\uACFC\uC77C", "\uACE0\uAE30", "\uACFC\uC790", "\uC74C\uB8CC\uC218"], h: "\uB098\uBB34\uC5D0 \uC5F4\uB824\uC694." },
+    { q: "\uBAA9\uC774 \uB9C8\uB97C \uB54C \uAC00\uC7A5 \uC88B\uC740 \uC74C\uB8CC\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", c: ["\uBB3C", "\uCF5C\uB77C", "\uC0AC\uC774\uB2E4", "\uD0C4\uC0B0 \uC8FC\uC2A4"], h: "\uC0C9\uB3C4 \uB9DB\uB3C4 \uC5C6\uC9C0\uB9CC \uBAB8\uC5D0 \uAF2D \uD544\uC694\uD574\uC694." },
+    { q: "\uACE8\uACE0\uB8E8 \uBA39\uB294\uB2E4\uB294 \uAC83\uC740 \uC5B4\uB5A4 \uB73B\uC77C\uAE4C\uC694?", c: ["\uC5EC\uB7EC \uAC00\uC9C0 \uC74C\uC2DD\uC744 \uACE0\uB974\uAC8C \uBA39\uAE30", "\uC88B\uC544\uD558\uB294 \uAC83\uB9CC \uBA39\uAE30", "\uD55C \uAC00\uC9C0\uB9CC \uB9CE\uC774 \uBA39\uAE30", "\uAD76\uAE30"], h: "\uD3B8\uC2DD\uC758 \uBC18\uB300\uC608\uC694." }
+  ];
+  var STAGE_INTRO = {
+    0: { all: "\uC548\uB155! \uB098\uB294 \uC601\uC591\uC774\uC57C. \uC5EC\uAE30\uC11C \uD0C8\uCD9C\uD558\uB294 \uBC29\uBC95\uC744 \uD558\uB098\uC529 \uC54C\uB824 \uC904\uAC8C!" },
+    1: { low: "\uAE09\uC2DD\uC2E4\uC774\uC57C! \uBC18\uCC2C\uC744 \uACE8\uACE0\uB8E8 \uBA39\uC73C\uBA74 \uADE0\uB3C4 \uC774\uAE38 \uC218 \uC788\uC5B4!", mid: "\uAE09\uC2DD\uC2E4\uC774\uC57C! \uC2DD\uB2E8\uC5D0\uB294 \uC5EC\uB7EC \uC2DD\uD488\uAD70\uC774 \uACE8\uACE0\uB8E8 \uB4E4\uC5B4 \uC788\uC5B4.", high: "\uAE09\uC2DD\uC2E4\uC774\uC57C! \uC601\uC591\uC0AC \uC120\uC0DD\uB2D8\uC774 \uADE0\uD615 \uC7A1\uD78C \uC2DD\uB2E8\uC744 \uC9DC \uC8FC\uC2DC\uC9C0." },
+    2: { low: "\uB0C9\uC7A5\uACE0 \uCC44\uC18C\uCE78\uC774\uC57C! \uCC44\uC18C\uC640 \uACFC\uC77C\uC740 \uC0C9\uAE54\uC774 \uCC38 \uB2E4\uC591\uD558\uC9C0?", mid: "\uCC44\uC18C\uCE78\uC774\uC57C! \uCC44\uC18C\uC640 \uACFC\uC77C\uC5D0\uB294 \uBE44\uD0C0\uBBFC\uACFC \uBB34\uAE30\uC9C8\uC774 \uB9CE\uC544.", high: "\uCC44\uC18C\uCE78\uC774\uC57C! \uC2DD\uC774\uC12C\uC720\uB294 \uC7A5\uC744 \uD2BC\uD2BC\uD558\uAC8C \uD574 \uC918." },
+    3: { low: "\uC6B0\uC720\xB7\uACE0\uAE30\uCE78\uC774\uC57C! \uC6B0\uC720\uB97C \uB9C8\uC2DC\uBA74 \uBF08\uAC00 \uD2BC\uD2BC\uD574\uC838!", mid: "\uC5EC\uAE30\uC5D4 \uB2E8\uBC31\uC9C8\uACFC \uCE7C\uC298\uC774 \uAC00\uB4DD\uD574!", high: "5\uB300 \uC601\uC591\uC18C\uAC00 \uD558\uB294 \uC77C\uC744 \uB5A0\uC62C\uB9AC\uBA70 \uD0C8\uCD9C\uD574 \uBCF4\uC790!" },
+    4: { low: "\uD143\uBC2D\uC774\uC57C! \uCC44\uC18C\uAC00 \uC5B4\uB5BB\uAC8C \uC790\uB77C\uB294\uC9C0 \uC0B4\uD3B4\uBCF4\uC790!", mid: "\uD143\uBC2D\uC774\uC57C! \uC81C\uCCA0 \uC74C\uC2DD\uC740 \uB9DB\uB3C4 \uC601\uC591\uB3C4 \uCD5C\uACE0\uC57C.", high: "\uD143\uBC2D\uC774\uC57C! \uAC00\uAE4C\uC6B4 \uACF3\uC5D0\uC11C \uAE30\uB978 \uB18D\uC0B0\uBB3C\uC740 \uD0C4\uC18C \uBC1C\uC790\uAD6D\uC774 \uC801\uC5B4." },
+    5: { low: "\uC2DC\uC7A5\uC774\uC57C! \uAC74\uAC15\uD55C \uAC04\uC2DD\uC744 \uACE8\uB77C \uBCF4\uC790!", mid: "\uC2DC\uC7A5\uC774\uC57C! \uB2F9\uACFC \uB098\uD2B8\uB968\uC740 \uC870\uAE08\uB9CC!", high: "\uC2DC\uC7A5\uC774\uC57C! \uC2DD\uD488 \uD45C\uC2DC\uB97C \uAF3C\uAF3C\uD788 \uC77D\uC5B4 \uBCF4\uC790." },
+    6: { low: "\uC6B0\uB9AC \uC9D1 \uC8FC\uBC29\uC774\uC57C! \uC190\uC744 \uAE68\uB057\uC774 \uC53B\uACE0 \uD0C8\uCD9C\uD558\uC790!", mid: "\uC8FC\uBC29\uC774\uC57C! \uC74C\uC2DD\uC740 \uC54C\uB9DE\uAC8C \uBCF4\uAD00\uD574\uC57C \uD574.", high: "\uB9C8\uC9C0\uB9C9 \uCE35! \uC2DD\uC911\uB3C5\uC744 \uB9C9\uB294 \uBC29\uBC95\uC744 \uAE30\uC5B5\uD574!" }
+  };
+  var FOUND_LINES = [
+    "\uCABD\uC9C0 \uC870\uAC01\uC744 \uCC3E\uC558\uC5B4! \uC870\uAE08\uB9CC \uB354 \uD798\uB0B4!",
+    "\uC88B\uC544! \uC870\uAC01\uC774 \uD558\uB098 \uB354 \uBAA8\uC600\uC5B4!",
+    "\uB300\uB2E8\uD574! \uC774\uC81C \uAC70\uC758 \uB2E4 \uC654\uC5B4!",
+    "\uC870\uAC01\uC744 \uB2E4 \uBAA8\uC558\uC5B4! \uCABD\uC9C0\uB97C \uC5F4\uC5B4\uC11C \uC21C\uC11C\uB300\uB85C \uBD99\uC5EC \uBD10!"
+  ];
+  var MISS_LINES = [
+    "\uC5EC\uAE34 \uC870\uAC01\uC774 \uC5C6\uB124. \uB2E4\uB978 ?\uAC00\uAD6C\uB97C \uCC3E\uC544\uBCF4\uC790!",
+    "\uAF5D! \uADF8\uB798\uB3C4 \uAD1C\uCC2E\uC544, \uB2E4\uB978 \uACF3\uC5D0 \uC788\uC744 \uAC70\uC57C.",
+    "\uC74C\u2026 \uC5EC\uAE30\uB294 \uC544\uB2C8\uC57C. \uAC10\uC9C0\uAE30\uB97C \uC798 \uBD10!"
+  ];
+
+  // js/questions.js
+  var B = {
+    low: {
+      // 1층 급식실: 골고루 먹기, 식사 예절
+      1: [
+        ["\uBC18\uCC2C\uC744 \uACE8\uACE0\uB8E8 \uBA39\uC73C\uBA74 \uC5B4\uB5BB\uAC8C \uB420\uAE4C\uC694?", "\uBAB8\uC774 \uD2BC\uD2BC\uD574\uC838\uC694", "\uD0A4\uAC00 \uC904\uC5B4\uB4E4\uC5B4\uC694", "\uBC30\uAC00 \uC544\uD30C\uC694", "\uC7A0\uC774 \uC548 \uC640\uC694", "\uD3B8\uC2DD\uC758 \uBC18\uB300\uC608\uC694."],
+        ["\uAE09\uC2DD\uC744 \uBC1B\uC744 \uB54C \uBC14\uB978 \uD589\uB3D9\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC904\uC744 \uC11C\uC11C \uCC28\uB840\uB97C \uAE30\uB2E4\uB824\uC694", "\uCE5C\uAD6C\uB97C \uBC00\uC5B4\uC694", "\uC0C8\uCE58\uAE30\uB97C \uD574\uC694", "\uB6F0\uC5B4\uB2E4\uB140\uC694", "\uCC28\uB840 \uC9C0\uD0A4\uAE30!"],
+        ["\uBC25\uC744 \uBA39\uC744 \uB54C \uC785\uC5D0 \uC74C\uC2DD\uC774 \uC788\uC73C\uBA74 \uC5B4\uB5BB\uAC8C \uD560\uAE4C\uC694?", "\uB2E4 \uC0BC\uD0A8 \uB4A4\uC5D0 \uB9D0\uD574\uC694", "\uD06C\uAC8C \uC6C3\uC5B4\uC694", "\uB178\uB798\uB97C \uBD88\uB7EC\uC694", "\uBC14\uB85C \uB9D0\uD574\uC694", "\uC74C\uC2DD\uC774 \uD280\uC9C0 \uC54A\uAC8C \uD574\uC694."],
+        ["\uC2EB\uC5B4\uD558\uB294 \uBC18\uCC2C\uC774 \uB098\uC624\uBA74 \uC5B4\uB5BB\uAC8C \uD560\uAE4C\uC694?", "\uC870\uAE08\uC774\uB77C\uB3C4 \uBA39\uC5B4 \uBD10\uC694", "\uBC14\uB2E5\uC5D0 \uBC84\uB824\uC694", "\uCE5C\uAD6C\uC5D0\uAC8C \uBAB0\uB798 \uC918\uC694", "\uC808\uB300 \uC548 \uBA39\uC5B4\uC694", "\uD55C \uC785 \uB3C4\uC804!"],
+        ["\uAE09\uC2DD\uC744 \uBA39\uAE30 \uC804\uC5D0 \uAF2D \uD574\uC57C \uD558\uB294 \uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBE44\uB204\uB85C \uC190 \uC53B\uAE30", "\uAC8C\uC784 \uD558\uAE30", "\uB2EC\uB9AC\uAE30", "\uB0AE\uC7A0 \uC790\uAE30", "\uC190\uC5D0 \uADE0\uC774 \uC788\uC5B4\uC694."],
+        ["\uC74C\uC2DD\uC744 \uB0A8\uAE30\uC9C0 \uC54A\uC73C\uB824\uBA74 \uC5B4\uB5BB\uAC8C \uBC1B\uC73C\uBA74 \uC88B\uC744\uAE4C\uC694?", "\uBA39\uC744 \uB9CC\uD07C\uB9CC \uBC1B\uC544\uC694", "\uC544\uC8FC \uB9CE\uC774 \uBC1B\uC544\uC694", "\uD558\uB098\uB3C4 \uC548 \uBC1B\uC544\uC694", "\uCE5C\uAD6C \uAC83\uAE4C\uC9C0 \uBC1B\uC544\uC694", "\uC54C\uB9DE\uC740 \uC591!"],
+        ["\uBC25\uC744 \uBA39\uC744 \uB54C \uBC14\uB978 \uC790\uC138\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBC14\uB974\uAC8C \uC549\uC544\uC11C \uBA39\uC5B4\uC694", "\uC11C\uC11C \uB3CC\uC544\uB2E4\uB2C8\uBA70 \uBA39\uC5B4\uC694", "\uB204\uC6CC\uC11C \uBA39\uC5B4\uC694", "\uC758\uC790 \uC704\uC5D0 \uC62C\uB77C\uAC00\uC694", "\uD5C8\uB9AC\uB97C \uD3B4\uC694."],
+        ["\uC74C\uC2DD\uC744 \uAF2D\uAF2D \uC539\uC5B4 \uBA39\uC73C\uBA74 \uC88B\uC740 \uC810\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC18C\uD654\uAC00 \uC798 \uB3FC\uC694", "\uC774\uAC00 \uBE60\uC838\uC694", "\uBC30\uAC00 \uB354 \uACE0\uD30C\uC694", "\uB9DB\uC774 \uC0AC\uB77C\uC838\uC694", "\uC704\uAC00 \uD3B8\uD574\uC838\uC694."],
+        ["\uB2E4\uC74C \uC911 \uBC25(\uACE1\uB958)\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC300\uBC25", "\uC0AC\uACFC", "\uC6B0\uC720", "\uC2DC\uAE08\uCE58", "\uC300\uB85C \uC9C0\uC5B4\uC694."],
+        ["\uB2E4\uC74C \uC911 \uCC44\uC18C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC2DC\uAE08\uCE58", "\uC6B0\uC720", "\uB2EC\uAC40", "\uBE75", "\uCD08\uB85D\uC0C9 \uC78E\uC774\uC5D0\uC694."],
+        ["\uAE09\uC2DD\uC744 \uB2E4 \uBA39\uC740 \uB4A4\uC5D0\uB294 \uBB34\uC5C7\uC744 \uD560\uAE4C\uC694?", "\uC2DD\uD310\uC744 \uC815\uB9AC\uD574\uC11C \uBC18\uB0A9\uD574\uC694", "\uC2DD\uD310\uC744 \uB450\uACE0 \uAC00\uC694", "\uC2DD\uD310\uC744 \uC228\uACA8\uC694", "\uBC14\uB2E5\uC5D0 \uC3DF\uC544\uC694", "\uC815\uB9AC \uC815\uB3C8!"],
+        ["\uB9DB\uC788\uAC8C \uBA39\uC740 \uB4A4 \uD558\uBA74 \uC88B\uC740 \uC778\uC0AC\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC798 \uBA39\uC5C8\uC2B5\uB2C8\uB2E4", "\uBC30\uACE0\uD30C\uC694", "\uB9DB\uC5C6\uC5B4\uC694", "\uC548\uB155\uD788 \uC8FC\uBB34\uC138\uC694", "\uAC10\uC0AC\uD558\uB294 \uB9C8\uC74C!"],
+        ["\uBC25\uC744 \uB108\uBB34 \uBE68\uB9AC \uBA39\uC73C\uBA74 \uC5B4\uB5BB\uAC8C \uB420 \uC218 \uC788\uC744\uAE4C\uC694?", "\uBC30\uAC00 \uC544\uD50C \uC218 \uC788\uC5B4\uC694", "\uD0A4\uAC00 \uCEE4\uC838\uC694", "\uD798\uC774 \uC138\uC838\uC694", "\uC7A0\uC774 \uC798 \uC640\uC694", "\uCC9C\uCC9C\uD788 \uAF2D\uAF2D!"],
+        ["\uB2E4\uC74C \uC911 \uB2E8\uBC31\uC9C8\uC774 \uB9CE\uC740 \uBC18\uCC2C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC0DD\uC120\uAD6C\uC774", "\uC0AC\uD0D5", "\uCF5C\uB77C", "\uAC10\uC790\uCE69", "\uBC14\uB2E4\uC5D0\uC11C \uC640\uC694."],
+        ["\uBB3C\uC740 \uC5B8\uC81C \uB9C8\uC2DC\uBA74 \uC88B\uC744\uAE4C\uC694?", "\uBAA9\uB9C8\uB97C \uB54C \uC790\uC8FC \uC870\uAE08\uC529", "\uC808\uB300 \uC548 \uB9C8\uC154\uC694", "\uD558\uB8E8\uC5D0 \uD55C \uBC88\uB9CC", "\uBC24\uC5D0\uB9CC", "\uBAB8\uC5D0 \uAF2D \uD544\uC694\uD574\uC694."]
+      ],
+      // 2층 채소칸: 채소·과일 이름과 색
+      2: [
+        ["\uBE68\uAC04\uC0C9 \uACFC\uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB538\uAE30", "\uBC14\uB098\uB098", "\uD0A4\uC704", "\uADE4", "\uC528\uAC00 \uAC89\uC5D0 \uCF55\uCF55!"],
+        ["\uB178\uB780\uC0C9 \uACFC\uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBC14\uB098\uB098", "\uD3EC\uB3C4", "\uC218\uBC15", "\uC0AC\uACFC", "\uC6D0\uC22D\uC774\uAC00 \uC88B\uC544\uD574\uC694."],
+        ["\uC8FC\uD669\uC0C9 \uCC44\uC18C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB2F9\uADFC", "\uC624\uC774", "\uAC00\uC9C0", "\uBC30\uCD94", "\uD1A0\uB07C\uAC00 \uC88B\uC544\uD574\uC694."],
+        ["\uBCF4\uB77C\uC0C9 \uCC44\uC18C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uAC00\uC9C0", "\uB2F9\uADFC", "\uC591\uBC30\uCD94 \uC78E", "\uC624\uC774", "\uAE38\uCB49\uD558\uACE0 \uBC18\uB4E4\uBC18\uB4E4\uD574\uC694."],
+        ["\uCD08\uB85D\uC0C9 \uCC44\uC18C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBE0C\uB85C\uCF5C\uB9AC", "\uD1A0\uB9C8\uD1A0", "\uB2F9\uADFC", "\uC625\uC218\uC218", "\uC791\uC740 \uB098\uBB34\uCC98\uB7FC \uC0DD\uACBC\uC5B4\uC694."],
+        ["\uAECD\uC9C8\uC744 \uAE4C\uC11C \uBA39\uB294 \uB178\uB780 \uACA8\uC6B8 \uACFC\uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uADE4", "\uB538\uAE30", "\uD3EC\uB3C4", "\uCCB4\uB9AC", "\uC0C8\uCF64\uB2EC\uCF64 \uACA8\uC6B8 \uACFC\uC77C!"],
+        ["\uC18D\uC774 \uBE68\uAC1B\uACE0 \uAECD\uC9C8\uC5D0 \uC904\uBB34\uB2AC\uAC00 \uC788\uB294 \uACFC\uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC218\uBC15", "\uCC38\uC678", "\uC0AC\uACFC", "\uBC30", "\uC5EC\uB984\uC5D0 \uC2DC\uC6D0\uD558\uAC8C!"],
+        ["\uAE40\uCE58\uB97C \uB9CC\uB4DC\uB294 \uB300\uD45C \uCC44\uC18C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBC30\uCD94", "\uBC14\uB098\uB098", "\uB538\uAE30", "\uD3EC\uB3C4", "\uC78E\uC774 \uACB9\uACB9\uC774!"],
+        ["\uCC44\uC18C\uC640 \uACFC\uC77C\uC744 \uBA39\uC73C\uBA74 \uC88B\uC740 \uC810\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBAB8\uC774 \uAC74\uAC15\uD574\uC838\uC694", "\uC774\uAC00 \uC369\uC5B4\uC694", "\uBC30\uAC00 \uC544\uD30C\uC694", "\uD798\uC774 \uBE60\uC838\uC694", "\uBE44\uD0C0\uBBFC\uC774 \uB9CE\uC544\uC694."],
+        ["\uC1A1\uC774\uC1A1\uC774 \uC54C\uC774 \uB2EC\uB9B0 \uACFC\uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uD3EC\uB3C4", "\uC0AC\uACFC", "\uBC30", "\uAC10", "\uBCF4\uB77C\uC0C9 \uC54C\uB9F9\uC774!"],
+        ["\uC5EC\uB7EC \uAC00\uC9C0 \uC0C9\uAE54\uC758 \uCC44\uC18C\uB97C \uBA39\uC73C\uBA74 \uC5B4\uB5A8\uAE4C\uC694?", "\uC5EC\uB7EC \uAC00\uC9C0 \uC601\uC591\uC18C\uB97C \uC5BB\uC5B4\uC694", "\uBC30\uD0C8\uC774 \uB098\uC694", "\uD0A4\uAC00 \uC904\uC5B4\uC694", "\uC544\uBB34 \uD6A8\uACFC \uC5C6\uC5B4\uC694", "\uBB34\uC9C0\uAC1C\uCC98\uB7FC \uACE8\uACE0\uB8E8!"],
+        ["\uC624\uC774\uB294 \uBB34\uC2A8 \uC0C9\uC77C\uAE4C\uC694?", "\uCD08\uB85D\uC0C9", "\uBE68\uAC04\uC0C9", "\uD30C\uB780\uC0C9", "\uBD84\uD64D\uC0C9", "\uC2DC\uC6D0\uD558\uACE0 \uAE38\uCB49\uD574\uC694."],
+        ["\uD1A0\uB9C8\uD1A0\uB294 \uBB34\uC2A8 \uC0C9\uC77C\uAE4C\uC694?", "\uBE68\uAC04\uC0C9", "\uD30C\uB780\uC0C9", "\uAC80\uC740\uC0C9", "\uD770\uC0C9", "\uCF00\uCCA9\uC758 \uC0C9!"],
+        ["\uACFC\uC77C\uC744 \uBA39\uAE30 \uC804\uC5D0 \uD574\uC57C \uD558\uB294 \uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uAE68\uB057\uC774 \uC53B\uC5B4\uC694", "\uBC14\uB2E5\uC5D0 \uAD74\uB824\uC694", "\uD587\uBE5B\uC5D0 \uB9D0\uB824\uC694", "\uADF8\uB0E5 \uBA39\uC5B4\uC694", "\uD759\uACFC \uBA3C\uC9C0\uB97C \uC5C6\uC560\uC694."],
+        ["\uB2E4\uC74C \uC911 \uACFC\uC77C\uC774 \uC544\uB2CC \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC591\uD30C", "\uC0AC\uACFC", "\uBC30", "\uBCF5\uC22D\uC544", "\uB208\uBB3C\uC774 \uB098\uB294 \uCC44\uC18C\uC608\uC694."]
+      ],
+      // 3층 우유·고기칸: 우유 마시면 튼튼
+      3: [
+        ["\uC6B0\uC720\uB97C \uB9C8\uC2DC\uBA74 \uBB34\uC5C7\uC774 \uD2BC\uD2BC\uD574\uC9C8\uAE4C\uC694?", "\uBF08\uC640 \uC774", "\uBA38\uB9AC\uCE74\uB77D \uC0C9", "\uC190\uD1B1 \uC0C9", "\uBAA9\uC18C\uB9AC", "\uCE7C\uC298\uC774 \uB9CE\uC544\uC694."],
+        ["\uC6B0\uC720\uB85C \uB9CC\uB4E0 \uC74C\uC2DD\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uCE58\uC988", "\uAE40\uCE58", "\uB450\uBD80", "\uB5A1", "\uB178\uB797\uACE0 \uAD6C\uBA4D\uC774 \uC1A1\uC1A1!"],
+        ["\uC6B0\uC720\uB85C \uB9CC\uB4E0 \uC74C\uC2DD\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC694\uAD6C\uB974\uD2B8", "\uC2DD\uBE75", "\uC5B4\uBB35", "\uAD6D\uC218", "\uC0C8\uCF64\uD558\uAC8C \uB5A0\uBA39\uC5B4\uC694."],
+        ["\uB2ED\uC774 \uB0B3\uB294 \uC74C\uC2DD\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB2EC\uAC40", "\uC6B0\uC720", "\uCE58\uC988", "\uB450\uBD80", "\uB3D9\uADF8\uB797\uACE0 \uAECD\uB370\uAE30\uAC00 \uC788\uC5B4\uC694."],
+        ["\uCF69\uC73C\uB85C \uB9CC\uB4E0 \uD558\uC580 \uC74C\uC2DD\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB450\uBD80", "\uCE58\uC988", "\uC6B0\uC720", "\uBE75", "\uB9D0\uB791\uB9D0\uB791 \uB124\uBAA8!"],
+        ["\uACE0\uAE30, \uC0DD\uC120, \uB2EC\uAC40, \uCF69\uC744 \uBA39\uC73C\uBA74 \uC88B\uC740 \uC810\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBAB8\uC774 \uC790\uB77C\uACE0 \uADFC\uC721\uC774 \uC0DD\uACA8\uC694", "\uC774\uAC00 \uC369\uC5B4\uC694", "\uB208\uC774 \uB098\uBE60\uC838\uC694", "\uC7A0\uC774 \uC548 \uC640\uC694", "\uB2E8\uBC31\uC9C8\uC774 \uB9CE\uC544\uC694."],
+        ["\uBC14\uB2E4\uC5D0\uC11C \uC7A1\uD788\uB294 \uC74C\uC2DD\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uACE0\uB4F1\uC5B4", "\uB3FC\uC9C0\uACE0\uAE30", "\uB2ED\uACE0\uAE30", "\uC18C\uACE0\uAE30", "\uBB3C\uC18D\uC5D0\uC11C \uD5E4\uC5C4\uCCD0\uC694."],
+        ["\uC6B0\uC720\uB294 \uC5B4\uB514\uC5D0 \uBCF4\uAD00\uD574\uC57C \uD560\uAE4C\uC694?", "\uB0C9\uC7A5\uACE0", "\uCC45\uC0C1 \uC11C\uB78D", "\uD587\uBE5B \uC544\uB798", "\uAC00\uBC29 \uC18D", "\uCC28\uAC11\uAC8C \uBCF4\uAD00!"],
+        ["\uBF08\uC9F8 \uBA39\uB294 \uC791\uC740 \uC0DD\uC120\uC73C\uB85C \uCE7C\uC298\uC774 \uB9CE\uC740 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBA78\uCE58", "\uCC38\uCE58", "\uC5F0\uC5B4", "\uACE0\uB798", "\uBCF6\uC74C \uBC18\uCC2C\uC73C\uB85C \uC790\uC8FC \uB098\uC640\uC694."],
+        ["\uB2EC\uAC40\uC740 \uC5B4\uB5BB\uAC8C \uBA39\uC5B4\uC57C \uC548\uC804\uD560\uAE4C\uC694?", "\uC798 \uC775\uD600 \uBA39\uC5B4\uC694", "\uAE68\uC9C4 \uAC83\uC744 \uBA39\uC5B4\uC694", "\uBC14\uB2E5\uC5D0 \uB5A8\uC5B4\uC9C4 \uAC83\uC744 \uBA39\uC5B4\uC694", "\uC624\uB798\uB41C \uAC83\uC744 \uBA39\uC5B4\uC694", "\uADE0\uC744 \uC5C6\uC560\uC694."],
+        ["\uC6B0\uC720\uB97C \uB9C8\uC2DC\uAE30 \uC5B4\uB824\uC6B8 \uB54C \uB300\uC2E0 \uBA39\uC744 \uC218 \uC788\uB294 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uCE58\uC988\uB098 \uC694\uAD6C\uB974\uD2B8", "\uCF5C\uB77C", "\uC0AC\uD0D5", "\uAC10\uC790\uCE69", "\uC6B0\uC720\uB85C \uB9CC\uB4E0 \uC74C\uC2DD!"],
+        ["\uB2E4\uC74C \uC911 \uACE0\uAE30\uAC00 \uC544\uB2CC \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC0AC\uACFC", "\uB2ED\uACE0\uAE30", "\uB3FC\uC9C0\uACE0\uAE30", "\uC18C\uACE0\uAE30", "\uB098\uBB34\uC5D0\uC11C \uC5F4\uB824\uC694."],
+        ["\uCF69\uC73C\uB85C \uB9CC\uB4E0 \uC74C\uC2DD\uC774 \uC544\uB2CC \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uCE58\uC988", "\uB450\uBD80", "\uB450\uC720", "\uB41C\uC7A5", "\uCE58\uC988\uB294 \uC6B0\uC720\uB85C \uB9CC\uB4E4\uC5B4\uC694."],
+        ["\uD0A4\uAC00 \uC465\uC465 \uD06C\uB824\uBA74 \uC5B4\uB5BB\uAC8C \uD558\uBA74 \uC88B\uC744\uAE4C\uC694?", "\uACE8\uACE0\uB8E8 \uBA39\uACE0 \uC798 \uC790\uC694", "\uC0AC\uD0D5\uB9CC \uBA39\uC5B4\uC694", "\uBC24\uC0C8 \uAC8C\uC784\uD574\uC694", "\uBC25\uC744 \uAD76\uC5B4\uC694", "\uC74C\uC2DD\uACFC \uC7A0\uC774 \uBAA8\uB450 \uC911\uC694\uD574\uC694."],
+        ["\uACE0\uAE30\uB97C \uBA39\uC744 \uB54C \uD568\uAED8 \uBA39\uC73C\uBA74 \uC88B\uC740 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uCC44\uC18C", "\uC0AC\uD0D5", "\uD0C4\uC0B0\uC74C\uB8CC", "\uACFC\uC790", "\uC308 \uC2F8 \uBA39\uC5B4\uC694!"]
+      ],
+      // 4층 텃밭: 채소가 자라는 모습
+      4: [
+        ["\uC2DD\uBB3C\uC774 \uC790\uB77C\uB824\uBA74 \uBB34\uC5C7\uC774 \uD544\uC694\uD560\uAE4C\uC694?", "\uBB3C\uACFC \uD587\uBE5B", "\uC0AC\uD0D5\uACFC \uACFC\uC790", "\uC5B4\uB460\uACFC \uC18C\uC74C", "\uC7A5\uB09C\uAC10", "\uAD11\uD569\uC131!"],
+        ["\uC528\uC557\uC5D0\uC11C \uAC00\uC7A5 \uBA3C\uC800 \uB098\uC624\uB294 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC2F9", "\uC5F4\uB9E4", "\uAF43", "\uD070 \uB098\uBB34", "\uC791\uACE0 \uC5F0\uD55C \uCD08\uB85D\uC0C9!"],
+        ["\uB2F9\uADFC\uC740 \uC2DD\uBB3C\uC758 \uC5B4\uB290 \uBD80\uBD84\uC744 \uBA39\uC744\uAE4C\uC694?", "\uBFCC\uB9AC", "\uAF43", "\uC5F4\uB9E4", "\uC528\uC557", "\uB545\uC18D\uC5D0\uC11C \uC790\uB77C\uC694."],
+        ["\uC0C1\uCD94\uB294 \uC2DD\uBB3C\uC758 \uC5B4\uB290 \uBD80\uBD84\uC744 \uBA39\uC744\uAE4C\uC694?", "\uC78E", "\uBFCC\uB9AC", "\uC528\uC557", "\uAF43", "\uC308\uC744 \uC2F8 \uBA39\uC5B4\uC694."],
+        ["\uAC10\uC790\uB294 \uC5B4\uB514\uC5D0\uC11C \uC790\uB784\uAE4C\uC694?", "\uB545\uC18D", "\uB098\uBB47\uAC00\uC9C0 \uB05D", "\uBC14\uB2F7\uC18D", "\uD558\uB298 \uC704", "\uCE90\uC11C \uC218\uD655\uD574\uC694."],
+        ["\uD1A0\uB9C8\uD1A0\uB294 \uC2DD\uBB3C\uC758 \uC5B4\uB290 \uBD80\uBD84\uC744 \uBA39\uC744\uAE4C\uC694?", "\uC5F4\uB9E4", "\uBFCC\uB9AC", "\uC78E", "\uC904\uAE30", "\uAF43\uC774 \uC9C4 \uB4A4\uC5D0 \uC5F4\uB824\uC694."],
+        ["\uD143\uBC2D \uCC44\uC18C\uC5D0 \uBB3C\uC744 \uC904 \uB54C \uC4F0\uB294 \uB3C4\uAD6C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBB3C\uBFCC\uB9AC\uAC1C", "\uC6B0\uC0B0", "\uC21F\uAC00\uB77D", "\uBE57\uC790\uB8E8", "\uAD6C\uBA4D\uC774 \uC1A1\uC1A1 \uB6AB\uB9B0 \uD1B5!"],
+        ["\uC2DD\uBB3C\uC774 \uC790\uB77C\uB294 \uC21C\uC11C\uB85C \uC54C\uB9DE\uC740 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC528\uC557 \u2192 \uC2F9 \u2192 \uC78E \u2192 \uAF43 \u2192 \uC5F4\uB9E4", "\uC5F4\uB9E4 \u2192 \uAF43 \u2192 \uC528\uC557 \u2192 \uC2F9", "\uAF43 \u2192 \uC528\uC557 \u2192 \uC78E", "\uC78E \u2192 \uC5F4\uB9E4 \u2192 \uC528\uC557 \u2192 \uC2F9", "\uC528\uC557\uC5D0\uC11C \uC2DC\uC791\uD574\uC694."],
+        ["\uC625\uC218\uC218\uB294 \uC5B4\uB5A4 \uBAA8\uC591\uC73C\uB85C \uC790\uB784\uAE4C\uC694?", "\uD0A4\uAC00 \uD070 \uC904\uAE30\uC5D0 \uC5F4\uB824\uC694", "\uB545\uC18D\uC5D0 \uBB3B\uD600 \uC790\uB77C\uC694", "\uBB3C \uC704\uC5D0 \uB5A0\uC11C \uC790\uB77C\uC694", "\uB098\uBB34 \uBFCC\uB9AC\uC5D0 \uBD99\uC5B4\uC694", "\uD0A4\uAC00 \uC0AC\uB78C\uBCF4\uB2E4 \uCEE4\uC694."],
+        ["\uC9C1\uC811 \uAE30\uB978 \uCC44\uC18C\uB97C \uBA39\uC73C\uBA74 \uC5B4\uB5A4 \uB9C8\uC74C\uC774 \uB4E4\uAE4C\uC694?", "\uC18C\uC911\uD558\uACE0 \uB9DB\uC788\uAC8C \uB290\uAEF4\uC838\uC694", "\uBA39\uAE30 \uC2EB\uC5B4\uC694", "\uC544\uBB34 \uB290\uB08C \uC5C6\uC5B4\uC694", "\uBC84\uB9AC\uACE0 \uC2F6\uC5B4\uC694", "\uC815\uC131\uC744 \uB4E4\uC600\uC73C\uB2C8\uAE4C!"],
+        ["\uC2DC\uAE08\uCE58\uB294 \uBB34\uC2A8 \uC0C9\uC77C\uAE4C\uC694?", "\uCD08\uB85D\uC0C9", "\uBE68\uAC04\uC0C9", "\uB178\uB780\uC0C9", "\uD770\uC0C9", "\uBF40\uBE60\uC774\uAC00 \uBA39\uC5B4\uC694."],
+        ["\uACE0\uAD6C\uB9C8\uB294 \uC5B4\uB514\uC5D0\uC11C \uCE98\uAE4C\uC694?", "\uB545\uC18D", "\uB098\uBB34 \uC704", "\uBC14\uB2E4", "\uAD6C\uB984 \uC18D", "\uAC10\uC790\uCC98\uB7FC \uCE90\uC694."],
+        ["\uB18D\uBD80 \uC544\uC800\uC528\uAC00 \uAE38\uB7EC \uC8FC\uC2E0 \uC74C\uC2DD\uC744 \uBA39\uC744 \uB54C \uAC16\uB294 \uB9C8\uC74C\uC740?", "\uAC10\uC0AC\uD558\uB294 \uB9C8\uC74C", "\uC9DC\uC99D \uB098\uB294 \uB9C8\uC74C", "\uBC84\uB9AC\uACE0 \uC2F6\uC740 \uB9C8\uC74C", "\uBB34\uAD00\uC2EC\uD55C \uB9C8\uC74C", "\uACE0\uB9C8\uC6CC\uC694!"],
+        ["\uC2DD\uBB3C \uC78E\uC774 \uC2DC\uB4E4\uC5C8\uC744 \uB54C \uD544\uC694\uD55C \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBB3C", "\uC0AC\uD0D5", "\uBAA8\uB798", "\uBD88", "\uBAA9\uC774 \uB9D0\uB77C\uC694."],
+        ["\uBC8C\uACFC \uB098\uBE44\uAC00 \uAF43\uC5D0 \uC624\uBA74 \uC5B4\uB5A4 \uC77C\uC774 \uC0DD\uAE38\uAE4C\uC694?", "\uC5F4\uB9E4\uAC00 \uC798 \uB9FA\uD600\uC694", "\uC78E\uC774 \uC0AC\uB77C\uC838\uC694", "\uBFCC\uB9AC\uAC00 \uC369\uC5B4\uC694", "\uAF43\uC774 \uC5BC\uC5B4\uC694", "\uAF43\uAC00\uB8E8\uB97C \uC62E\uACA8\uC694."]
+      ],
+      // 5층 시장: 건강한 간식 고르기
+      5: [
+        ["\uAC74\uAC15\uD55C \uAC04\uC2DD\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uACFC\uC77C", "\uC0AC\uD0D5", "\uD0C4\uC0B0\uC74C\uB8CC", "\uAC10\uC790\uCE69", "\uC790\uC5F0\uC5D0\uC11C \uC628 \uB2EC\uCF64\uD568!"],
+        ["\uBAA9\uC774 \uB9C8\uB97C \uB54C \uAC00\uC7A5 \uC88B\uC740 \uC74C\uB8CC\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBB3C", "\uCF5C\uB77C", "\uC0AC\uC774\uB2E4", "\uD0C4\uC0B0 \uC8FC\uC2A4", "\uC0C9\uB3C4 \uB9DB\uB3C4 \uC5C6\uC9C0\uB9CC \uCD5C\uACE0!"],
+        ["\uC0AC\uD0D5\uC744 \uB9CE\uC774 \uBA39\uC73C\uBA74 \uC5B4\uB5BB\uAC8C \uB420\uAE4C\uC694?", "\uC774\uAC00 \uC369\uC744 \uC218 \uC788\uC5B4\uC694", "\uC774\uAC00 \uD2BC\uD2BC\uD574\uC838\uC694", "\uD0A4\uAC00 \uCEE4\uC838\uC694", "\uB208\uC774 \uC88B\uC544\uC838\uC694", "\uCDA9\uCE58\uC7C1\uC774\uAC00 \uC88B\uC544\uD574\uC694."],
+        ["\uB2E8 \uAC83\uC744 \uBA39\uC740 \uB4A4\uC5D0 \uAF2D \uD574\uC57C \uD558\uB294 \uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC591\uCE58\uC9C8", "\uB0AE\uC7A0", "\uB2EC\uB9AC\uAE30", "\uAC8C\uC784", "\uCDA9\uCE58\uB97C \uB9C9\uC544\uC694."],
+        ["\uAC74\uAC15\uD55C \uAC04\uC2DD\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC6B0\uC720", "\uCD08\uCF5C\uB9BF", "\uC824\uB9AC", "\uD0C4\uC0B0\uC74C\uB8CC", "\uD558\uC597\uACE0 \uACE0\uC18C\uD574\uC694."],
+        ["\uAC74\uAC15\uD55C \uAC04\uC2DD\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uCC10 \uACE0\uAD6C\uB9C8", "\uB3C4\uB11B", "\uC544\uC774\uC2A4\uD06C\uB9BC", "\uACFC\uC790", "\uCA84\uC11C \uBA39\uB294 \uBFCC\uB9AC\uCC44\uC18C!"],
+        ["\uAC04\uC2DD\uC740 \uC5B8\uC81C \uBA39\uB294 \uAC83\uC774 \uC88B\uC744\uAE4C\uC694?", "\uBC25\uACFC \uBC25 \uC0AC\uC774\uC5D0 \uC870\uAE08", "\uBC25 \uB300\uC2E0 \uB9CE\uC774", "\uC790\uAE30 \uC9C1\uC804\uC5D0 \uB9CE\uC774", "\uD558\uB8E8 \uC885\uC77C \uACC4\uC18D", "\uBC25\uB9DB\uC744 \uC9C0\uCF1C\uC694."],
+        ["\uC2DC\uC7A5\uC5D0\uC11C \uACFC\uC77C\uC744 \uACE0\uB97C \uB54C \uC88B\uC740 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC2F1\uC2F1\uD558\uACE0 \uC0C1\uCC98 \uC5C6\uB294 \uAC83", "\uBB3C\uB7EC\uC9C0\uACE0 \uC0C1\uD55C \uAC83", "\uACF0\uD321\uC774 \uD540 \uAC83", "\uB0C4\uC0C8\uAC00 \uC774\uC0C1\uD55C \uAC83", "\uB208\uC73C\uB85C \uC798 \uC0B4\uD3B4\uC694."],
+        ["\uB2E4\uC74C \uC911 \uB2E8 \uC74C\uB8CC\uAC00 \uC544\uB2CC \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBB3C", "\uCF5C\uB77C", "\uC774\uC628 \uC74C\uB8CC", "\uACFC\uC77C \uB9DB \uD0C4\uC0B0", "\uB9DB\uC774 \uC5C6\uC5B4\uC694."],
+        ["\uC9E0 \uACFC\uC790\uB97C \uB9CE\uC774 \uBA39\uC73C\uBA74 \uC5B4\uB5BB\uAC8C \uB420 \uC218 \uC788\uC744\uAE4C\uC694?", "\uBAA9\uC774 \uB9CE\uC774 \uB9C8\uB974\uACE0 \uBAB8\uC5D0 \uC548 \uC88B\uC544\uC694", "\uD0A4\uAC00 \uCEE4\uC838\uC694", "\uC774\uAC00 \uD558\uC598\uC838\uC694", "\uD798\uC774 \uC138\uC838\uC694", "\uC18C\uAE08\uC774 \uB9CE\uC544\uC694."],
+        ["\uAC04\uC2DD\uC73C\uB85C \uACFC\uC790 \uD55C \uBD09\uC9C0\uB97C \uB2E4 \uBA39\uC73C\uBA74 \uC5B4\uB5BB\uAC8C \uB420\uAE4C\uC694?", "\uBC25\uC744 \uB9DB\uC788\uAC8C \uBABB \uBA39\uC5B4\uC694", "\uBC25\uC774 \uB354 \uB9DB\uC788\uC5B4\uC694", "\uD2BC\uD2BC\uD574\uC838\uC694", "\uC544\uBB34\uB807\uC9C0 \uC54A\uC544\uC694", "\uBC30\uAC00 \uB108\uBB34 \uBD88\uB7EC\uC694."],
+        ["\uC2DC\uC7A5\uC5D0\uC11C \uBB3C\uAC74\uC744 \uC0B4 \uB54C \uBC14\uB978 \uD589\uB3D9\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uD544\uC694\uD55C \uB9CC\uD07C\uB9CC \uC0AC\uC694", "\uBAA8\uB450 \uB2E4 \uC0AC\uC694", "\uBB3C\uAC74\uC744 \uB358\uC838\uC694", "\uC904\uC744 \uC548 \uC11C\uC694", "\uC54C\uB730\uD558\uAC8C!"],
+        ["\uAC74\uAC15\uD55C \uAC04\uC2DD\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBC29\uC6B8\uD1A0\uB9C8\uD1A0", "\uC0AC\uD0D5", "\uD0C4\uC0B0\uC74C\uB8CC", "\uB3C4\uB11B", "\uC791\uACE0 \uBE68\uAC04 \uC5F4\uB9E4!"],
+        ["\uC544\uC774\uC2A4\uD06C\uB9BC\uC740 \uC5B4\uB5BB\uAC8C \uBA39\uC73C\uBA74 \uC88B\uC744\uAE4C\uC694?", "\uAC00\uB054 \uC870\uAE08\uB9CC \uBA39\uC5B4\uC694", "\uB9E4\uC77C \uB9CE\uC774 \uBA39\uC5B4\uC694", "\uBC25 \uB300\uC2E0 \uBA39\uC5B4\uC694", "\uC790\uAE30 \uC804\uC5D0 \uBA39\uC5B4\uC694", "\uB2E8 \uAC83\uC740 \uC870\uAE08\uB9CC."],
+        ["\uC74C\uC2DD\uC744 \uC0AC \uC624\uBA74 \uBA3C\uC800 \uD560 \uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC54C\uB9DE\uC740 \uACF3\uC5D0 \uBCF4\uAD00\uD574\uC694", "\uC544\uBB34 \uB370\uB098 \uB358\uC838\uC694", "\uD587\uBE5B\uC5D0 \uB46C\uC694", "\uAC00\uBC29\uC5D0 \uACC4\uC18D \uB123\uC5B4 \uB46C\uC694", "\uCC28\uAC00\uC6B4 \uAC83\uC740 \uB0C9\uC7A5\uACE0\uB85C!"]
+      ],
+      // 6층 주방: 손 씻기
+      6: [
+        ["\uC190\uC744 \uC53B\uC744 \uB54C \uAF2D \uC0AC\uC6A9\uD574\uC57C \uD558\uB294 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBE44\uB204", "\uBAA8\uB798", "\uBB3C\uAC10", "\uD480", "\uAC70\uD488\uC774 \uADE0\uC744 \uC5C6\uC560\uC694."],
+        ["\uC190\uC740 \uBA87 \uCD08 \uC774\uC0C1 \uC53B\uB294 \uAC83\uC774 \uC88B\uC744\uAE4C\uC694?", "30\uCD08 \uC774\uC0C1", "1\uCD08", "3\uCD08", "\uC544\uC608 \uC548 \uC53B\uC5B4\uC694", "\uC0DD\uC77C \uCD95\uD558 \uB178\uB798 \uB450 \uBC88!"],
+        ["\uC190\uC744 \uC53B\uC5B4\uC57C \uD558\uB294 \uB54C\uAC00 \uC544\uB2CC \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC190\uC744 \uC774\uBBF8 \uAE68\uB057\uC774 \uC53B\uC740 \uC9C1\uD6C4", "\uD654\uC7A5\uC2E4\uC5D0 \uB2E4\uB140\uC628 \uB4A4", "\uBC16\uC5D0\uC11C \uB180\uACE0 \uC628 \uB4A4", "\uBC25 \uBA39\uAE30 \uC804", "\uC5B8\uC81C \uC53B\uC744\uC9C0 \uC0DD\uAC01\uD574 \uBD10\uC694."],
+        ["\uC190\uC744 \uC53B\uC744 \uB54C \uD568\uAED8 \uAF2D \uB2E6\uC544\uC57C \uD558\uB294 \uACF3\uC740 \uC5B4\uB514\uC77C\uAE4C\uC694?", "\uC190\uAC00\uB77D \uC0AC\uC774\uC640 \uC190\uD1B1 \uBC11", "\uD314\uAFC8\uCE58\uB9CC", "\uBC1C\uAC00\uB77D", "\uADC0", "\uADE0\uC774 \uC228\uC5B4 \uC788\uC5B4\uC694."],
+        ["\uAE30\uCE68\uC774 \uB098\uC62C \uB54C \uBC14\uB978 \uBC29\uBC95\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC637\uC18C\uB9E4\uB85C \uC785\uC744 \uAC00\uB824\uC694", "\uC0AC\uB78C \uC5BC\uAD74\uC5D0 \uD574\uC694", "\uC74C\uC2DD\uC5D0 \uB300\uACE0 \uD574\uC694", "\uC190\uC73C\uB85C \uC74C\uC2DD \uC9D1\uAE30", "\uADE0\uC774 \uD37C\uC9C0\uC9C0 \uC54A\uAC8C!"],
+        ["\uC190\uC744 \uC53B\uC740 \uB4A4\uC5D0\uB294 \uC5B4\uB5BB\uAC8C \uD560\uAE4C\uC694?", "\uAE68\uB057\uD55C \uC218\uAC74\uC73C\uB85C \uB2E6\uC544\uC694", "\uC637\uC5D0 \uBB38\uC9C8\uB7EC\uC694", "\uBC14\uB2E5\uC5D0 \uB2E6\uC544\uC694", "\uADF8\uB0E5 \uD754\uB4E4\uC5B4\uC694", "\uBB3C\uAE30\uB97C \uC5C6\uC560\uC694."],
+        ["\uC694\uB9AC\uD558\uAE30 \uC804\uC5D0 \uD574\uC57C \uD558\uB294 \uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC190\uC744 \uC53B\uC5B4\uC694", "\uBC14\uB2E5\uC5D0 \uC549\uC544\uC694", "\uAC8C\uC784\uC744 \uD574\uC694", "\uC2E0\uBC1C\uC744 \uBC97\uC5B4 \uB358\uC838\uC694", "\uAE68\uB057\uD55C \uC190\uC73C\uB85C!"],
+        ["\uCE7C\uACFC \uBD88\uC744 \uC0AC\uC6A9\uD560 \uB54C\uB294 \uC5B4\uB5BB\uAC8C \uD560\uAE4C\uC694?", "\uC5B4\uB978\uACFC \uD568\uAED8 \uD574\uC694", "\uD63C\uC790\uC11C \uC7A5\uB09C\uCCD0\uC694", "\uCE5C\uAD6C\uC5D0\uAC8C \uB358\uC838\uC694", "\uB208\uC744 \uAC10\uACE0 \uD574\uC694", "\uC548\uC804\uC774 \uBA3C\uC800!"],
+        ["\uB5A8\uC5B4\uC9C4 \uC74C\uC2DD\uC740 \uC5B4\uB5BB\uAC8C \uD560\uAE4C\uC694?", "\uBA39\uC9C0 \uC54A\uC544\uC694", "\uC8FC\uC6CC\uC11C \uBC14\uB85C \uBA39\uC5B4\uC694", "\uCE5C\uAD6C\uC5D0\uAC8C \uC918\uC694", "\uC228\uACA8 \uB46C\uC694", "\uADE0\uC774 \uBB3B\uC5C8\uC5B4\uC694."],
+        ["\uC544\uCE68\uBC25\uC744 \uBA39\uC73C\uBA74 \uC88B\uC740 \uC810\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uACF5\uBD80\uD560 \uD798\uC774 \uB098\uC694", "\uC878\uC74C\uC774 \uC3DF\uC544\uC838\uC694", "\uBC30\uAC00 \uC544\uD30C\uC694", "\uD0A4\uAC00 \uC904\uC5B4\uC694", "\uD558\uB8E8\uC758 \uC2DC\uC791!"],
+        ["\uC2DD\uC0AC \uB4A4\uC5D0 \uC774\uB97C \uB2E6\uC73C\uBA74 \uC88B\uC740 \uC810\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uCDA9\uCE58\uB97C \uB9C9\uC544\uC694", "\uC774\uAC00 \uC369\uC5B4\uC694", "\uC785\uC5D0\uC11C \uB0C4\uC0C8\uAC00 \uB098\uC694", "\uBC25\uB9DB\uC774 \uC5C6\uC5B4\uC838\uC694", "\uCDA9\uCE58\uC7C1\uC774\uAC00 \uC2EB\uC5B4\uD574\uC694."],
+        ["\uC190 \uC53B\uAE30\uC5D0 \uC54C\uB9DE\uC740 \uBB3C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uD750\uB974\uB294 \uAE68\uB057\uD55C \uBB3C", "\uACE0\uC778 \uD759\uD0D5\uBB3C", "\uBC14\uB2F7\uBB3C", "\uBB3C\uC744 \uC548 \uC368\uC694", "\uC218\uB3C4\uAF2D\uC9C0 \uBB3C!"],
+        ["\uC8FC\uBC29\uC5D0\uC11C \uB6F0\uBA74 \uC5B4\uB5BB\uAC8C \uB420\uAE4C\uC694?", "\uB2E4\uCE60 \uC218 \uC788\uC5B4\uC694", "\uC694\uB9AC\uAC00 \uB9DB\uC788\uC5B4\uC838\uC694", "\uBE68\uB9AC \uBC30\uBD88\uB7EC\uC694", "\uC544\uBB34 \uC77C\uB3C4 \uC5C6\uC5B4\uC694", "\uB728\uAC70\uC6B4 \uAC83\uC774 \uB9CE\uC544\uC694."],
+        ["\uB0A8\uC740 \uC74C\uC2DD\uC740 \uC5B4\uB514\uC5D0 \uB458\uAE4C\uC694?", "\uB69C\uAED1\uC744 \uB36E\uC5B4 \uB0C9\uC7A5\uACE0\uC5D0", "\uD587\uBE5B \uB4DC\uB294 \uCC3D\uAC00\uC5D0", "\uBC14\uB2E5\uC5D0", "\uC774\uBD88 \uC18D\uC5D0", "\uCC28\uAC11\uAC8C \uBCF4\uAD00!"],
+        ["\uADE0\uC774 \uAC00\uC7A5 \uC2EB\uC5B4\uD558\uB294 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uAE68\uB057\uC774 \uC53B\uC740 \uC190", "\uB354\uB7EC\uC6B4 \uC190", "\uB5A8\uC5B4\uC9C4 \uC74C\uC2DD", "\uC0C1\uD55C \uC6B0\uC720", "\uBE44\uB204 \uAC70\uD488!"]
+      ]
+    },
+    mid: {
+      // 1층 급식실: 식품군
+      1: [
+        ["\uBC25, \uBE75, \uAD6D\uC218, \uAC10\uC790\uB294 \uC5B4\uB5A4 \uC2DD\uD488\uAD70\uC77C\uAE4C\uC694?", "\uACE1\uB958", "\uACFC\uC77C\uB958", "\uC6B0\uC720\xB7\uC720\uC81C\uD488\uB958", "\uC720\uC9C0\xB7\uB2F9\uB958", "\uD798\uC744 \uB0B4\uB294 \uC5D0\uB108\uC9C0!"],
+        ["\uACE0\uAE30, \uC0DD\uC120, \uB2EC\uAC40, \uCF69\uC740 \uC5B4\uB5A4 \uC2DD\uD488\uAD70\uC77C\uAE4C\uC694?", "\uACE0\uAE30\xB7\uC0DD\uC120\xB7\uB2EC\uAC40\xB7\uCF69\uB958", "\uCC44\uC18C\uB958", "\uACE1\uB958", "\uACFC\uC77C\uB958", "\uBAB8\uC744 \uB9CC\uB4DC\uB294 \uB2E8\uBC31\uC9C8!"],
+        ["\uC6B0\uC720, \uCE58\uC988, \uC694\uAD6C\uB974\uD2B8\uB294 \uC5B4\uB5A4 \uC2DD\uD488\uAD70\uC77C\uAE4C\uC694?", "\uC6B0\uC720\xB7\uC720\uC81C\uD488\uB958", "\uACE1\uB958", "\uCC44\uC18C\uB958", "\uC720\uC9C0\xB7\uB2F9\uB958", "\uCE7C\uC298\uC774 \uB9CE\uC544\uC694."],
+        ["\uC2DD\uC6A9\uC720, \uBC84\uD130, \uC124\uD0D5\uC740 \uC5B4\uB5A4 \uC2DD\uD488\uAD70\uC77C\uAE4C\uC694?", "\uC720\uC9C0\xB7\uB2F9\uB958", "\uACFC\uC77C\uB958", "\uCC44\uC18C\uB958", "\uACE1\uB958", "\uC544\uC8FC \uC870\uAE08\uB9CC \uBA39\uC5B4\uC694."],
+        ["\uC2DC\uAE08\uCE58, \uC624\uC774, \uAE40\uCE58\uB294 \uC5B4\uB5A4 \uC2DD\uD488\uAD70\uC77C\uAE4C\uC694?", "\uCC44\uC18C\uB958", "\uACFC\uC77C\uB958", "\uACE1\uB958", "\uC720\uC9C0\xB7\uB2F9\uB958", "\uBE44\uD0C0\uBBFC\uACFC \uBB34\uAE30\uC9C8!"],
+        ["\uC2DD\uD488\uAD6C\uC131\uC790\uC804\uAC70\uC5D0\uC11C \uC55E\uBC14\uD034\uB294 \uBB34\uC5C7\uC744 \uB73B\uD560\uAE4C\uC694?", "\uBB3C", "\uC0AC\uD0D5", "\uACE0\uAE30", "\uBE75", "\uB9E4\uC77C \uCDA9\uBD84\uD788 \uB9C8\uC154\uC694."],
+        ["\uC2DD\uD488\uAD6C\uC131\uC790\uC804\uAC70\uC758 \uB4B7\uBC14\uD034\uB294 \uBB34\uC5C7\uC73C\uB85C \uB098\uB260\uAE4C\uC694?", "6\uAC00\uC9C0 \uC2DD\uD488\uAD70", "\uACFC\uC790 \uC885\uB958", "\uC74C\uB8CC\uC218 \uC885\uB958", "\uC694\uB9AC \uB3C4\uAD6C", "\uACE8\uACE0\uB8E8 \uBA39\uC5B4\uC694."],
+        ["\uC2DD\uD488\uAD70 \uC911 \uAC00\uC7A5 \uC870\uAE08 \uBA39\uC5B4\uC57C \uD558\uB294 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC720\uC9C0\xB7\uB2F9\uB958", "\uCC44\uC18C\uB958", "\uACE1\uB958", "\uC6B0\uC720\xB7\uC720\uC81C\uD488\uB958", "\uAE30\uB984\uACFC \uC124\uD0D5!"],
+        ["\uAE09\uC2DD \uC2DD\uB2E8\uC5D0 \uC5EC\uB7EC \uC2DD\uD488\uAD70\uC774 \uB4E4\uC5B4 \uC788\uB294 \uAE4C\uB2ED\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC601\uC591\uC18C\uB97C \uACE8\uACE0\uB8E8 \uC5BB\uC73C\uB824\uACE0", "\uB3C8\uC744 \uC544\uB07C\uB824\uACE0", "\uB9DB\uC744 \uC5C6\uC560\uB824\uACE0", "\uC74C\uC2DD\uC744 \uB0A8\uAE30\uB824\uACE0", "\uADE0\uD615!"],
+        ["\uB450\uBD80\uB294 \uC5B4\uB5A4 \uC2DD\uD488\uAD70\uC77C\uAE4C\uC694?", "\uACE0\uAE30\xB7\uC0DD\uC120\xB7\uB2EC\uAC40\xB7\uCF69\uB958", "\uCC44\uC18C\uB958", "\uACFC\uC77C\uB958", "\uACE1\uB958", "\uCF69\uC73C\uB85C \uB9CC\uB4E4\uC5B4\uC694."],
+        ["\uACE0\uAD6C\uB9C8\uB294 \uC5B4\uB5A4 \uC2DD\uD488\uAD70\uC77C\uAE4C\uC694?", "\uACE1\uB958", "\uACFC\uC77C\uB958", "\uACE0\uAE30\xB7\uC0DD\uC120\xB7\uB2EC\uAC40\xB7\uCF69\uB958", "\uC6B0\uC720\xB7\uC720\uC81C\uD488\uB958", "\uAC10\uC790\uC640 \uAC19\uC740 \uBB34\uB9AC\uC608\uC694."],
+        ["\uD3B8\uC2DD\uC744 \uD558\uBA74 \uC5B4\uB5A4 \uC77C\uC774 \uC0DD\uAE38 \uC218 \uC788\uC744\uAE4C\uC694?", "\uD544\uC694\uD55C \uC601\uC591\uC18C\uAC00 \uBD80\uC871\uD574\uC838\uC694", "\uD0A4\uAC00 \uAC11\uC790\uAE30 \uCEE4\uC838\uC694", "\uBCD1\uC5D0 \uC548 \uAC78\uB824\uC694", "\uBAA8\uB4E0 \uC601\uC591\uC18C\uB97C \uC5BB\uC5B4\uC694", "\uACE8\uACE0\uB8E8 \uBA39\uC9C0 \uC54A\uC73C\uBA74?"],
+        ["\uAE09\uC2DD \uC794\uBC18\uC744 \uC904\uC774\uB294 \uBC29\uBC95\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBA39\uC744 \uB9CC\uD07C \uBC1B\uACE0 \uB0A8\uAE30\uC9C0 \uC54A\uAE30", "\uB9CE\uC774 \uBC1B\uACE0 \uBC84\uB9AC\uAE30", "\uCE5C\uAD6C \uC2DD\uD310\uC5D0 \uB35C\uAE30", "\uAE09\uC2DD \uC548 \uBA39\uAE30", "\uD658\uACBD\uB3C4 \uC9C0\uCF1C\uC694."],
+        ["\uC2DD\uD488\uAD6C\uC131\uC790\uC804\uAC70\uC5D0\uC11C \uC790\uC804\uAC70\uB97C \uD0C0\uB294 \uC0AC\uB78C\uC740 \uBB34\uC5C7\uC744 \uB73B\uD560\uAE4C\uC694?", "\uC6B4\uB3D9", "\uC7A0", "\uAC8C\uC784", "\uACF5\uBD80", "\uBAB8\uC744 \uC6C0\uC9C1\uC5EC\uC694."],
+        ["\uADE4, \uC0AC\uACFC, \uD3EC\uB3C4\uB294 \uC5B4\uB5A4 \uC2DD\uD488\uAD70\uC77C\uAE4C\uC694?", "\uACFC\uC77C\uB958", "\uCC44\uC18C\uB958", "\uACE1\uB958", "\uC720\uC9C0\xB7\uB2F9\uB958", "\uB2EC\uCF64\uD55C \uBE44\uD0C0\uBBFC!"]
+      ],
+      // 2층 채소칸: 비타민·무기질
+      2: [
+        ["\uADE4, \uB538\uAE30, \uD0A4\uC704\uC5D0 \uB9CE\uC740 \uBE44\uD0C0\uBBFC\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBE44\uD0C0\uBBFC C", "\uBE44\uD0C0\uBBFC D", "\uBE44\uD0C0\uBBFC K", "\uBE44\uD0C0\uBBFC B12", "\uAC10\uAE30\uB97C \uC774\uACA8 \uB0B4\uC694."],
+        ["\uB2F9\uADFC\uC5D0 \uB9CE\uC544\uC11C \uB208 \uAC74\uAC15\uC744 \uB3D5\uB294 \uC601\uC591\uC18C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBE44\uD0C0\uBBFC A", "\uBE44\uD0C0\uBBFC C", "\uCE7C\uC298", "\uC9C0\uBC29", "\uBC24\uB208\uC744 \uBC1D\uD600\uC694."],
+        ["\uBE44\uD0C0\uBBFC\uACFC \uBB34\uAE30\uC9C8\uC774 \uD558\uB294 \uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBAB8\uC758 \uAE30\uB2A5\uC744 \uC870\uC808\uD574\uC694", "\uBAB8\uC744 \uCC28\uAC11\uAC8C \uB9CC\uB4E4\uC5B4\uC694", "\uC7A0\uC744 \uBABB \uC790\uAC8C \uD574\uC694", "\uC0B4\uB9CC \uCC0C\uAC8C \uD574\uC694", "\uBAB8\uC18D \uC77C\uAFBC!"],
+        ["\uC2DC\uAE08\uCE58\uC5D0 \uB9CE\uC544\uC11C \uD53C\uB97C \uB9CC\uB4DC\uB294 \uB370 \uB3C4\uC6C0\uC744 \uC8FC\uB294 \uBB34\uAE30\uC9C8\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uCCA0\uBD84", "\uC124\uD0D5", "\uC18C\uAE08", "\uC9C0\uBC29", "\uBD80\uC871\uD558\uBA74 \uC5B4\uC9C0\uB7EC\uC6CC\uC694."],
+        ["\uCC44\uC18C\uC640 \uACFC\uC77C\uC744 \uB0A0\uB9C8\uB2E4 \uBA39\uC5B4\uC57C \uD558\uB294 \uAE4C\uB2ED\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBE44\uD0C0\uBBFC\uACFC \uBB34\uAE30\uC9C8\uC744 \uC5BB\uC73C\uB824\uACE0", "\uBC30\uB97C \uC544\uD504\uAC8C \uD558\uB824\uACE0", "\uC774\uB97C \uC369\uAC8C \uD558\uB824\uACE0", "\uC0B4\uC744 \uCC0C\uC6B0\uB824\uACE0", "\uBAB8\uC774 \uD2BC\uD2BC!"],
+        ["\uD587\uBE5B\uC744 \uCB10\uBA74 \uBAB8\uC5D0\uC11C \uB9CC\uB4E4\uC5B4\uC9C0\uB294 \uBE44\uD0C0\uBBFC\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBE44\uD0C0\uBBFC D", "\uBE44\uD0C0\uBBFC C", "\uBE44\uD0C0\uBBFC A", "\uBE44\uD0C0\uBBFC E", "\uBF08 \uAC74\uAC15\uC744 \uB3C4\uC640\uC694."],
+        ["\uBE44\uD0C0\uBBFC C\uAC00 \uBD80\uC871\uD558\uBA74 \uC5B4\uB5A4 \uC77C\uC774 \uC0DD\uAE38 \uC218 \uC788\uC744\uAE4C\uC694?", "\uC787\uBAB8\uC5D0\uC11C \uD53C\uAC00 \uB098\uACE0 \uC27D\uAC8C \uC9C0\uCCD0\uC694", "\uD0A4\uAC00 \uAC11\uC790\uAE30 \uCEE4\uC838\uC694", "\uB208\uC774 \uC88B\uC544\uC838\uC694", "\uBA38\uB9AC\uCE74\uB77D\uC774 \uB9CE\uC544\uC838\uC694", "\uC61B\uB0A0 \uBC43\uC0AC\uB78C\uB4E4\uC758 \uBCD1!"],
+        ["\uC0C9\uC774 \uC9C4\uD55C \uCC44\uC18C\uB97C \uACE0\uB974\uBA74 \uC88B\uC740 \uAE4C\uB2ED\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC601\uC591\uC18C\uAC00 \uD48D\uBD80\uD55C \uACBD\uC6B0\uAC00 \uB9CE\uC544\uC694", "\uB9DB\uC774 \uC5C6\uC5B4\uC11C", "\uAC12\uC774 \uBE44\uC2F8\uC11C", "\uBE68\uB9AC \uC0C1\uD574\uC11C", "\uCD08\uB85D\xB7\uC8FC\uD669\xB7\uBE68\uAC15!"],
+        ["\uACFC\uC77C \uC8FC\uC2A4\uBCF4\uB2E4 \uC0DD\uACFC\uC77C\uC774 \uB354 \uC88B\uC740 \uAE4C\uB2ED\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC2DD\uC774\uC12C\uC720\uAC00 \uC0B4\uC544 \uC788\uC5B4\uC694", "\uC124\uD0D5\uC774 \uB354 \uB9CE\uC544\uC694", "\uC539\uC9C0 \uC54A\uC544\uB3C4 \uB3FC\uC694", "\uC601\uC591\uC18C\uAC00 \uC5C6\uC5B4\uC694", "\uAECD\uC9C8\uACFC \uACFC\uC721\uAE4C\uC9C0!"],
+        ["\uBBF8\uC5ED, \uB2E4\uC2DC\uB9C8\uC5D0 \uB9CE\uC740 \uBB34\uAE30\uC9C8\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC544\uC774\uC624\uB518(\uC694\uC624\uB4DC)", "\uC124\uD0D5", "\uC9C0\uBC29", "\uBE44\uD0C0\uBBFC C", "\uBC14\uB2E4 \uCC44\uC18C!"],
+        ["\uCC44\uC18C\uB97C \uC53B\uC744 \uB54C \uBC14\uB978 \uBC29\uBC95\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uD750\uB974\uB294 \uBB3C\uC5D0 \uAE68\uB057\uC774 \uC53B\uC5B4\uC694", "\uC138\uC81C\uB97C \uB4EC\uBFCD \uC368\uC694", "\uC53B\uC9C0 \uC54A\uC544\uC694", "\uD759\uD0D5\uBB3C\uC5D0 \uB2F4\uAC00\uC694", "\uD750\uB974\uB294 \uBB3C!"],
+        ["\uBE44\uD0C0\uBBFC\uC774 \uB9CE\uC740 \uCC44\uC18C\uB97C \uC624\uB798 \uB053\uC774\uBA74 \uC5B4\uB5BB\uAC8C \uB420\uAE4C\uC694?", "\uC77C\uBD80 \uBE44\uD0C0\uBBFC\uC774 \uC904\uC5B4\uB4E4\uC5B4\uC694", "\uBE44\uD0C0\uBBFC\uC774 \uB298\uC5B4\uB098\uC694", "\uC544\uBB34 \uBCC0\uD654 \uC5C6\uC5B4\uC694", "\uACE0\uAE30\uB85C \uBC14\uB00C\uC5B4\uC694", "\uC5F4\uC5D0 \uC57D\uD55C \uBE44\uD0C0\uBBFC!"],
+        ["\uD30C\uD504\uB9AC\uCE74, \uBE0C\uB85C\uCF5C\uB9AC\uC5D0 \uB9CE\uC740 \uBE44\uD0C0\uBBFC\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBE44\uD0C0\uBBFC C", "\uBE44\uD0C0\uBBFC D", "\uCE7C\uC298", "\uB098\uD2B8\uB968", "\uADE4\uB9CC \uC788\uB294 \uAC8C \uC544\uB2C8\uC5D0\uC694."],
+        ["\uB2E4\uC74C \uC911 \uBB34\uAE30\uC9C8\uC774 \uC544\uB2CC \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB2E8\uBC31\uC9C8", "\uCE7C\uC298", "\uCCA0\uBD84", "\uCE7C\uB968", "\uBB34\uAE30\uC9C8\uC740 \uAD11\uBB3C \uC131\uBD84\uC774\uC5D0\uC694."],
+        ["\uCC44\uC18C\uB97C \uB9DB\uC788\uAC8C \uBA39\uB294 \uBC29\uBC95\uC73C\uB85C \uC54C\uB9DE\uC740 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC308, \uBB34\uCE68, \uBCF6\uC74C \uB4F1 \uC5EC\uB7EC \uBC29\uBC95\uC73C\uB85C \uBA39\uC5B4\uC694", "\uC124\uD0D5\uC744 \uC794\uB729 \uBFCC\uB824\uC694", "\uC544\uC608 \uBA39\uC9C0 \uC54A\uC544\uC694", "\uC18C\uAE08\uB9CC \uBA39\uC5B4\uC694", "\uC694\uB9AC\uBC95\uC744 \uBC14\uAFD4 \uBD10\uC694."]
+      ],
+      // 3층 우유·고기칸: 단백질·칼슘
+      3: [
+        ["\uB2E8\uBC31\uC9C8\uC774 \uD558\uB294 \uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uADFC\uC721\uACFC \uD53C\uBD80 \uB4F1 \uBAB8\uC744 \uB9CC\uB4E4\uC5B4\uC694", "\uBAB8\uC744 \uCC28\uAC11\uAC8C \uD574\uC694", "\uC774\uB97C \uC369\uAC8C \uD574\uC694", "\uB208\uC744 \uB098\uC058\uAC8C \uD574\uC694", "\uBAB8\uC758 \uC7AC\uB8CC!"],
+        ["\uCE7C\uC298\uC774 \uD558\uB294 \uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBF08\uC640 \uC774\uB97C \uD2BC\uD2BC\uD558\uAC8C \uD574\uC694", "\uD53C\uBD80\uB97C \uAE4C\uB9E3\uAC8C \uD574\uC694", "\uBA38\uB9AC\uCE74\uB77D\uC744 \uBE60\uC9C0\uAC8C \uD574\uC694", "\uC0B4\uC744 \uCC0C\uC6CC\uC694", "\uC6B0\uC720\uC5D0 \uB9CE\uC544\uC694."],
+        ["\uCE7C\uC298\uC774 \uB9CE\uC740 \uC74C\uC2DD\uC774 \uC544\uB2CC \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uCF5C\uB77C", "\uC6B0\uC720", "\uBA78\uCE58", "\uCE58\uC988", "\uD0C4\uC0B0\uC74C\uB8CC\uB294 \uC544\uB2C8\uC5D0\uC694."],
+        ["\uC2DD\uBB3C\uC131 \uB2E8\uBC31\uC9C8\uC774 \uB9CE\uC740 \uC74C\uC2DD\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uCF69", "\uC0AC\uACFC", "\uC124\uD0D5", "\uBC84\uD130", "\uBC2D\uC5D0\uC11C \uB098\uB294 \uACE0\uAE30!"],
+        ["\uC131\uC7A5\uAE30 \uC5B4\uB9B0\uC774\uC5D0\uAC8C \uB2E8\uBC31\uC9C8\uC774 \uD2B9\uD788 \uC911\uC694\uD55C \uAE4C\uB2ED\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBAB8\uC774 \uC790\uB77C\uB294 \uB370 \uD544\uC694\uD574\uC11C", "\uC7A0\uC744 \uBABB \uC790\uAC8C \uD574\uC11C", "\uC0B4\uB9CC \uCC0C\uC6CC\uC11C", "\uD544\uC694 \uC5C6\uC5B4\uC11C", "\uC465\uC465 \uC790\uB77C\uC694."],
+        ["\uBA78\uCE58\uB97C \uBF08\uC9F8 \uBA39\uC73C\uBA74 \uC5BB\uC744 \uC218 \uC788\uB294 \uC601\uC591\uC18C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uCE7C\uC298", "\uBE44\uD0C0\uBBFC C", "\uC2DD\uC774\uC12C\uC720", "\uC124\uD0D5", "\uBF08\uC5D0 \uB4E4\uC5B4 \uC788\uC5B4\uC694."],
+        ["\uB2EC\uAC40\uD770\uC790\uC5D0 \uB9CE\uC740 \uC601\uC591\uC18C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB2E8\uBC31\uC9C8", "\uC124\uD0D5", "\uBE44\uD0C0\uBBFC C", "\uC2DD\uC774\uC12C\uC720", "\uADFC\uC721\uC758 \uC7AC\uB8CC!"],
+        ["\uACE0\uAE30\uB97C \uBA39\uC744 \uB54C \uD568\uAED8 \uBA39\uC73C\uBA74 \uC88B\uC740 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uCC44\uC18C", "\uD0C4\uC0B0\uC74C\uB8CC", "\uC0AC\uD0D5", "\uAC10\uC790\uCE69", "\uADE0\uD615 \uC788\uAC8C!"],
+        ["\uC6B0\uC720\uB97C \uB9C8\uC2DC\uBA74 \uBC30\uAC00 \uC544\uD508 \uCE5C\uAD6C\uB294 \uBB34\uC5C7\uC744 \uBA39\uC73C\uBA74 \uC88B\uC744\uAE4C\uC694?", "\uC694\uAD6C\uB974\uD2B8\uB098 \uCE58\uC988", "\uCF5C\uB77C", "\uC0AC\uD0D5", "\uC544\uBB34\uAC83\uB3C4 \uC548 \uBA39\uAE30", "\uBC1C\uD6A8 \uC720\uC81C\uD488!"],
+        ["\uC0DD\uC120\uC5D0 \uB9CE\uACE0 \uB450\uB1CC \uBC1C\uB2EC\uC5D0 \uB3C4\uC6C0\uC774 \uB418\uB294 \uC88B\uC740 \uC9C0\uBC29\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC624\uBA54\uAC00-3 \uC9C0\uBC29\uC0B0", "\uD2B8\uB79C\uC2A4\uC9C0\uBC29", "\uC124\uD0D5", "\uB098\uD2B8\uB968", "\uB4F1\uD478\uB978 \uC0DD\uC120!"],
+        ["\uACE0\uAE30\uB97C \uACE0\uB97C \uB54C \uAC74\uAC15\uC5D0 \uB354 \uC88B\uC740 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uAE30\uB984\uAE30\uAC00 \uC801\uC740 \uC0B4\uCF54\uAE30", "\uAE30\uB984 \uB369\uC5B4\uB9AC", "\uD280\uAE34 \uACE0\uAE30\uB9CC", "\uD0C4 \uACE0\uAE30", "\uC9C0\uBC29\uC740 \uC870\uAE08!"],
+        ["\uB450\uBD80, \uB450\uC720, \uB41C\uC7A5\uC758 \uACF5\uD1B5 \uC7AC\uB8CC\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uCF69", "\uC300", "\uBC00", "\uC6B0\uC720", "\uB178\uB780 \uC54C\uAC31\uC774!"],
+        ["\uCE7C\uC298\uC774 \uC798 \uD761\uC218\uB418\uB3C4\uB85D \uB3D5\uB294 \uBE44\uD0C0\uBBFC\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBE44\uD0C0\uBBFC D", "\uBE44\uD0C0\uBBFC C", "\uBE44\uD0C0\uBBFC A", "\uBE44\uD0C0\uBBFC B1", "\uD587\uBE5B \uBE44\uD0C0\uBBFC!"],
+        ["\uACE0\uAE30\uC640 \uC0DD\uC120\uC740 \uC5B4\uB5BB\uAC8C \uBCF4\uAD00\uD574\uC57C \uD560\uAE4C\uC694?", "\uB0C9\uC7A5 \uB610\uB294 \uB0C9\uB3D9 \uBCF4\uAD00", "\uC2E4\uC628\uC5D0 \uC624\uB798 \uB450\uAE30", "\uD587\uBE5B\uC5D0 \uB450\uAE30", "\uAC00\uBC29 \uC18D\uC5D0 \uB450\uAE30", "\uCC28\uAC11\uAC8C!"],
+        ["\uACE0\uAE30\xB7\uC0DD\uC120\xB7\uB2EC\uAC40\xB7\uCF69\uB958 \uC2DD\uD488\uAD70\uC5D0 \uB9CE\uC740 \uC601\uC591\uC18C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB2E8\uBC31\uC9C8", "\uBE44\uD0C0\uBBFC C", "\uC2DD\uC774\uC12C\uC720", "\uB2F9\uB958", "\uBAB8\uC744 \uB9CC\uB4E4\uC5B4\uC694."]
+      ],
+      // 4층 텃밭: 제철 음식
+      4: [
+        ["\uC5EC\uB984\uC774 \uC81C\uCCA0\uC778 \uACFC\uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC218\uBC15", "\uADE4", "\uAC10", "\uC0AC\uACFC", "\uB354\uC6B8 \uB54C \uC2DC\uC6D0\uD558\uAC8C!"],
+        ["\uAC00\uC744\uC774 \uC81C\uCCA0\uC778 \uACFC\uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC0AC\uACFC", "\uC218\uBC15", "\uCC38\uC678", "\uCCB4\uB9AC", "\uCD94\uC11D\uC5D0 \uCC28\uB840\uC0C1\uC5D0 \uC62C\uB77C\uC694."],
+        ["\uACA8\uC6B8\uC774 \uC81C\uCCA0\uC778 \uACFC\uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uADE4", "\uC218\uBC15", "\uCC38\uC678", "\uBCF5\uC22D\uC544", "\uB530\uB73B\uD55C \uBC29\uC5D0\uC11C \uAE4C \uBA39\uC5B4\uC694."],
+        ["\uBD04\uC774 \uC81C\uCCA0\uC778 \uB098\uBB3C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB0C9\uC774", "\uACE0\uAD6C\uB9C8", "\uBC24", "\uADE4", "\uBD04 \uB4E4\uD310\uC5D0\uC11C \uCE90\uC694."],
+        ["\uC81C\uCCA0 \uC74C\uC2DD\uC758 \uC88B\uC740 \uC810\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB9DB\uACFC \uC601\uC591\uC774 \uC88B\uACE0 \uAC12\uC774 \uC2F8\uC694", "\uB9DB\uC774 \uC5C6\uC5B4\uC694", "\uBE44\uC2F8\uC694", "\uC601\uC591\uC774 \uC5C6\uC5B4\uC694", "\uC790\uC5F0\uC758 \uB54C\uC5D0 \uB9DE\uCDB0\uC694."],
+        ["\uC5EC\uB984\uC774 \uC81C\uCCA0\uC778 \uCC44\uC18C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC624\uC774", "\uB0C9\uC774", "\uB2EC\uB798", "\uC465", "\uC2DC\uC6D0\uD558\uACE0 \uC544\uC0AD!"],
+        ["\uAC00\uC744\uC5D0 \uCE90\uB294 \uBFCC\uB9AC\uCC44\uC18C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uACE0\uAD6C\uB9C8", "\uB0C9\uC774", "\uCC38\uC678", "\uC218\uBC15", "\uAD70\uACE0\uAD6C\uB9C8!"],
+        ["\uAE40\uC7A5\uC740 \uC8FC\uB85C \uC5B4\uB290 \uACC4\uC808\uC5D0 \uD560\uAE4C\uC694?", "\uB2A6\uAC00\uC744\uBD80\uD130 \uCD08\uACA8\uC6B8", "\uD55C\uC5EC\uB984", "\uC774\uB978 \uBD04", "\uC7A5\uB9C8\uCCA0", "\uBC30\uCD94\uAC00 \uB9DB\uC788\uB294 \uB54C!"],
+        ["\uB178\uB780 \uCC38\uC678\uAC00 \uC81C\uCCA0\uC778 \uACC4\uC808\uC740 \uC5B8\uC81C\uC77C\uAE4C\uC694?", "\uC5EC\uB984", "\uACA8\uC6B8", "\uB2A6\uAC00\uC744", "\uC774\uB978 \uBD04", "\uC218\uBC15\uACFC \uAC19\uC740 \uB54C!"],
+        ["\uBC24\uC774 \uC81C\uCCA0\uC778 \uACC4\uC808\uC740 \uC5B8\uC81C\uC77C\uAE4C\uC694?", "\uAC00\uC744", "\uC5EC\uB984", "\uBD04", "\uC7A5\uB9C8\uCCA0", "\uAC00\uC2DC \uC1A1\uC774\uAC00 \uBC8C\uC5B4\uC838\uC694."],
+        ["\uD143\uBC2D\uC5D0 \uAC70\uB984\uC744 \uC8FC\uB294 \uAE4C\uB2ED\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC2DD\uBB3C\uC5D0 \uC591\uBD84\uC744 \uC8FC\uB824\uACE0", "\uBC8C\uB808\uB97C \uD0A4\uC6B0\uB824\uACE0", "\uBB3C\uC744 \uC5C6\uC560\uB824\uACE0", "\uD759\uC744 \uB531\uB531\uD558\uAC8C \uD558\uB824\uACE0", "\uC2DD\uBB3C\uC758 \uBC25!"],
+        ["\uBD04\uC5D0 \uD143\uBC2D\uC5D0\uC11C \uBA3C\uC800 \uD558\uB294 \uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC528\uC557\uC744 \uBFCC\uB9AC\uAC70\uB098 \uBAA8\uC885\uC744 \uC2EC\uC5B4\uC694", "\uC218\uD655\uC744 \uD574\uC694", "\uB208\uC744 \uCE58\uC6CC\uC694", "\uAE40\uC7A5\uC744 \uD574\uC694", "\uC2DC\uC791\uC758 \uACC4\uC808!"],
+        ["\uB538\uAE30\uB294 \uC6D0\uB798 \uBC2D(\uB178\uC9C0)\uC5D0\uC11C \uC5B8\uC81C \uC5F4\uB9E4\uB97C \uB9FA\uC744\uAE4C\uC694?", "\uBD04", "\uD55C\uACA8\uC6B8", "\uB2A6\uAC00\uC744", "\uC7A5\uB9C8 \uB4A4 \uD55C\uC5EC\uB984", "\uD558\uC6B0\uC2A4\uAC00 \uC5C6\uC73C\uBA74?"],
+        ["\uC81C\uCCA0\uC774 \uC544\uB2CC \uCC44\uC18C\uB97C \uAE30\uB974\uB824\uBA74 \uBB34\uC5C7\uC774 \uD544\uC694\uD560 \uB54C\uAC00 \uB9CE\uC744\uAE4C\uC694?", "\uBE44\uB2D0\uD558\uC6B0\uC2A4\uC640 \uB09C\uBC29 \uAC19\uC740 \uC5D0\uB108\uC9C0", "\uC544\uBB34\uAC83\uB3C4 \uD544\uC694 \uC5C6\uC5B4\uC694", "\uBC14\uB2F7\uBB3C", "\uBAA8\uB798\uB9CC", "\uACC4\uC808\uC744 \uAC70\uC2AC\uB7EC\uC694."],
+        ["\uC218\uD655\uD55C \uCC44\uC18C\uB97C \uC624\uB798 \uBCF4\uAD00\uD558\uB294 \uC6B0\uB9AC \uC804\uD1B5 \uBC29\uBC95\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB9D0\uB9AC\uAE30, \uC808\uC774\uAE30(\uC7A5\uC544\uCC0C)", "\uD587\uBE5B\uC5D0 \uADF8\uB0E5 \uB450\uAE30", "\uBB3C\uC5D0 \uACC4\uC18D \uB2F4\uAC00 \uB450\uAE30", "\uB545\uC5D0 \uBC84\uB9AC\uAE30", "\uC2DC\uB798\uAE30, \uC7A5\uC544\uCC0C!"]
+      ],
+      // 5층 시장: 당·나트륨 줄이기
+      5: [
+        ["\uB098\uD2B8\uB968\uC744 \uB9CE\uC774 \uBA39\uC73C\uBA74 \uC5B4\uB5A4 \uC77C\uC774 \uC0DD\uAE38 \uC218 \uC788\uC744\uAE4C\uC694?", "\uD608\uC555\uC774 \uB192\uC544\uC9C8 \uC218 \uC788\uC5B4\uC694", "\uBF08\uAC00 \uD2BC\uD2BC\uD574\uC838\uC694", "\uD0A4\uAC00 \uCEE4\uC838\uC694", "\uB208\uC774 \uC88B\uC544\uC838\uC694", "\uC9E0\uB9DB \uC131\uBD84!"],
+        ["\uAD6D\uC744 \uBA39\uC744 \uB54C \uB098\uD2B8\uB968\uC744 \uC904\uC774\uB294 \uBC29\uBC95\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uAD6D\uBB3C\uC744 \uC801\uAC8C \uBA39\uC5B4\uC694", "\uC18C\uAE08\uC744 \uB354 \uB123\uC5B4\uC694", "\uAD6D\uBB3C\uB9CC \uB2E4 \uB9C8\uC154\uC694", "\uB77C\uBA74 \uC218\uD504\uB97C \uB123\uC5B4\uC694", "\uAC74\uB354\uAE30 \uC704\uC8FC\uB85C!"],
+        ["\uB2F9\uC744 \uB9CE\uC774 \uBA39\uC73C\uBA74 \uC5B4\uB5A4 \uC77C\uC774 \uC0DD\uAE38 \uC218 \uC788\uC744\uAE4C\uC694?", "\uCDA9\uCE58\uC640 \uBE44\uB9CC\uC774 \uC0DD\uAE38 \uC218 \uC788\uC5B4\uC694", "\uC774\uAC00 \uD558\uC598\uC838\uC694", "\uADFC\uC721\uC774 \uC0DD\uACA8\uC694", "\uBCD1\uC774 \uB098\uC544\uC694", "\uCDA9\uCE58\uC7C1\uC774\uAC00 \uC88B\uC544\uD574\uC694."],
+        ["\uD0C4\uC0B0\uC74C\uB8CC \uB300\uC2E0 \uB9C8\uC2DC\uBA74 \uC88B\uC740 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBB3C\uC774\uB098 \uC6B0\uC720", "\uC774\uC628 \uC74C\uB8CC", "\uACFC\uC77C \uB9DB \uD0C4\uC0B0", "\uC5D0\uB108\uC9C0 \uC74C\uB8CC", "\uB2F9\uC774 \uC5C6\uB294 \uC74C\uB8CC!"],
+        ["\uC9E0\uB9DB \uB300\uC2E0 \uB9DB\uC744 \uB0B4\uB294 \uC88B\uC740 \uBC29\uBC95\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC2DD\uCD08, \uB808\uBAAC, \uB4E4\uAE68 \uB4F1\uC73C\uB85C \uB9DB\uC744 \uB0B4\uC694", "\uC18C\uAE08\uC744 \uB4EC\uBFCD", "\uAC04\uC7A5\uC744 \uB4EC\uBFCD", "\uB77C\uBA74 \uC218\uD504", "\uC0C8\uCF64\uD558\uACE0 \uACE0\uC18C\uD558\uAC8C!"],
+        ["\uB098\uD2B8\uB968\uC774 \uD2B9\uD788 \uB9CE\uC740 \uC74C\uC2DD\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB77C\uBA74", "\uC0AC\uACFC", "\uC6B0\uC720", "\uC624\uC774", "\uAD6D\uBB3C\uC774 \uC9DC\uC694."],
+        ["\uACFC\uC790\uB97C \uACE0\uB97C \uB54C \uB2F9\uACFC \uB098\uD2B8\uB968\uC744 \uD655\uC778\uD558\uB294 \uACF3\uC740 \uC5B4\uB514\uC77C\uAE4C\uC694?", "\uC601\uC591\uC131\uBD84\uD45C", "\uD3EC\uC7A5 \uADF8\uB9BC", "\uAD11\uACE0 \uBB38\uAD6C", "\uAC00\uACA9\uD45C", "\uC22B\uC790\uAC00 \uC801\uD78C \uD45C!"],
+        ["\uB2E8\uB9DB\uC774 \uB098\uB294 \uC74C\uB8CC\uB97C \uACE0\uB97C \uB54C \uB354 \uC88B\uC740 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB2F9\uC774 \uC801\uC740 \uAC83", "\uB2F9\uC774 \uAC00\uC7A5 \uB9CE\uC740 \uAC83", "\uC0C9\uC774 \uAC00\uC7A5 \uC9C4\uD55C \uAC83", "\uC6A9\uB7C9\uC774 \uAC00\uC7A5 \uD070 \uAC83", "\uC22B\uC790\uAC00 \uC791\uC744\uC218\uB85D!"],
+        ["\uC9E0 \uC74C\uC2DD\uC744 \uBA39\uC740 \uB4A4 \uBAB8\uC774 \uC6D0\uD558\uB294 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBB3C", "\uC18C\uAE08", "\uC0AC\uD0D5", "\uACFC\uC790", "\uBAA9\uC774 \uB9D0\uB77C\uC694."],
+        ["\uC5B4\uBB35, \uD584, \uC18C\uC2DC\uC9C0 \uAC19\uC740 \uAC00\uACF5\uC2DD\uD488\uC758 \uD2B9\uC9D5\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB098\uD2B8\uB968\uC774 \uB9CE\uC740 \uD3B8\uC774\uC5D0\uC694", "\uB098\uD2B8\uB968\uC774 \uC804\uD600 \uC5C6\uC5B4\uC694", "\uCC44\uC18C\uB85C\uB9CC \uB9CC\uB4E4\uC5B4\uC694", "\uBE44\uD0C0\uBBFC\uC774 \uAC00\uC7A5 \uB9CE\uC544\uC694", "\uB9DB\uC744 \uB0B4\uB824\uACE0 \uB123\uC5B4\uC694."],
+        ["\uAE40\uCE58\uB97C \uB35C \uC9DC\uAC8C \uBA39\uB294 \uBC29\uBC95\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC54C\uB9DE\uC740 \uC591\uB9CC \uBA39\uC5B4\uC694", "\uAE40\uCE6B\uAD6D\uBB3C\uC744 \uB2E4 \uB9C8\uC154\uC694", "\uC18C\uAE08\uC744 \uBFCC\uB824\uC694", "\uB77C\uBA74\uACFC \uD568\uAED8 \uBA39\uC5B4\uC694", "\uC591 \uC870\uC808!"],
+        ["\uB2E8 \uC74C\uC2DD\uC744 \uC904\uC774\uB294 \uC88B\uC740 \uC2B5\uAD00\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uAC04\uC2DD\uC73C\uB85C \uACFC\uC77C\uC774\uB098 \uC6B0\uC720 \uBA39\uAE30", "\uC2DD\uC0AC \uB300\uC2E0 \uCF00\uC774\uD06C", "\uD0C4\uC0B0\uC74C\uB8CC \uB9E4\uC77C \uB9C8\uC2DC\uAE30", "\uC0AC\uD0D5 \uB298 \uB4E4\uACE0 \uB2E4\uB2C8\uAE30", "\uC790\uC5F0\uC758 \uB2E8\uB9DB!"],
+        ["\uC2DC\uC7A5\uC5D0\uC11C \uC7A5\uC744 \uBCFC \uB54C \uC88B\uC740 \uC2B5\uAD00\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uD544\uC694\uD55C \uAC83\uC744 \uBBF8\uB9AC \uC801\uC5B4 \uAC00\uC694", "\uB208\uC5D0 \uB744\uB294 \uAC83\uC744 \uB2E4 \uC0AC\uC694", "\uACFC\uC790\uB9CC \uC0AC\uC694", "\uC544\uBB34 \uACC4\uD68D \uC5C6\uC774 \uAC00\uC694", "\uC7A5\uBCF4\uAE30 \uBAA9\uB85D!"],
+        ["\uC18C\uC2A4(\uCF00\uCCA9, \uB9C8\uC694\uB124\uC988)\uB294 \uC5B4\uB5BB\uAC8C \uBA39\uC73C\uBA74 \uC88B\uC744\uAE4C\uC694?", "\uC870\uAE08\uB9CC \uCC0D\uC5B4 \uBA39\uC5B4\uC694", "\uB4EC\uBFCD \uBD80\uC5B4 \uBA39\uC5B4\uC694", "\uC18C\uC2A4\uB9CC \uBA39\uC5B4\uC694", "\uBC25 \uB300\uC2E0 \uBA39\uC5B4\uC694", "\uB2F9\uACFC \uB098\uD2B8\uB968\uC774 \uC228\uC5B4 \uC788\uC5B4\uC694."],
+        ["\uB2F9\uACFC \uB098\uD2B8\uB968\uC744 \uC904\uC774\uBA74 \uC88B\uC740 \uC810\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uAC74\uAC15\uD55C \uBAB8\uC744 \uC9C0\uD0AC \uC218 \uC788\uC5B4\uC694", "\uD0A4\uAC00 \uC904\uC5B4\uC694", "\uBC30\uAC00 \uB298 \uACE0\uD30C\uC694", "\uD798\uC774 \uC5C6\uC5B4\uC838\uC694", "\uD3C9\uC0DD \uC2B5\uAD00!"]
+      ],
+      // 6층 주방: 식품 보관, 소비기한
+      6: [
+        ["\uC2DD\uD488\uC744 \uBA39\uC5B4\uB3C4 \uB418\uB294 \uB9C8\uC9C0\uB9C9 \uB0A0\uC9DC\uB97C \uB73B\uD558\uB294 \uD45C\uC2DC\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC18C\uBE44\uAE30\uD55C", "\uC81C\uC870\uBC88\uD638", "\uBC14\uCF54\uB4DC", "\uC6D0\uC0B0\uC9C0", "\uC694\uC998 \uBC14\uB010 \uD45C\uC2DC\uC608\uC694."],
+        ["\uB0C9\uC7A5 \uBCF4\uAD00\uC5D0 \uC54C\uB9DE\uC740 \uC628\uB3C4\uB294 \uBA87 \uB3C4 \uC815\uB3C4\uC77C\uAE4C\uC694?", "0~5\u2103", "20~25\u2103", "40~50\u2103", "100\u2103", "\uC544\uC8FC \uCC28\uAC11\uC9C0\uB9CC \uC5BC\uC9C0 \uC54A\uC544\uC694."],
+        ["\uB0C9\uB3D9 \uBCF4\uAD00\uC5D0 \uC54C\uB9DE\uC740 \uC628\uB3C4\uB294 \uBA87 \uB3C4 \uC774\uD558\uC77C\uAE4C\uC694?", "\uC601\uD558 18\u2103 \uC774\uD558", "\uC601\uC0C1 10\u2103 \uC774\uD558", "\uC601\uC0C1 25\u2103 \uC774\uD558", "\uC601\uD558 1\u2103 \uC774\uD558", "\uAF41\uAF41 \uC5BC\uC5B4\uC694."],
+        ["\uB0C9\uC7A5\uACE0\uB97C \uB108\uBB34 \uAF49 \uCC44\uC6B0\uBA74 \uC5B4\uB5BB\uAC8C \uB420\uAE4C\uC694?", "\uCC2C \uACF5\uAE30\uAC00 \uC798 \uB3CC\uC9C0 \uC54A\uC544\uC694", "\uB354 \uC798 \uCC28\uAC00\uC6CC\uC838\uC694", "\uC804\uAE30\uB97C \uB35C \uC368\uC694", "\uC74C\uC2DD\uC774 \uC624\uB798\uAC00\uC694", "\uC5EC\uC720 \uACF5\uAC04\uC774 \uD544\uC694\uD574\uC694."],
+        ["\uB0A8\uC740 \uC74C\uC2DD\uC740 \uC5B4\uB5BB\uAC8C \uBCF4\uAD00\uD560\uAE4C\uC694?", "\uC2DD\uD600\uC11C \uB69C\uAED1\uC744 \uB36E\uC5B4 \uBC14\uB85C \uB0C9\uC7A5 \uBCF4\uAD00", "\uD558\uB8E8 \uC885\uC77C \uC2E4\uC628\uC5D0 \uB450\uAE30", "\uD587\uBE5B\uC5D0 \uB450\uAE30", "\uB69C\uAED1 \uC5C6\uC774 \uB450\uAE30", "\uBE68\uB9AC \uCC28\uAC11\uAC8C!"],
+        ["\uC18C\uBE44\uAE30\uD55C\uC774 \uC9C0\uB09C \uC6B0\uC720\uB294 \uC5B4\uB5BB\uAC8C \uD560\uAE4C\uC694?", "\uB9C8\uC2DC\uC9C0 \uC54A\uC544\uC694", "\uADF8\uB0E5 \uB9C8\uC154\uC694", "\uCE5C\uAD6C\uC5D0\uAC8C \uC918\uC694", "\uB053\uC5EC\uC11C \uB9C8\uC154\uC694", "\uB0A0\uC9DC \uD655\uC778!"],
+        ["\uB0A0\uACE0\uAE30\uC640 \uCC44\uC18C\uB97C \uD568\uAED8 \uC190\uC9C8\uD560 \uB54C \uBC14\uB978 \uBC29\uBC95\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB3C4\uB9C8\uC640 \uCE7C\uC744 \uB530\uB85C \uC368\uC694", "\uAC19\uC740 \uB3C4\uB9C8\uB97C \uC53B\uC9C0 \uC54A\uACE0 \uC368\uC694", "\uCC44\uC18C\uB97C \uACE0\uAE30 \uC704\uC5D0 \uC62C\uB824\uC694", "\uC190\uC744 \uC548 \uC53B\uC5B4\uC694", "\uADE0\uC774 \uC62E\uACA8 \uAC00\uC694."],
+        ["\uAC10\uC790, \uC591\uD30C\uCC98\uB7FC \uC11C\uB298\uD55C \uACF3\uC5D0 \uB450\uB294 \uC2DD\uD488\uC758 \uC54C\uB9DE\uC740 \uBCF4\uAD00 \uC7A5\uC18C\uB294?", "\uD587\uBE5B\uC774 \uC5C6\uACE0 \uBC14\uB78C\uC774 \uD1B5\uD558\uB294 \uACF3", "\uB728\uAC70\uC6B4 \uAC00\uC2A4\uB808\uC778\uC9C0 \uC606", "\uC695\uC2E4", "\uB0C9\uB3D9\uC2E4", "\uC11C\uB298\uD558\uACE0 \uC5B4\uB450\uC6B4 \uACF3!"],
+        ["\uB0C9\uB3D9\uD55C \uACE0\uAE30\uB97C \uB179\uC774\uB294 \uC548\uC804\uD55C \uBC29\uBC95\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB0C9\uC7A5\uC2E4\uC5D0\uC11C \uCC9C\uCC9C\uD788 \uB179\uC5EC\uC694", "\uD587\uBE5B\uC5D0 \uB450\uC5B4\uC694", "\uC2E4\uC628\uC5D0 \uD558\uB8E8 \uC885\uC77C \uB46C\uC694", "\uB728\uAC70\uC6B4 \uBB3C\uC5D0 \uC624\uB798 \uB2F4\uAC00\uC694", "\uCC28\uAC00\uC6B4 \uACF3\uC5D0\uC11C!"],
+        ["\uC7A5\uC744 \uBCF4\uACE0 \uB3CC\uC544\uC640 \uAC00\uC7A5 \uBA3C\uC800 \uC815\uB9AC\uD560 \uC2DD\uD488\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB0C9\uC7A5\xB7\uB0C9\uB3D9 \uC2DD\uD488", "\uACFC\uC790", "\uB77C\uBA74", "\uD1B5\uC870\uB9BC", "\uBE68\uB9AC \uCC28\uAC11\uAC8C!"],
+        ["\uB0C9\uC7A5\uACE0 \uC548\uC5D0\uC11C \uBA3C\uC800 \uBA39\uC5B4\uC57C \uD558\uB294 \uC74C\uC2DD\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC18C\uBE44\uAE30\uD55C\uC774 \uAC00\uAE4C\uC6B4 \uC74C\uC2DD", "\uC0C8\uB85C \uC0B0 \uC74C\uC2DD", "\uAC00\uC7A5 \uD070 \uC74C\uC2DD", "\uC544\uBB34\uAC70\uB098", "\uBA3C\uC800 \uC0B0 \uAC83 \uBA3C\uC800!"],
+        ["\uD1B5\uC870\uB9BC \uCE94\uC774 \uBD80\uD480\uC5B4 \uC788\uC73C\uBA74 \uC5B4\uB5BB\uAC8C \uD560\uAE4C\uC694?", "\uBA39\uC9C0 \uC54A\uC544\uC694", "\uADF8\uB0E5 \uBA39\uC5B4\uC694", "\uD754\uB4E4\uC5B4\uC11C \uBA39\uC5B4\uC694", "\uCE5C\uAD6C\uC5D0\uAC8C \uC918\uC694", "\uC0C1\uD588\uB2E4\uB294 \uC2E0\uD638\uC608\uC694."],
+        ["\uB2EC\uAC40\uC740 \uC5B4\uB514\uC5D0 \uBCF4\uAD00\uD558\uB294 \uAC83\uC774 \uC88B\uC744\uAE4C\uC694?", "\uB0C9\uC7A5\uACE0", "\uCC3D\uAC00", "\uAC00\uC2A4\uB808\uC778\uC9C0 \uC606", "\uC11C\uB78D\uC7A5", "\uCC28\uAC11\uAC8C \uBCF4\uAD00!"],
+        ["\uC2DD\uD488\uC744 \uC0B4 \uB54C \uD655\uC778\uD558\uBA74 \uC88B\uC740 \uD45C\uC2DC\uAC00 \uC544\uB2CC \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uD3EC\uC7A5\uC9C0\uC758 \uCE90\uB9AD\uD130 \uADF8\uB9BC", "\uC18C\uBE44\uAE30\uD55C", "\uBCF4\uAD00 \uBC29\uBC95", "\uC6D0\uC7AC\uB8CC\uBA85", "\uADF8\uB9BC\uC740 \uC601\uC591\uACFC \uC0C1\uAD00\uC5C6\uC5B4\uC694."],
+        ["\uB0C9\uC7A5\uACE0 \uBB38\uC744 \uC624\uB798 \uC5F4\uC5B4 \uB450\uBA74 \uC5B4\uB5BB\uAC8C \uB420\uAE4C\uC694?", "\uC548\uC758 \uC628\uB3C4\uAC00 \uC62C\uB77C\uAC00\uC694", "\uB354 \uCC28\uAC00\uC6CC\uC838\uC694", "\uC74C\uC2DD\uC774 \uC2E0\uC120\uD574\uC838\uC694", "\uC804\uAE30\uB97C \uC544\uAEF4\uC694", "\uCC2C \uACF5\uAE30\uAC00 \uBE60\uC838\uB098\uAC00\uC694."]
+      ]
+    },
+    high: {
+      // 1층 급식실: 균형 잡힌 식단
+      1: [
+        ["\uC6B0\uB9AC \uBAB8\uC5D0 \uD544\uC694\uD55C 5\uB300 \uC601\uC591\uC18C\uAC00 \uC544\uB2CC \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC2DD\uD488\uCCA8\uAC00\uBB3C", "\uD0C4\uC218\uD654\uBB3C", "\uB2E8\uBC31\uC9C8", "\uBB34\uAE30\uC9C8", "\uB098\uBA38\uC9C0\uB294 \uBE44\uD0C0\uBBFC\uACFC \uC9C0\uBC29!"],
+        ["\uADE0\uD615 \uC7A1\uD78C \uD55C \uB07C \uC2DD\uB2E8\uC73C\uB85C \uAC00\uC7A5 \uC54C\uB9DE\uC740 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBC25, \uAD6D, \uC0DD\uC120\uAD6C\uC774, \uB098\uBB3C, \uAE40\uCE58", "\uB77C\uBA74, \uAE40\uBC25, \uB5A1\uBCF6\uC774", "\uCF00\uC774\uD06C\uC640 \uD0C4\uC0B0\uC74C\uB8CC", "\uD584\uBC84\uAC70, \uAC10\uC790\uD280\uAE40, \uCF5C\uB77C", "\uC5EC\uB7EC \uC2DD\uD488\uAD70!"],
+        ["\uC2DD\uB2E8\uC744 \uC9E4 \uB54C \uAC00\uC7A5 \uBA3C\uC800 \uC0DD\uAC01\uD560 \uC810\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC5EC\uB7EC \uC2DD\uD488\uAD70\uC744 \uACE8\uACE0\uB8E8 \uB123\uAE30", "\uC88B\uC544\uD558\uB294 \uC74C\uC2DD\uB9CC \uB123\uAE30", "\uAC00\uC7A5 \uBE44\uC2FC \uC74C\uC2DD \uB123\uAE30", "\uD280\uAE34 \uC74C\uC2DD\uB9CC \uB123\uAE30", "\uADE0\uD615!"],
+        ["\uC6B0\uB9AC\uB098\uB77C \uC2DD\uD488\uAD6C\uC131\uC790\uC804\uAC70\uC758 6\uAC00\uC9C0 \uC2DD\uD488\uAD70\uC5D0 \uB4E4\uC5B4\uAC00\uC9C0 \uC54A\uB294 \uAC83\uC740?", "\uACFC\uC790\uB958", "\uACE1\uB958", "\uCC44\uC18C\uB958", "\uACFC\uC77C\uB958", "\uAC04\uC2DD\uC740 \uB530\uB85C!"],
+        ["\uD55C \uB07C \uC2DD\uB2E8\uC5D0 \uCC44\uC18C \uBC18\uCC2C\uC744 \uB450 \uAC00\uC9C0 \uC774\uC0C1 \uB123\uC73C\uBA74 \uC88B\uC740 \uAE4C\uB2ED\uC740?", "\uBE44\uD0C0\uBBFC\xB7\uBB34\uAE30\uC9C8\xB7\uC2DD\uC774\uC12C\uC720\uB97C \uCDA9\uBD84\uD788 \uC5BB\uC73C\uB824\uACE0", "\uB9DB\uC744 \uC5C6\uC560\uB824\uACE0", "\uC5F4\uB7C9\uC744 \uB192\uC774\uB824\uACE0", "\uC9C0\uBC29\uC744 \uB298\uB9AC\uB824\uACE0", "\uCC44\uC18C\uC758 \uD798!"],
+        ["\uC6B0\uB9AC \uBAB8\uC5D0\uC11C \uC5D0\uB108\uC9C0(\uC5F4\uB7C9)\uB97C \uB0B4\uB294 \uC601\uC591\uC18C\uB07C\uB9AC \uBB36\uC778 \uAC83\uC740?", "\uD0C4\uC218\uD654\uBB3C, \uB2E8\uBC31\uC9C8, \uC9C0\uBC29", "\uBE44\uD0C0\uBBFC, \uBB34\uAE30\uC9C8, \uBB3C", "\uCE7C\uC298, \uCCA0\uBD84, \uC544\uC5F0", "\uBB3C, \uBE44\uD0C0\uBBFC, \uC9C0\uBC29", "\uC5F4\uB7C9 \uC601\uC591\uC18C!"],
+        ["\uC9C0\uBC29 1g\uC774 \uB0B4\uB294 \uC5F4\uB7C9\uC740 \uC57D \uBA87 kcal\uC77C\uAE4C\uC694?", "9kcal", "4kcal", "1kcal", "20kcal", "\uD0C4\uC218\uD654\uBB3C\uC758 \uB450 \uBC30\uAC00 \uB118\uC5B4\uC694."],
+        ["\uD0C4\uC218\uD654\uBB3C 1g\uC774 \uB0B4\uB294 \uC5F4\uB7C9\uC740 \uC57D \uBA87 kcal\uC77C\uAE4C\uC694?", "4kcal", "9kcal", "0kcal", "12kcal", "\uB2E8\uBC31\uC9C8\uACFC \uAC19\uC544\uC694."],
+        ["\uAE09\uC2DD \uC2DD\uB2E8\uD45C\uB97C \uBCFC \uB54C \uD655\uC778\uD560 \uC218 \uC788\uB294 \uAC83\uC774 \uC544\uB2CC \uAC83\uC740?", "\uCE5C\uAD6C\uC758 \uD0A4", "\uC74C\uC2DD \uC774\uB984", "\uC54C\uB808\uB974\uAE30 \uC720\uBC1C \uC2DD\uD488 \uBC88\uD638", "\uC5F4\uB7C9 \uC815\uBCF4", "\uC2DD\uB2E8\uD45C\uC5D0\uB294 \uC74C\uC2DD \uC815\uBCF4\uB9CC!"],
+        ["\uD3B8\uC2DD\uC744 \uACE0\uCE58\uB294 \uC88B\uC740 \uBC29\uBC95\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC2EB\uC5B4\uD558\uB294 \uC74C\uC2DD\uC744 \uC870\uAE08\uC529 \uC5EC\uB7EC \uBC88 \uBA39\uC5B4 \uBCF4\uAE30", "\uC88B\uC544\uD558\uB294 \uC74C\uC2DD\uB9CC \uBA39\uAE30", "\uC2EB\uC740 \uC74C\uC2DD\uC740 \uC808\uB300 \uC548 \uBA39\uAE30", "\uBC25\uC744 \uAD76\uAE30", "\uC870\uAE08\uC529 \uB3C4\uC804!"],
+        ["\uD55C \uB07C \uC2DD\uB2E8\uC5D0\uC11C \uC720\uC9C0\xB7\uB2F9\uB958\uB97C \uC801\uAC8C \uB123\uC5B4\uC57C \uD558\uB294 \uAE4C\uB2ED\uC740?", "\uC5F4\uB7C9\uC774 \uB192\uC544 \uB9CE\uC774 \uBA39\uC73C\uBA74 \uBE44\uB9CC\uC774 \uB420 \uC218 \uC788\uC5B4\uC11C", "\uB9DB\uC774 \uC5C6\uC5B4\uC11C", "\uC601\uC591\uC18C\uAC00 \uC804\uD600 \uC5C6\uC5B4\uC11C", "\uC18C\uD654\uAC00 \uC548 \uB418\uC5B4\uC11C", "\uC870\uAE08\uB9CC \uD544\uC694\uD574\uC694."],
+        ["\uBB3C\uC774 \uC6B0\uB9AC \uBAB8\uC5D0\uC11C \uD558\uB294 \uC77C\uC774 \uC544\uB2CC \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uADFC\uC721\uC744 \uC9C1\uC811 \uB9CC\uB4DC\uB294 \uC7AC\uB8CC\uAC00 \uB3FC\uC694", "\uCCB4\uC628\uC744 \uC870\uC808\uD574\uC694", "\uC601\uC591\uC18C\uB97C \uC6B4\uBC18\uD574\uC694", "\uB178\uD3D0\uBB3C\uC744 \uB0B4\uBCF4\uB0B4\uC694", "\uADFC\uC721 \uC7AC\uB8CC\uB294 \uB2E8\uBC31\uC9C8!"],
+        ["\uC544\uCE68 \uC2DD\uB2E8\uC5D0 \uB2E8\uBC31\uC9C8 \uBC18\uCC2C(\uB2EC\uAC40 \uB4F1)\uC744 \uB123\uC73C\uBA74 \uC88B\uC740 \uC810\uC740?", "\uC624\uB798 \uB4E0\uB4E0\uD558\uACE0 \uBAB8\uC744 \uB9CC\uB4DC\uB294 \uB370 \uB3C4\uC6C0\uC774 \uB3FC\uC694", "\uBE68\uB9AC \uBC30\uACE0\uD30C\uC838\uC694", "\uC7A0\uC774 \uC640\uC694", "\uC544\uBB34 \uD6A8\uACFC \uC5C6\uC5B4\uC694", "\uD3EC\uB9CC\uAC10!"],
+        ["\uAE09\uC2DD\uC744 \uB0A8\uAE30\uBA74 \uC0DD\uAE30\uB294 \uBB38\uC81C\uAC00 \uC544\uB2CC \uAC83\uC740?", "\uC601\uC591\uC774 \uB354 \uC88B\uC544\uC838\uC694", "\uC74C\uC2DD\uBB3C \uC4F0\uB808\uAE30\uAC00 \uB298\uC5B4\uC694", "\uD544\uC694\uD55C \uC601\uC591\uC18C\uB97C \uBABB \uC5BB\uC5B4\uC694", "\uCC98\uB9AC \uBE44\uC6A9\uC774 \uB4E4\uC5B4\uC694", "\uB0A8\uAE30\uBA74 \uC190\uD574!"],
+        ["\uC2DD\uB2E8\uC5D0 \uC5EC\uB7EC \uAC00\uC9C0 \uC0C9\uC758 \uC2DD\uD488\uC744 \uB123\uC73C\uBA74 \uC88B\uC740 \uAE4C\uB2ED\uC740?", "\uC11C\uB85C \uB2E4\uB978 \uC601\uC591\uC18C\uB97C \uACE8\uACE0\uB8E8 \uC5BB\uC744 \uC218 \uC788\uC5B4\uC11C", "\uC608\uC058\uAE30\uB9CC \uD574\uC11C", "\uC5F4\uB7C9\uC744 \uB192\uC774\uB824\uACE0", "\uB9DB\uC744 \uC5C6\uC560\uB824\uACE0", "\uCEEC\uB7EC \uD478\uB4DC!"]
+      ],
+      // 2층 채소칸: 식이섬유, 하루 권장량
+      2: [
+        ["\uC2DD\uC774\uC12C\uC720\uAC00 \uD558\uB294 \uC77C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC7A5 \uC6B4\uB3D9\uC744 \uB3C4\uC640 \uBCC0\uBE44\uB97C \uB9C9\uC544\uC694", "\uBF08\uB97C \uB9CC\uB4E4\uC5B4\uC694", "\uD53C\uB97C \uB9CC\uB4E4\uC5B4\uC694", "\uCCB4\uC628\uC744 \uC62C\uB824\uC694", "\uC7A5 \uCCAD\uC18C\uBD80!"],
+        ["\uC2DD\uC774\uC12C\uC720\uAC00 \uB9CE\uC740 \uC2DD\uD488\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uD604\uBBF8, \uCC44\uC18C, \uD574\uC870\uB958", "\uD770 \uC124\uD0D5", "\uBC84\uD130", "\uD0C4\uC0B0\uC74C\uB8CC", "\uAC70\uCE60\uACE0 \uC539\uB294 \uB9DB!"],
+        ["\uD770\uC300\uBC25 \uB300\uC2E0 \uD604\uBBF8\uBC25\uC774\uB098 \uC7A1\uACE1\uBC25\uC744 \uBA39\uC73C\uBA74 \uC88B\uC740 \uC810\uC740?", "\uC2DD\uC774\uC12C\uC720\uC640 \uBE44\uD0C0\uBBFC\uC744 \uB354 \uC5BB\uC5B4\uC694", "\uC5F4\uB7C9\uB9CC \uB298\uC5B4\uC694", "\uC601\uC591\uC18C\uAC00 \uC0AC\uB77C\uC838\uC694", "\uC18C\uD654\uAC00 \uC804\uD600 \uC548 \uB3FC\uC694", "\uAECD\uC9C8 \uCABD\uC5D0 \uC601\uC591\uC774!"],
+        ["\uC2DD\uC774\uC12C\uC720\uB97C \uBA39\uC744 \uB54C \uD568\uAED8 \uCDA9\uBD84\uD788 \uBA39\uC5B4\uC57C \uD558\uB294 \uAC83\uC740?", "\uBB3C", "\uC18C\uAE08", "\uC124\uD0D5", "\uAE30\uB984", "\uC2DD\uC774\uC12C\uC720\uAC00 \uBB3C\uC744 \uBA38\uAE08\uC5B4\uC694."],
+        ["\uC5B4\uB9B0\uC774\uAC00 \uCC44\uC18C\uB97C \uCDA9\uBD84\uD788 \uBA39\uB294 \uBC29\uBC95\uC73C\uB85C \uC54C\uB9DE\uC740 \uAC83\uC740?", "\uB07C\uB2C8\uB9C8\uB2E4 \uCC44\uC18C \uBC18\uCC2C\uC744 \uACC1\uB4E4\uC5EC\uC694", "\uC77C\uC8FC\uC77C\uC5D0 \uD55C \uBC88\uB9CC \uBA39\uC5B4\uC694", "\uCC44\uC18C \uC8FC\uC2A4 \uB300\uC2E0 \uD0C4\uC0B0\uC74C\uB8CC", "\uACFC\uC790\uB85C \uB300\uC2E0\uD574\uC694", "\uB9E4 \uB07C\uB2C8!"],
+        ["\uACFC\uC77C\uC744 \uC8FC\uC2A4\uBCF4\uB2E4 \uD1B5\uC9F8\uB85C \uBA39\uC744 \uB54C \uB354 \uB9CE\uC774 \uC5BB\uB294 \uAC83\uC740?", "\uC2DD\uC774\uC12C\uC720", "\uB2F9\uB958", "\uB098\uD2B8\uB968", "\uD2B8\uB79C\uC2A4\uC9C0\uBC29", "\uAECD\uC9C8\uACFC \uACFC\uC721!"],
+        ["\uC2DD\uC774\uC12C\uC720\uAC00 \uBD80\uC871\uD558\uBA74 \uC0DD\uAE30\uAE30 \uC26C\uC6B4 \uBB38\uC81C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBCC0\uBE44", "\uCDA9\uCE58 \uC608\uBC29", "\uADFC\uC721 \uC99D\uAC00", "\uC2DC\uB825 \uD5A5\uC0C1", "\uD654\uC7A5\uC2E4\uC774 \uD798\uB4E4\uC5B4\uC694."],
+        ["\uC2DD\uC774\uC12C\uC720\uB294 5\uB300 \uC601\uC591\uC18C \uC911 \uBB34\uC5C7\uC5D0 \uC18D\uD560\uAE4C\uC694?", "\uD0C4\uC218\uD654\uBB3C", "\uB2E8\uBC31\uC9C8", "\uC9C0\uBC29", "\uBE44\uD0C0\uBBFC", "\uC18C\uD654\uB418\uC9C0 \uC54A\uB294 \uD0C4\uC218\uD654\uBB3C!"],
+        ["\uB2E4\uC74C \uC911 \uC2DD\uC774\uC12C\uC720\uAC00 \uAC00\uC7A5 \uC801\uC740 \uAC83\uC740?", "\uD770 \uC124\uD0D5", "\uACE0\uAD6C\uB9C8", "\uC0AC\uACFC", "\uBBF8\uC5ED", "\uC815\uC81C\uB41C \uB2E8\uB9DB!"],
+        ["\uCC44\uC18C\uC640 \uACFC\uC77C\uC744 \uACE0\uB97C \uB54C \uC88B\uC740 \uC2B5\uAD00\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC5EC\uB7EC \uC0C9\uC744 \uACE8\uACE0\uB8E8 \uACE8\uB77C\uC694", "\uD55C \uAC00\uC9C0 \uC0C9\uB9CC \uACE8\uB77C\uC694", "\uD280\uAE34 \uCC44\uC18C\uB9CC \uACE8\uB77C\uC694", "\uB2F9\uC808\uC784 \uACFC\uC77C\uB9CC \uACE8\uB77C\uC694", "\uBB34\uC9C0\uAC1C \uC2DD\uB2E8!"],
+        ["\uACFC\uC77C\uC744 \uBA39\uC744 \uB54C \uC8FC\uC758\uD560 \uC810\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uACFC\uC77C\uC5D0\uB3C4 \uB2F9\uC774 \uC788\uC73C\uB2C8 \uC54C\uB9DE\uAC8C \uBA39\uC5B4\uC694", "\uB9CE\uC774 \uBA39\uC744\uC218\uB85D \uC88B\uC544\uC694", "\uBC25 \uB300\uC2E0 \uACFC\uC77C\uB9CC \uBA39\uC5B4\uC694", "\uC53B\uC9C0 \uC54A\uACE0 \uBA39\uC5B4\uC694", "\uC801\uB2F9\uD788!"],
+        ["\uC7A5 \uC18D \uC720\uC775\uADE0\uC758 \uBA39\uC774\uAC00 \uB418\uC5B4 \uC7A5 \uAC74\uAC15\uC744 \uB3D5\uB294 \uAC83\uC740?", "\uC2DD\uC774\uC12C\uC720", "\uD2B8\uB79C\uC2A4\uC9C0\uBC29", "\uB098\uD2B8\uB968", "\uC124\uD0D5", "\uC720\uC775\uADE0\uC758 \uBC25!"],
+        ["\uB2F9\uADFC\uC758 \uBCA0\uD0C0\uCE74\uB85C\uD2F4\uC740 \uBAB8\uC5D0\uC11C \uBB34\uC5C7\uC73C\uB85C \uBC14\uB014\uAE4C\uC694?", "\uBE44\uD0C0\uBBFC A", "\uBE44\uD0C0\uBBFC C", "\uCE7C\uC298", "\uB2E8\uBC31\uC9C8", "\uB208 \uAC74\uAC15!"],
+        ["\uCC44\uC18C\uB97C \uAE30\uB984\uC5D0 \uC0B4\uC9DD \uBCF6\uC73C\uBA74 \uD761\uC218\uAC00 \uC798 \uB418\uB294 \uBE44\uD0C0\uBBFC\uC740?", "\uBE44\uD0C0\uBBFC A", "\uBE44\uD0C0\uBBFC C", "\uBE44\uD0C0\uBBFC B1", "\uBE44\uD0C0\uBBFC B12", "\uAE30\uB984\uC5D0 \uB179\uB294 \uBE44\uD0C0\uBBFC!"],
+        ["\uD558\uB8E8\uC5D0 \uBA39\uB294 \uCC44\uC18C\uC640 \uACFC\uC77C\uC758 \uC591\uC744 \uB298\uB9AC\uB294 \uBC29\uBC95\uC73C\uB85C \uC54C\uB9DE\uC740 \uAC83\uC740?", "\uAC04\uC2DD\uC73C\uB85C \uBC29\uC6B8\uD1A0\uB9C8\uD1A0\uB098 \uACFC\uC77C \uBA39\uAE30", "\uAC04\uC2DD\uC73C\uB85C \uC0AC\uD0D5 \uBA39\uAE30", "\uAE09\uC2DD \uCC44\uC18C \uB0A8\uAE30\uAE30", "\uB77C\uBA74\uB9CC \uBA39\uAE30", "\uAC04\uC2DD\uC744 \uBC14\uAFD4\uC694."]
+      ],
+      // 3층 우유·고기칸: 5대 영양소와 하는 일
+      3: [
+        ["\uADFC\uC721, \uD53C\uBD80, \uBA38\uB9AC\uCE74\uB77D\uC744 \uB9CC\uB4DC\uB294 \uC8FC\uB41C \uC601\uC591\uC18C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB2E8\uBC31\uC9C8", "\uD0C4\uC218\uD654\uBB3C", "\uBE44\uD0C0\uBBFC C", "\uBB3C", "\uBAB8\uC758 \uC7AC\uB8CC!"],
+        ["\uC6B0\uB9AC \uBAB8\uC758 \uC8FC\uB41C \uC5D0\uB108\uC9C0\uC6D0\uC774 \uB418\uB294 \uC601\uC591\uC18C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uD0C4\uC218\uD654\uBB3C", "\uBB34\uAE30\uC9C8", "\uBE44\uD0C0\uBBFC", "\uBB3C", "\uBC25\uACFC \uBE75!"],
+        ["\uBAB8\uC758 \uAE30\uB2A5\uC744 \uC870\uC808\uD558\uB294 \uC601\uC591\uC18C\uB07C\uB9AC \uBB36\uC778 \uAC83\uC740?", "\uBE44\uD0C0\uBBFC\uACFC \uBB34\uAE30\uC9C8", "\uD0C4\uC218\uD654\uBB3C\uACFC \uC9C0\uBC29", "\uB2E8\uBC31\uC9C8\uACFC \uC9C0\uBC29", "\uC124\uD0D5\uACFC \uC18C\uAE08", "\uC870\uC808 \uC601\uC591\uC18C!"],
+        ["\uC9C0\uBC29\uC774 \uD558\uB294 \uC77C\uB85C \uC54C\uB9DE\uC740 \uAC83\uC740?", "\uC5D0\uB108\uC9C0\uB97C \uC800\uC7A5\uD558\uACE0 \uCCB4\uC628\uC744 \uC720\uC9C0\uD574\uC694", "\uBF08\uB9CC \uB9CC\uB4E4\uC5B4\uC694", "\uD53C\uB97C \uB9CC\uB4E4\uC5B4\uC694", "\uC544\uBB34 \uC77C\uB3C4 \uC548 \uD574\uC694", "\uC801\uB2F9\uD788 \uD544\uC694\uD574\uC694."],
+        ["\uCCA0\uBD84\uC774 \uBD80\uC871\uD558\uBA74 \uC0DD\uAE38 \uC218 \uC788\uB294 \uBB38\uC81C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBE48\uD608", "\uCDA9\uCE58", "\uBE44\uB9CC", "\uACE8\uB2E4\uACF5\uC99D", "\uC5B4\uC9C0\uB7EC\uC6CC\uC694."],
+        ["\uCE7C\uC298\uC774 \uBD80\uC871\uD558\uBA74 \uC0DD\uAE38 \uC218 \uC788\uB294 \uBB38\uC81C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBF08\uAC00 \uC57D\uD574\uC838\uC694", "\uD53C\uBD80\uAC00 \uAE4C\uB9E4\uC838\uC694", "\uD0A4\uAC00 \uAC11\uC790\uAE30 \uCEE4\uC838\uC694", "\uB208\uC774 \uC88B\uC544\uC838\uC694", "\uBF08 \uAC74\uAC15!"],
+        ["\uB2E8\uBC31\uC9C8\uC744 \uAD6C\uC131\uD558\uB294 \uC791\uC740 \uB2E8\uC704\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC544\uBBF8\uB178\uC0B0", "\uD3EC\uB3C4\uB2F9", "\uC9C0\uBC29\uC0B0", "\uBE44\uD0C0\uBBFC", "\uBE14\uB85D \uC870\uAC01!"],
+        ["\uD0C4\uC218\uD654\uBB3C\uC774 \uC18C\uD654\uB418\uC5B4 \uB9CC\uB4E4\uC5B4\uC9C0\uB294 \uB300\uD45C\uC801\uC778 \uB2F9\uC740?", "\uD3EC\uB3C4\uB2F9", "\uC544\uBBF8\uB178\uC0B0", "\uC9C0\uBC29\uC0B0", "\uCE7C\uC298", "\uB1CC\uC758 \uC5D0\uB108\uC9C0!"],
+        ["\uC88B\uC740 \uC9C0\uBC29(\uBD88\uD3EC\uD654\uC9C0\uBC29)\uC774 \uB9CE\uC740 \uC2DD\uD488\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB4F1\uD478\uB978 \uC0DD\uC120, \uACAC\uACFC\uB958", "\uD280\uAE40 \uAE30\uB984 \uACFC\uC790", "\uB9C8\uAC00\uB9B0 \uACFC\uC790", "\uBC84\uD130 \uCF00\uC774\uD06C", "\uACE0\uB4F1\uC5B4, \uD638\uB450!"],
+        ["\uB3D9\uBB3C\uC131 \uB2E8\uBC31\uC9C8\uACFC \uC2DD\uBB3C\uC131 \uB2E8\uBC31\uC9C8\uC744 \uD568\uAED8 \uBA39\uC73C\uBA74 \uC88B\uC740 \uC810\uC740?", "\uC5EC\uB7EC \uC601\uC591\uC18C\uB97C \uACE8\uACE0\uB8E8 \uC5BB\uC744 \uC218 \uC788\uC5B4\uC694", "\uC601\uC591\uC18C\uAC00 \uC0AC\uB77C\uC838\uC694", "\uC18C\uD654\uAC00 \uC548 \uB3FC\uC694", "\uC0B4\uB9CC \uCA84\uC694", "\uACE0\uAE30 + \uCF69!"],
+        ["\uD2B8\uB79C\uC2A4\uC9C0\uBC29\uC774 \uB9CE\uC744 \uC218 \uC788\uB294 \uC74C\uC2DD\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC77C\uBD80 \uD280\uAE34 \uACFC\uC790\uC640 \uD328\uC2A4\uD2B8\uD478\uB4DC", "\uC0DD\uACFC\uC77C", "\uC0B6\uC740 \uB2EC\uAC40", "\uC6B0\uC720", "\uB418\uB3C4\uB85D \uC801\uAC8C!"],
+        ["\uBE44\uD0C0\uBBFC B1\uC774 \uBD80\uC871\uD558\uBA74 \uC0DD\uAE38 \uC218 \uC788\uB294 \uBCD1\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uAC01\uAE30\uBCD1", "\uAD34\uD608\uBCD1", "\uC57C\uB9F9\uC99D", "\uAD6C\uB8E8\uBCD1", "\uD604\uBBF8\uC5D0 \uB9CE\uC740 \uBE44\uD0C0\uBBFC!"],
+        ["\uBE44\uD0C0\uBBFC D\uAC00 \uBD80\uC871\uD558\uBA74 \uC5B4\uB9B0\uC774\uC5D0\uAC8C \uC0DD\uAE38 \uC218 \uC788\uB294 \uBCD1\uC740?", "\uAD6C\uB8E8\uBCD1", "\uAC01\uAE30\uBCD1", "\uAD34\uD608\uBCD1", "\uBE48\uD608", "\uBF08\uAC00 \uD718\uC5B4\uC694."],
+        ["\uB2E4\uC74C \uC911 \uC601\uC591\uC18C\uAC00 \uD558\uB294 \uC77C\uC744 \uBC14\uB974\uAC8C \uC9DD\uC9C0\uC740 \uAC83\uC740?", "\uCE7C\uC298 \u2013 \uBF08\uC640 \uC774", "\uBE44\uD0C0\uBBFC C \u2013 \uADFC\uC721 \uC7AC\uB8CC", "\uC9C0\uBC29 \u2013 \uD53C \uB9CC\uB4E4\uAE30", "\uCCA0\uBD84 \u2013 \uB208 \uAC74\uAC15", "\uD558\uB098\uC529 \uB530\uC838 \uBD10\uC694."],
+        ["5\uB300 \uC601\uC591\uC18C\uC5D0 \uBB3C\uC744 \uB354\uD574 \uBD80\uB974\uB294 \uC774\uB984\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "6\uB300 \uC601\uC591\uC18C", "7\uB300 \uC601\uC591\uC18C", "4\uB300 \uC601\uC591\uC18C", "3\uB300 \uC601\uC591\uC18C", "\uD558\uB098\uAC00 \uB298\uC5C8\uC5B4\uC694."]
+      ],
+      // 4층 텃밭: 지역 농산물, 탄소 발자국
+      4: [
+        ["\uB0B4\uAC00 \uC0AC\uB294 \uC9C0\uC5ED \uAC00\uAE4C\uC6B4 \uACF3\uC5D0\uC11C \uC0DD\uC0B0\uB41C \uB18D\uC0B0\uBB3C\uC744 \uBB34\uC5C7\uC774\uB77C \uD560\uAE4C\uC694?", "\uB85C\uCEEC\uD478\uB4DC", "\uD328\uC2A4\uD2B8\uD478\uB4DC", "\uC815\uD06C\uD478\uB4DC", "\uC778\uC2A4\uD134\uD2B8\uC2DD\uD488", "\uAC00\uAE4C\uC6B4 \uBA39\uAC70\uB9AC!"],
+        ["\uC2DD\uD488\uC774 \uC0DD\uC0B0\uC9C0\uC5D0\uC11C \uC2DD\uD0C1\uAE4C\uC9C0 \uC774\uB3D9\uD55C \uAC70\uB9AC\uC640 \uC591\uC744 \uB098\uD0C0\uB0B8 \uAC83\uC740?", "\uD478\uB4DC \uB9C8\uC77C\uB9AC\uC9C0", "\uCE7C\uB85C\uB9AC", "\uC601\uC591\uC131\uBD84\uD45C", "\uC18C\uBE44\uAE30\uD55C", "\uBA40\uC218\uB85D \uCEE4\uC838\uC694."],
+        ["\uB85C\uCEEC\uD478\uB4DC\uB97C \uBA39\uC73C\uBA74 \uC88B\uC740 \uC810\uC774 \uC544\uB2CC \uAC83\uC740?", "\uC6B4\uC1A1 \uAC70\uB9AC\uAC00 \uB298\uC5B4\uB098\uC694", "\uC2E0\uC120\uD574\uC694", "\uD0C4\uC18C \uBC30\uCD9C\uC774 \uC904\uC5B4\uC694", "\uC9C0\uC5ED \uB18D\uAC00\uC5D0 \uB3C4\uC6C0\uC774 \uB3FC\uC694", "\uAC70\uB9AC\uAC00 \uC904\uC5B4\uC694!"],
+        ["\uD0C4\uC18C \uBC1C\uC790\uAD6D\uC744 \uC904\uC774\uB294 \uC2DD\uC0DD\uD65C\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC81C\uCCA0\xB7\uB85C\uCEEC \uC2DD\uD488\uC744 \uBA39\uACE0 \uC74C\uC2DD\uC744 \uB0A8\uAE30\uC9C0 \uC54A\uC544\uC694", "\uC218\uC785 \uACFC\uC77C\uB9CC \uBA39\uC5B4\uC694", "\uC74C\uC2DD\uC744 \uB9CE\uC774 \uB0A8\uACA8\uC694", "\uC77C\uD68C\uC6A9 \uC6A9\uAE30\uB97C \uB9CE\uC774 \uC368\uC694", "\uC9C0\uAD6C\uB97C \uC9C0\uCF1C\uC694."],
+        ["\uC74C\uC2DD\uBB3C \uC4F0\uB808\uAE30\uB97C \uC904\uC774\uBA74 \uC88B\uC740 \uC810\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC790\uC6D0\uC744 \uC544\uB07C\uACE0 \uD658\uACBD \uC624\uC5FC\uC744 \uC904\uC5EC\uC694", "\uC4F0\uB808\uAE30\uAC00 \uB298\uC5B4\uC694", "\uB3C8\uC774 \uB354 \uB4E4\uC5B4\uC694", "\uC544\uBB34 \uC0C1\uAD00 \uC5C6\uC5B4\uC694", "\uC794\uBC18 \uC81C\uB85C!"],
+        ["\uC81C\uCCA0\uC774 \uC544\uB2CC \uCC44\uC18C\uB97C \uAE30\uB97C \uB54C \uC5D0\uB108\uC9C0\uAC00 \uB354 \uB4DC\uB294 \uAE4C\uB2ED\uC740?", "\uB09C\uBC29 \uB4F1 \uC2DC\uC124\uC774 \uD544\uC694\uD574\uC11C", "\uBB3C\uC774 \uD544\uC694 \uC5C6\uC5B4\uC11C", "\uD587\uBE5B\uC774 \uB108\uBB34 \uB9CE\uC544\uC11C", "\uC528\uC557\uC774 \uC5C6\uC5B4\uC11C", "\uD558\uC6B0\uC2A4 \uB09C\uBC29!"],
+        ["\uC7A5\uBC14\uAD6C\uB2C8\uB97C \uC4F0\uB294 \uAC83\uACFC \uAD00\uB828 \uC788\uB294 \uD658\uACBD \uC2E4\uCC9C\uC740?", "\uC77C\uD68C\uC6A9 \uBE44\uB2D0 \uC904\uC774\uAE30", "\uC74C\uC2DD \uB0A8\uAE30\uAE30", "\uBB3C \uB0AD\uBE44", "\uC5D0\uB108\uC9C0 \uB0AD\uBE44", "\uBE44\uB2D0 \uB300\uC2E0!"],
+        ["\uB18D\uC0B0\uBB3C\uC744 \uAE30\uB97C \uB54C \uD654\uD559 \uBE44\uB8CC\uC640 \uB18D\uC57D\uC744 \uC904\uC774\uB294 \uB18D\uC5C5 \uBC29\uC2DD\uC740?", "\uCE5C\uD658\uACBD \uB18D\uC5C5", "\uB300\uB7C9 \uC0DD\uC0B0 \uB18D\uC5C5", "\uC218\uC785 \uB18D\uC5C5", "\uAC00\uACF5 \uB18D\uC5C5", "\uB545\uC744 \uC0B4\uB824\uC694."],
+        ["\uBA40\uB9AC\uC11C \uBE44\uD589\uAE30\uB85C \uC2E4\uC5B4 \uC628 \uACFC\uC77C\uC758 \uD2B9\uC9D5\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC6B4\uC1A1 \uC911 \uD0C4\uC18C\uAC00 \uB9CE\uC774 \uB098\uC640\uC694", "\uD0C4\uC18C\uAC00 \uC804\uD600 \uC548 \uB098\uC640\uC694", "\uC5B8\uC81C\uB098 \uB354 \uC2E0\uC120\uD574\uC694", "\uD478\uB4DC \uB9C8\uC77C\uB9AC\uC9C0\uAC00 \uC791\uC544\uC694", "\uBA3C \uAE38\uC744 \uC654\uC5B4\uC694."],
+        ["\uD143\uBC2D \uAC00\uAFB8\uAE30\uB85C \uC5BB\uC744 \uC218 \uC788\uB294 \uAC83\uC774 \uC544\uB2CC \uAC83\uC740?", "\uD0C4\uC18C \uBC30\uCD9C \uC99D\uAC00", "\uBA39\uAC70\uB9AC \uC18C\uC911\uD568 \uAE68\uB2EB\uAE30", "\uC2E0\uC120\uD55C \uCC44\uC18C", "\uC790\uC5F0 \uAD00\uCC30", "\uC88B\uC740 \uC810\uC774 \uB9CE\uC544\uC694."],
+        ["\uB0A8\uC740 \uCC44\uC18C \uAECD\uC9C8\uC744 \uD65C\uC6A9\uD558\uB294 \uCE5C\uD658\uACBD \uBC29\uBC95\uC740?", "\uD1F4\uBE44\uB85C \uB9CC\uB4E4\uC5B4 \uD759\uC5D0 \uB3CC\uB824\uC918\uC694", "\uBC14\uB2E4\uC5D0 \uBC84\uB824\uC694", "\uD0DC\uC6CC\uC694", "\uC544\uBB34 \uB370\uB098 \uBC84\uB824\uC694", "\uD759\uC758 \uBC25!"],
+        ["\uC6B0\uB9AC \uC9C0\uC5ED \uB18D\uC0B0\uBB3C\uC5D0 \uBD99\uC740 \uC778\uC99D \uD45C\uC2DC\uB97C \uD655\uC778\uD558\uBA74 \uC54C \uC218 \uC788\uB294 \uAC83\uC740?", "\uC5B4\uB514\uC11C \uC5B4\uB5BB\uAC8C \uAE38\uB800\uB294\uC9C0", "\uAC00\uAC8C \uC8FC\uC778 \uC774\uB984", "\uD3EC\uC7A5\uC9C0 \uC0C9\uAE54", "\uAD11\uACE0 \uBAA8\uB378", "\uBBFF\uC744 \uC218 \uC788\uB294 \uC815\uBCF4!"],
+        ["\uC721\uB958 \uB300\uC2E0 \uCF69 \uAC19\uC740 \uC2DD\uBB3C\uC131 \uB2E8\uBC31\uC9C8\uC744 \uAC00\uB054 \uBA39\uC73C\uBA74 \uC88B\uC740 \uC810\uC740?", "\uC628\uC2E4\uAC00\uC2A4 \uBC30\uCD9C\uC744 \uC904\uC774\uB294 \uB370 \uB3C4\uC6C0\uC774 \uB3FC\uC694", "\uD0C4\uC18C\uAC00 \uB298\uC5B4\uC694", "\uC601\uC591\uC18C\uAC00 \uC804\uD600 \uC5C6\uC5B4\uC694", "\uBB3C\uC744 \uB354 \uB9CE\uC774 \uC368\uC694", "\uC9C0\uAD6C\uC5D0\uB3C4 \uC88B\uC544\uC694."],
+        ["\uAC10\uC790\uB294 \uC2DD\uBB3C\uC758 \uC5B4\uB290 \uBD80\uBD84\uC744 \uBA39\uB294 \uAC83\uC77C\uAE4C\uC694?", "\uB545\uC18D\uC904\uAE30(\uB369\uC774\uC904\uAE30)", "\uBFCC\uB9AC", "\uC5F4\uB9E4", "\uAF43", "\uACE0\uAD6C\uB9C8\uC640 \uB2EC\uB77C\uC694!"],
+        ["\uACE0\uAD6C\uB9C8\uB294 \uC2DD\uBB3C\uC758 \uC5B4\uB290 \uBD80\uBD84\uC744 \uBA39\uB294 \uAC83\uC77C\uAE4C\uC694?", "\uBFCC\uB9AC(\uB369\uC774\uBFCC\uB9AC)", "\uC904\uAE30", "\uC5F4\uB9E4", "\uC78E", "\uAC10\uC790\uC640 \uB2EC\uB77C\uC694!"]
+      ],
+      // 5층 시장: 식품 표시 읽기
+      5: [
+        ["\uC601\uC591\uC131\uBD84\uD45C\uC5D0\uC11C \uD655\uC778\uD560 \uC218 \uC5C6\uB294 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uB9DB\uC788\uB294 \uC815\uB3C4", "\uC5F4\uB7C9", "\uB098\uD2B8\uB968", "\uB2F9\uB958", "\uC22B\uC790\uB85C \uC801\uD78C \uAC83\uB9CC!"],
+        ['\uC601\uC591\uC131\uBD84\uD45C\uC758 "1\uC77C \uC601\uC591\uC131\uBD84 \uAE30\uC900\uCE58\uC5D0 \uB300\uD55C \uBE44\uC728(%)"\uC740 \uBB34\uC5C7\uC744 \uC54C\uB824 \uC904\uAE4C\uC694?', "\uD558\uB8E8 \uD544\uC694\uD55C \uC591 \uC911 \uC5BC\uB9C8\uB97C \uBA39\uB294\uC9C0", "\uAC00\uACA9\uC774 \uC5BC\uB9C8\uC778\uC9C0", "\uC5BC\uB9C8\uB098 \uB9DB\uC788\uB294\uC9C0", "\uBA87 \uAC1C \uB4E4\uC5C8\uB294\uC9C0", "\uD37C\uC13C\uD2B8!"],
+        ["\uC6D0\uC7AC\uB8CC\uBA85\uC740 \uC5B4\uB5A4 \uC21C\uC11C\uB85C \uC801\uD600 \uC788\uC744\uAE4C\uC694?", "\uB9CE\uC774 \uB4E4\uC5B4\uAC04 \uC21C\uC11C", "\uAC00\uB098\uB2E4\uC21C", "\uAC12\uC774 \uBE44\uC2FC \uC21C\uC11C", "\uC0C9\uAE54 \uC21C\uC11C", "\uCCAB \uBC88\uC9F8\uAC00 \uAC00\uC7A5 \uB9CE\uC544\uC694."],
+        ["\uB450 \uACFC\uC790 \uC911 \uB098\uD2B8\uB968\uC774 \uC801\uC740 \uAC83\uC744 \uACE0\uB974\uB824\uBA74 \uBB34\uC5C7\uC744 \uBE44\uAD50\uD560\uAE4C\uC694?", "\uC601\uC591\uC131\uBD84\uD45C\uC758 \uB098\uD2B8\uB968 \uC218\uCE58", "\uD3EC\uC7A5 \uD06C\uAE30", "\uCE90\uB9AD\uD130 \uADF8\uB9BC", "\uAD11\uACE0 \uBB38\uAD6C", "\uC22B\uC790\uB97C \uBE44\uAD50\uD574\uC694."],
+        ["\uC54C\uB808\uB974\uAE30\uAC00 \uC788\uB294 \uCE5C\uAD6C\uAC00 \uAF2D \uD655\uC778\uD574\uC57C \uD558\uB294 \uD45C\uC2DC\uB294?", "\uC54C\uB808\uB974\uAE30 \uC720\uBC1C \uBB3C\uC9C8 \uD45C\uC2DC", "\uBC14\uCF54\uB4DC", "\uD3EC\uC7A5 \uC0C9\uAE54", "\uD68C\uC0AC \uC804\uD654\uBC88\uD638", "\uB545\uCF69, \uC6B0\uC720, \uB2EC\uAC40 \uB4F1!"],
+        ['\uC2DD\uD488 \uD3EC\uC7A5\uC5D0\uC11C "\uC18C\uBE44\uAE30\uD55C"\uC774 \uB73B\uD558\uB294 \uAC83\uC740?', "\uD45C\uC2DC\uB41C \uBCF4\uAD00 \uBC29\uBC95\uC744 \uC9C0\uD0A4\uBA74 \uBA39\uC5B4\uB3C4 \uC548\uC804\uD55C \uAE30\uD55C", "\uAC00\uAC8C\uC5D0\uC11C \uD314 \uC218 \uC788\uB294 \uAE30\uD55C", "\uB9CC\uB4E0 \uB0A0\uC9DC", "\uD3EC\uC7A5\uD55C \uC0AC\uB78C \uC774\uB984", "2023\uB144\uBD80\uD130 \uBC14\uB00C\uC5C8\uC5B4\uC694."],
+        ["\uC601\uC591\uC131\uBD84\uD45C\uC5D0\uC11C \uC904\uC5EC \uBA39\uC5B4\uC57C \uD560 \uC131\uBD84\uB07C\uB9AC \uBB36\uC778 \uAC83\uC740?", "\uB098\uD2B8\uB968, \uB2F9\uB958, \uD3EC\uD654\uC9C0\uBC29, \uD2B8\uB79C\uC2A4\uC9C0\uBC29", "\uB2E8\uBC31\uC9C8, \uCE7C\uC298", "\uC2DD\uC774\uC12C\uC720, \uBE44\uD0C0\uBBFC", "\uCCA0\uBD84, \uCE7C\uB968", "\uC801\uC744\uC218\uB85D \uC88B\uC544\uC694."],
+        ['\uACFC\uC790 \uD55C \uBD09\uC9C0\uC5D0 "\uCD1D 2\uD68C \uC81C\uACF5\uB7C9"\uC774\uB77C\uACE0 \uC801\uD600 \uC788\uB2E4\uBA74?', "\uD55C \uBD09\uC9C0\uB97C \uB2E4 \uBA39\uC73C\uBA74 \uD45C\uC2DC \uC5F4\uB7C9\uC758 2\uBC30\uB97C \uBA39\uB294 \uAC70\uC608\uC694", "\uC5F4\uB7C9\uC774 \uBC18\uC73C\uB85C \uC904\uC5B4\uC694", "\uC544\uBB34 \uC758\uBBF8 \uC5C6\uC5B4\uC694", "\uB450 \uBD09\uC9C0\uB97C \uC0AC\uC57C \uD574\uC694", "\uACF1\uD558\uAE30!"],
+        ['"\uBB34\uC124\uD0D5" \uC74C\uB8CC\uC5D0 \uB300\uD574 \uBC14\uB978 \uC124\uBA85\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?', "\uC124\uD0D5\uC740 \uC5C6\uC9C0\uB9CC \uB2E4\uB978 \uB2E8\uB9DB \uC131\uBD84\uC774 \uC788\uC744 \uC218 \uC788\uC5B4\uC694", "\uC5F4\uB7C9\uC774 \uBB34\uC870\uAC74 0\uC774\uC5D0\uC694", "\uBB3C\uACFC \uB611\uAC19\uC544\uC694", "\uAC74\uAC15\uC5D0 \uBB34\uC870\uAC74 \uC88B\uC544\uC694", "\uD45C\uC2DC\uB97C \uAF3C\uAF3C\uD788!"],
+        ["HACCP(\uD574\uC379) \uC778\uC99D \uB9C8\uD06C\uAC00 \uB73B\uD558\uB294 \uAC83\uC740?", "\uC2DD\uD488\uC744 \uC548\uC804\uD558\uAC8C \uAD00\uB9AC\uD558\uBA70 \uB9CC\uB4E4\uC5C8\uB2E4\uB294 \uD45C\uC2DC", "\uB9DB\uC788\uB2E4\uB294 \uD45C\uC2DC", "\uAC12\uC774 \uC2F8\uB2E4\uB294 \uD45C\uC2DC", "\uC218\uC785\uD488\uC774\uB77C\uB294 \uD45C\uC2DC", "\uC2DD\uD488 \uC548\uC804!"],
+        ["\uC6D0\uC0B0\uC9C0 \uD45C\uC2DC\uB97C \uBCF4\uBA74 \uC54C \uC218 \uC788\uB294 \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC2DD\uD488\uC744 \uC0DD\uC0B0\uD55C \uB098\uB77C\uB098 \uC9C0\uC5ED", "\uC601\uC591\uC18C \uC591", "\uB9DB", "\uAC00\uACA9", "\uC5B4\uB514\uC11C \uC654\uC744\uAE4C?"],
+        ["\uC74C\uB8CC 1\uBCD1\uC5D0 \uB2F9\uB958 27g\uC774 \uB4E4\uC5B4 \uC788\uB2E4\uBA74 \uAC01\uC124\uD0D5(\uC57D 3g) \uBA87 \uAC1C\uCBE4\uC77C\uAE4C\uC694?", "\uC57D 9\uAC1C", "\uC57D 1\uAC1C", "\uC57D 3\uAC1C", "\uC57D 30\uAC1C", "27 \xF7 3"],
+        ["\uC5B4\uB9B0\uC774 \uAE30\uD638\uC2DD\uD488 \uD488\uC9C8\uC778\uC99D \uB9C8\uD06C\uAC00 \uC788\uB294 \uC2DD\uD488\uC758 \uD2B9\uC9D5\uC740?", "\uC548\uC804\uD558\uACE0 \uC601\uC591\uC744 \uACE0\uB824\uD55C \uC5B4\uB9B0\uC774 \uAC04\uC2DD\uC774\uC5D0\uC694", "\uBB34\uC870\uAC74 \uB9CE\uC774 \uBA39\uC5B4\uB3C4 \uB3FC\uC694", "\uC5F4\uB7C9\uC774 \uAC00\uC7A5 \uB192\uC544\uC694", "\uC218\uC785\uD488\uC774\uC5D0\uC694", "\uC5B4\uB9B0\uC774\uB97C \uC704\uD55C \uC778\uC99D!"],
+        ["\uC601\uC591\uC131\uBD84\uD45C\uB97C \uC77D\uB294 \uC2B5\uAD00\uC758 \uC88B\uC740 \uC810\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uAC74\uAC15\uD55C \uC2DD\uD488\uC744 \uC2A4\uC2A4\uB85C \uACE0\uB97C \uC218 \uC788\uC5B4\uC694", "\uACFC\uC790\uB97C \uB354 \uB9CE\uC774 \uBA39\uAC8C \uB3FC\uC694", "\uB3C8\uC774 \uB354 \uB4E4\uC5B4\uC694", "\uC544\uBB34 \uB3C4\uC6C0\uC774 \uC548 \uB3FC\uC694", "\uB611\uB611\uD55C \uC18C\uBE44\uC790!"],
+        ["\uB098\uD2B8\uB968 \uD568\uB7C9\uC774 \uAC19\uC740 \uB450 \uB77C\uBA74 \uC911 \uAD6D\uBB3C\uC744 \uB0A8\uAE30\uBA74 \uC5B4\uB5BB\uAC8C \uB420\uAE4C\uC694?", "\uBA39\uB294 \uB098\uD2B8\uB968\uC774 \uC904\uC5B4\uC694", "\uB098\uD2B8\uB968\uC774 \uB298\uC5B4\uC694", "\uB611\uAC19\uC544\uC694", "\uB2E8\uBC31\uC9C8\uC774 \uB298\uC5B4\uC694", "\uB098\uD2B8\uB968\uC740 \uAD6D\uBB3C\uC5D0 \uB9CE\uC544\uC694."]
+      ],
+      // 6층 주방: 식중독 예방, 아침밥
+      6: [
+        ["\uC2DD\uC911\uB3C5 \uC608\uBC29 3\uB300 \uC218\uCE59\uC5D0 \uB4E4\uC5B4\uAC00\uC9C0 \uC54A\uB294 \uAC83\uC740?", "\uC74C\uC2DD\uC740 \uC624\uB798 \uC2E4\uC628\uC5D0 \uB450\uAE30", "\uC190 \uC53B\uAE30", "\uC775\uD600 \uBA39\uAE30", "\uB053\uC5EC \uBA39\uAE30", "\uB098\uBA38\uC9C0 \uC14B\uC774 \uC218\uCE59\uC774\uC5D0\uC694."],
+        ["\uC2DD\uC911\uB3C5\uC774 \uAC00\uC7A5 \uB9CE\uC774 \uC0DD\uAE30\uAE30 \uC26C\uC6B4 \uACC4\uC808\uC740 \uC5B8\uC81C\uC77C\uAE4C\uC694?", "\uC5EC\uB984", "\uACA8\uC6B8", "\uB2A6\uAC00\uC744", "\uC774\uB978 \uBD04", "\uB365\uACE0 \uC2B5\uD560 \uB54C!"],
+        ["\uACE0\uAE30\uB97C \uC548\uC804\uD558\uAC8C \uC775\uD788\uB824\uBA74 \uC18D\uAE4C\uC9C0 \uBA87 \u2103 \uC774\uC0C1\uC73C\uB85C 1\uBD84 \uB118\uAC8C \uC775\uD600\uC57C \uD560\uAE4C\uC694?", "75\u2103", "30\u2103", "45\u2103", "10\u2103", "\uC18D\uAE4C\uC9C0 \uCDA9\uBD84\uD788!"],
+        ["\uC544\uCE68\uBC25\uC744 \uBA39\uC73C\uBA74 \uC88B\uC740 \uC810\uC774 \uC544\uB2CC \uAC83\uC740?", "\uC810\uC2EC\uC744 \uAD76\uC5B4\uB3C4 \uB3FC\uC694", "\uC9D1\uC911\uB825\uC774 \uC88B\uC544\uC838\uC694", "\uB1CC\uC5D0 \uC5D0\uB108\uC9C0\uB97C \uC918\uC694", "\uADDC\uCE59\uC801\uC778 \uC2DD\uC2B5\uAD00\uC774 \uC0DD\uACA8\uC694", "\uC544\uCE68\uC740 \uD558\uB8E8\uC758 \uC2DC\uC791!"],
+        ["\uC544\uCE68\uC744 \uAC70\uB974\uBA74 \uC0DD\uAE38 \uC218 \uC788\uB294 \uBB38\uC81C\uB294 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uC9D1\uC911\uB825\uC774 \uB5A8\uC5B4\uC9C0\uACE0 \uC810\uC2EC\uC5D0 \uACFC\uC2DD\uD558\uAE30 \uC26C\uC6CC\uC694", "\uACF5\uBD80\uAC00 \uB354 \uC798 \uB3FC\uC694", "\uD0A4\uAC00 \uCEE4\uC838\uC694", "\uBC30\uAC00 \uC548 \uACE0\uD30C\uC694", "\uC5D0\uB108\uC9C0 \uBD80\uC871!"],
+        ["\uB1CC\uAC00 \uC8FC\uB85C \uC0AC\uC6A9\uD558\uB294 \uC5D0\uB108\uC9C0\uC6D0\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uD3EC\uB3C4\uB2F9", "\uC9C0\uBC29\uC0B0", "\uB098\uD2B8\uB968", "\uCE7C\uC298", "\uD0C4\uC218\uD654\uBB3C\uC774 \uBC14\uB010 \uAC83!"],
+        ["\uC870\uB9AC \uB3C4\uAD6C\uB85C \uC0DD\uAE34 \uAD50\uCC28\uC624\uC5FC\uC744 \uB9C9\uB294 \uBC29\uBC95\uC740?", "\uB0A0\uACE0\uAE30\uC6A9\xB7\uCC44\uC18C\uC6A9 \uB3C4\uB9C8\uB97C \uB530\uB85C \uC368\uC694", "\uD55C \uB3C4\uB9C8\uB85C \uACC4\uC18D \uC368\uC694", "\uB3C4\uB9C8\uB97C \uC53B\uC9C0 \uC54A\uC544\uC694", "\uCE7C\uC744 \uBC14\uB2E5\uC5D0 \uB46C\uC694", "\uADE0\uC774 \uC62E\uC9C0 \uC54A\uAC8C!"],
+        ["\uB178\uB85C\uBC14\uC774\uB7EC\uC2A4 \uC2DD\uC911\uB3C5\uC744 \uB9C9\uB294 \uB370 \uD2B9\uD788 \uC911\uC694\uD55C \uC2B5\uAD00\uC740?", "\uBE44\uB204\uB85C \uC190 \uC53B\uAE30\uC640 \uC775\uD600 \uBA39\uAE30", "\uCC2C\uBB3C\uB9CC \uB9C8\uC2DC\uAE30", "\uC74C\uC2DD \uB0A8\uAE30\uAE30", "\uCC3D\uBB38 \uB2EB\uAE30", "\uACA8\uC6B8\uC5D0\uB3C4 \uC0DD\uACA8\uC694."],
+        ["\uB3C4\uC2DC\uB77D\uC744 \uC300 \uB54C \uC2DD\uC911\uB3C5\uC744 \uB9C9\uB294 \uBC29\uBC95\uC740?", "\uCDA9\uBD84\uD788 \uC2DD\uD78C \uB4A4 \uB69C\uAED1\uC744 \uB2EB\uACE0 \uC2DC\uC6D0\uD558\uAC8C \uBCF4\uAD00", "\uB728\uAC70\uC6B8 \uB54C \uBC14\uB85C \uB2EB\uC544 \uD587\uBE5B\uC5D0 \uB450\uAE30", "\uD558\uB8E8 \uC885\uC77C \uCC28 \uC548\uC5D0 \uB450\uAE30", "\uC804\uB0A0 \uB0A8\uC740 \uC74C\uC2DD \uADF8\uB300\uB85C", "\uAE40\uC774 \uCC28\uBA74 \uADE0\uC774 \uC790\uB77C\uC694."],
+        ["\uC2DD\uC911\uB3C5 \uC99D\uC0C1\uC774 \uC544\uB2CC \uAC83\uC740?", "\uD0A4\uAC00 \uCEE4\uC838\uC694", "\uC124\uC0AC", "\uAD6C\uD1A0", "\uBCF5\uD1B5", "\uBC30\uD0C8 \uC99D\uC0C1!"],
+        ["\uC2DD\uC911\uB3C5\uC774 \uC758\uC2EC\uB420 \uB54C \uBC14\uB978 \uD589\uB3D9\uC740?", "\uBB3C\uC744 \uB9C8\uC2DC\uACE0 \uC5B4\uB978\uAED8 \uC54C\uB9AC\uACE0 \uBCD1\uC6D0\uC5D0 \uAC00\uC694", "\uCC38\uACE0 \uACC4\uC18D \uBA39\uC5B4\uC694", "\uC544\uBB34\uC5D0\uAC8C\uB3C4 \uC548 \uC54C\uB824\uC694", "\uD0C4\uC0B0\uC74C\uB8CC\uB97C \uB9C8\uC154\uC694", "\uBE68\uB9AC \uC54C\uB9AC\uAE30!"],
+        ["\uAC04\uB2E8\uD558\uC9C0\uB9CC \uADE0\uD615 \uC7A1\uD78C \uC544\uCE68\uBC25\uC73C\uB85C \uC54C\uB9DE\uC740 \uAC83\uC740?", "\uBC25, \uB2EC\uAC40, \uAE40, \uACFC\uC77C", "\uD0C4\uC0B0\uC74C\uB8CC\uC640 \uACFC\uC790", "\uC0AC\uD0D5 \uD55C \uC90C", "\uC544\uC774\uC2A4\uD06C\uB9BC", "\uACE1\uB958 + \uB2E8\uBC31\uC9C8 + \uACFC\uC77C!"],
+        ["\uB0A0\uB2EC\uAC40\uC744 \uB9CC\uC9C4 \uB4A4 \uD574\uC57C \uD558\uB294 \uC77C\uC740?", "\uBE44\uB204\uB85C \uC190\uC744 \uC53B\uC5B4\uC694", "\uBC14\uB85C \uACFC\uC77C\uC744 \uBA39\uC5B4\uC694", "\uC637\uC5D0 \uB2E6\uC544\uC694", "\uADF8\uB0E5 \uB46C\uC694", "\uAECD\uB370\uAE30\uC5D0 \uADE0\uC774 \uC788\uC744 \uC218 \uC788\uC5B4\uC694."],
+        ["\uD589\uC8FC\uC640 \uC218\uC138\uBBF8\uB97C \uAE68\uB057\uD558\uAC8C \uAD00\uB9AC\uD558\uB294 \uBC29\uBC95\uC740?", "\uC790\uC8FC \uC0B6\uAC70\uB098 \uB9D0\uB824\uC11C \uC368\uC694", "\uC816\uC740 \uCC44\uB85C \uACC4\uC18D \uC368\uC694", "\uC808\uB300 \uBE68\uC9C0 \uC54A\uC544\uC694", "\uC74C\uC2DD\uBB3C\uACFC \uAC19\uC774 \uB46C\uC694", "\uC816\uC5B4 \uC788\uC73C\uBA74 \uADE0\uC774 \uC790\uB77C\uC694."],
+        ["\uBB3C\uC744 \uB053\uC5EC \uBA39\uC73C\uBA74 \uC88B\uC740 \uAE4C\uB2ED\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", "\uBB3C\uC18D \uADE0\uC744 \uC5C6\uC568 \uC218 \uC788\uC5B4\uC694", "\uBB3C\uC774 \uB2EC\uC544\uC838\uC694", "\uC601\uC591\uC18C\uAC00 \uB298\uC5B4\uC694", "\uBB3C\uC774 \uCC28\uAC00\uC6CC\uC838\uC694", "\uB053\uC5EC \uBA39\uAE30!"]
+      ]
+    }
+  };
+  var QUESTIONS = {};
+  for (const band of Object.keys(B)) {
+    QUESTIONS[band] = {};
+    for (const st of Object.keys(B[band])) QUESTIONS[band][st] = B[band][st].map(([q, a, b, c, d, h]) => ({ q, c: [a, b, c, d], h }));
+  }
+
+  // js/save.js
+  var PREFIX = "nyam1:";
+  var key = (cls, num) => `${PREFIX}c${cls}:n${num}`;
+  function read(k) {
+    try {
+      const v = localStorage.getItem(k);
+      return v ? JSON.parse(v) : null;
+    } catch {
+      return null;
+    }
+  }
+  function write(k, v) {
+    try {
+      localStorage.setItem(k, JSON.stringify(v));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  var Save = {
+    load(cls, num) {
+      const s = read(key(cls, num));
+      return s && s.v === SAVE_VERSION ? s : null;
+    },
+    store(cls, num, data) {
+      data.v = SAVE_VERSION;
+      data.updated = Date.now();
+      return write(key(cls, num), data);
+    },
+    remove(cls, num) {
+      try {
+        localStorage.removeItem(key(cls, num));
+      } catch {
+      }
+    },
+    // 반 전체 목록(선생님 화면)
+    listClass(cls) {
+      const out = [];
+      for (let n = 1; n <= 30; n++) {
+        const s = this.load(cls, n);
+        if (s) out.push({ num: n, s });
+      }
+      return out;
+    },
+    removeClass(cls) {
+      for (let n = 1; n <= 30; n++) this.remove(cls, n);
+    },
+    classesWithData() {
+      const set = /* @__PURE__ */ new Set();
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          const m = k && k.match(/^nyam1:c(\d+):n\d+$/);
+          if (m) set.add(+m[1]);
+        }
+      } catch {
+      }
+      return [...set].sort((a, b) => a - b);
+    },
+    // 마지막으로 고른 반(다음에 바로 보이게)
+    get lastClass() {
+      return +(read(PREFIX + "lastClass") || 0);
+    },
+    set lastClass(v) {
+      write(PREFIX + "lastClass", v);
+    },
+    get sound() {
+      return read(PREFIX + "sound") === true;
+    },
+    set sound(v) {
+      write(PREFIX + "sound", !!v);
+    },
+    get diff() {
+      return read(PREFIX + "diff") || "easy";
+    },
+    set diff(v) {
+      write(PREFIX + "diff", v);
+    }
+  };
+
+  // js/sound.js
+  var ctx = null;
+  var Sound = {
+    on: Save.sound,
+    toggle() {
+      this.on = !this.on;
+      Save.sound = this.on;
+      if (this.on) this.unlock();
+      return this.on;
+    },
+    unlock() {
+      if (!this.on) return;
+      try {
+        ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === "suspended") ctx.resume();
+      } catch {
+        ctx = null;
+      }
+    },
+    tone(freqs, dur = 0.12, type = "sine", vol = 0.15) {
+      if (!this.on) return;
+      this.unlock();
+      if (!ctx) return;
+      let t = ctx.currentTime;
+      for (const f of freqs) {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = type;
+        o.frequency.value = f;
+        g.gain.setValueAtTime(vol, t);
+        g.gain.exponentialRampToValueAtTime(1e-3, t + dur);
+        o.connect(g).connect(ctx.destination);
+        o.start(t);
+        o.stop(t + dur);
+        t += dur * 0.8;
+      }
+    },
+    pickup() {
+      this.tone([880, 1320], 0.08, "triangle");
+    },
+    good() {
+      this.tone([660, 880, 1100], 0.1, "triangle");
+    },
+    bad() {
+      this.tone([300, 220], 0.15, "square", 0.08);
+    },
+    pop() {
+      this.tone([1200, 600], 0.06, "sine", 0.12);
+    },
+    caught() {
+      this.tone([440, 330, 220], 0.16, "sawtooth", 0.07);
+    },
+    open() {
+      this.tone([523, 659, 784, 1047], 0.12, "triangle");
+    },
+    spotted() {
+      this.tone([700, 900], 0.07, "square", 0.05);
+    }
+  };
+
+  // js/map.js
+  function rng(seed) {
+    let s = seed >>> 0 || 1;
+    return () => {
+      s ^= s << 13;
+      s >>>= 0;
+      s ^= s >> 17;
+      s ^= s << 5;
+      s >>>= 0;
+      return s / 4294967296;
+    };
+  }
+  var pick = (r, a) => a[Math.floor(r() * a.length)];
+  function shuffle(r, a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(r() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function buildStage(stageId) {
+    const S2 = STAGES[stageId], T = THEMES[S2.theme], r = rng(S2.seed);
+    const W = S2.cols * (S2.rw + 1) + 1, H = S2.rows * (S2.rh + 1) + 1;
+    const g = new Uint8Array(W * H).fill(1);
+    const room = new Int8Array(W * H).fill(-1);
+    const at = (x, y) => x < 0 || y < 0 || x >= W || y >= H ? 1 : g[y * W + x];
+    const set = (x, y, v) => {
+      g[y * W + x] = v;
+    };
+    const rooms = [];
+    for (let ry = 0; ry < S2.rows; ry++) for (let rx = 0; rx < S2.cols; rx++) {
+      const x0 = rx * (S2.rw + 1) + 1, y0 = ry * (S2.rh + 1) + 1, id = rooms.length;
+      rooms.push({ id, rx, ry, x0, y0, x1: x0 + S2.rw - 1, y1: y0 + S2.rh - 1, name: S2.rooms[id] || `\uBC29 ${id + 1}` });
+      for (let y = y0; y < y0 + S2.rh; y++) for (let x = x0; x < x0 + S2.rw; x++) {
+        set(x, y, 0);
+        room[y * W + x] = id;
+      }
+    }
+    const idx = (rx, ry) => ry * S2.cols + rx;
+    const links = [];
+    const seen = /* @__PURE__ */ new Set([0]), stack = [0];
+    while (stack.length) {
+      const cur = stack[stack.length - 1], c = rooms[cur];
+      const nb = [[1, 0], [-1, 0], [0, 1], [0, -1]].map(([dx, dy]) => [c.rx + dx, c.ry + dy]).filter(([x, y]) => x >= 0 && y >= 0 && x < S2.cols && y < S2.rows && !seen.has(idx(x, y)));
+      if (!nb.length) {
+        stack.pop();
+        continue;
+      }
+      const [nx, ny] = pick(r, nb), n = idx(nx, ny);
+      links.push([cur, n]);
+      seen.add(n);
+      stack.push(n);
+    }
+    for (let a = 0; a < rooms.length; a++) for (let b = a + 1; b < rooms.length; b++) {
+      const A = rooms[a], B2 = rooms[b];
+      if (Math.abs(A.rx - B2.rx) + Math.abs(A.ry - B2.ry) !== 1) continue;
+      if (links.some(([p, q]) => p === a && q === b || p === b && q === a)) continue;
+      if (r() < 0.45) links.push([a, b]);
+    }
+    for (const [a, b] of links) {
+      const A = rooms[a], B2 = rooms[b];
+      if (A.ry === B2.ry) {
+        const wx = (A.rx < B2.rx ? A : B2).x1 + 1;
+        const y = A.y0 + 1 + Math.floor(r() * (S2.rh - 3));
+        set(wx, y, 0);
+        set(wx, y + 1, 0);
+      } else {
+        const top = A.ry < B2.ry ? A : B2, wy = top.y1 + 1;
+        const x = A.x0 + 1 + Math.floor(r() * (S2.rw - 3));
+        set(x, wy, 0);
+        set(x + 1, wy, 0);
+      }
+    }
+    const start = { x: rooms[0].x0 + 1.5, y: rooms[0].y0 + 1.5 };
+    const startTile = { x: rooms[0].x0 + 1, y: rooms[0].y0 + 1 };
+    const far = farthestRoom(rooms, links);
+    const exit = exitTile(rooms[far], S2, W, H);
+    const keep = new Uint8Array(W * H);
+    const keepAround = (x, y, rad) => {
+      for (let dy = -rad; dy <= rad; dy++) for (let dx = -rad; dx <= rad; dx++) {
+        const X = x + dx, Y = y + dy;
+        if (X >= 0 && Y >= 0 && X < W && Y < H) keep[Y * W + X] = 1;
+      }
+    };
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (at(x, y) === 0 && room[y * W + x] === -1) keepAround(x, y, 1);
+    keepAround(startTile.x, startTile.y, 2);
+    keepAround(exit.ix, exit.iy, 1);
+    const free = (x, y) => at(x, y) === 0 && !keep[y * W + x];
+    const objects = [];
+    const occupied = /* @__PURE__ */ new Set();
+    const placeIn = (rm, kind, data, tries = 60) => {
+      for (let t = 0; t < tries; t++) {
+        const x = rm.x0 + 1 + Math.floor(r() * (S2.rw - 2)), y = rm.y0 + 1 + Math.floor(r() * (S2.rh - 2));
+        if (!free(x, y) || occupied.has(y * W + x)) continue;
+        set(x, y, 2);
+        if (!connected(g, W, H, startTile)) {
+          set(x, y, 0);
+          continue;
+        }
+        occupied.add(y * W + x);
+        const o = { kind, x, y, ...data, id: objects.length };
+        objects.push(o);
+        keepAround(x, y, 0);
+        return o;
+      }
+      return null;
+    };
+    const nSearch = stageId === 0 ? 4 : 10;
+    const ids = rooms.map((rm) => rm.id), pool = stageId === 0 ? ids : ids.slice(1);
+    const order = stageId === 0 ? [] : [0];
+    while (order.length < nSearch) order.push(...shuffle(r, pool.slice()));
+    order.length = nSearch;
+    order.forEach((rid, i) => {
+      const [emoji, name] = T.search[i % T.search.length];
+      placeIn(rooms[rid], "search", { emoji, name });
+    });
+    const nHide = stageId === 0 ? 1 : 4;
+    shuffle(r, rooms.slice(stageId === 0 ? 0 : 1)).slice(0, nHide).forEach((rm) => placeIn(rm, "hide", { emoji: T.hide[0], name: T.hide[1] }));
+    if (stageId === 0 && !objects.some((o) => o.kind === "hide")) placeIn(rooms[0], "hide", { emoji: T.hide[0], name: T.hide[1] });
+    for (const rm of rooms) {
+      const n = stageId === 0 ? 2 : 3;
+      for (let i = 0; i < n; i++) placeIn(rm, "decor", { emoji: pick(r, T.decor), name: "" }, 20);
+    }
+    const pickups = [];
+    const floorTiles = [];
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (at(x, y) === 0 && room[y * W + x] >= 0 && !(x === startTile.x && y === startTile.y)) floorTiles.push({ x, y });
+    shuffle(r, floorTiles);
+    const nSoap = stageId === 0 ? 3 : 12;
+    for (let i = 0; i < nSoap && i < floorTiles.length; i++) pickups.push({ id: i, kind: "soap", x: floorTiles[i].x, y: floorTiles[i].y });
+    if (stageId !== 0) {
+      pickups.push({ id: nSoap, kind: "water", x: floorTiles[nSoap].x, y: floorTiles[nSoap].y });
+      pickups.push({ id: nSoap + 1, kind: "mask", x: floorTiles[nSoap + 1].x, y: floorTiles[nSoap + 1].y });
+    }
+    const germSpots = [];
+    const others = rooms.length > 1 ? rooms.slice(1) : rooms;
+    for (let i = 0; i < 12; i++) {
+      const rm = others[i % others.length];
+      for (let t = 0; t < 40; t++) {
+        const x = rm.x0 + Math.floor(r() * S2.rw), y = rm.y0 + Math.floor(r() * S2.rh);
+        if (at(x, y) === 0) {
+          germSpots.push({ x: x + 0.5, y: y + 0.5 });
+          break;
+        }
+      }
+    }
+    return {
+      id: stageId,
+      S: S2,
+      T,
+      W,
+      H,
+      g,
+      room,
+      rooms,
+      start,
+      startTile,
+      exit,
+      objects,
+      pickups,
+      germSpots,
+      at,
+      solid: (x, y) => at(x, y) !== 0,
+      roomAt(x, y) {
+        const X = Math.floor(x), Y = Math.floor(y);
+        if (X < 0 || Y < 0 || X >= W || Y >= H) return null;
+        const id = room[Y * W + X];
+        return id >= 0 ? rooms[id] : nearestRoom(rooms, X, Y);
+      }
+    };
+  }
+  function nearestRoom(rooms, x, y) {
+    let best = rooms[0], bd = 1e9;
+    for (const rm of rooms) {
+      const cx = (rm.x0 + rm.x1) / 2, cy = (rm.y0 + rm.y1) / 2, d = (cx - x) ** 2 + (cy - y) ** 2;
+      if (d < bd) {
+        bd = d;
+        best = rm;
+      }
+    }
+    return best;
+  }
+  function farthestRoom(rooms, links) {
+    const dist = new Array(rooms.length).fill(-1);
+    dist[0] = 0;
+    const q = [0];
+    while (q.length) {
+      const c = q.shift();
+      for (const [a, b] of links) {
+        const n = a === c ? b : b === c ? a : -1;
+        if (n >= 0 && dist[n] < 0) {
+          dist[n] = dist[c] + 1;
+          q.push(n);
+        }
+      }
+    }
+    let best = 0;
+    dist.forEach((d, i) => {
+      if (d > dist[best] || d === dist[best] && i > best) best = i;
+    });
+    return best;
+  }
+  function exitTile(rm, S2, W, H) {
+    const mx = Math.floor((rm.x0 + rm.x1) / 2), my = Math.floor((rm.y0 + rm.y1) / 2);
+    if (rm.rx === S2.cols - 1) return { x: rm.x1 + 1, y: my, ix: rm.x1, iy: my, dir: "e" };
+    if (rm.ry === S2.rows - 1) return { x: mx, y: rm.y1 + 1, ix: mx, iy: rm.y1, dir: "s" };
+    if (rm.ry === 0) return { x: mx, y: rm.y0 - 1, ix: mx, iy: rm.y0, dir: "n" };
+    return { x: rm.x0 - 1, y: my, ix: rm.x0, iy: my, dir: "w" };
+  }
+  function connected(g, W, H, s) {
+    let total = 0;
+    for (let i = 0; i < g.length; i++) if (g[i] === 0) total++;
+    const seen = new Uint8Array(W * H), q = [s.y * W + s.x];
+    seen[q[0]] = 1;
+    let n = 0;
+    while (q.length) {
+      const i = q.pop();
+      n++;
+      const x = i % W, y = i / W | 0;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const X = x + dx, Y = y + dy;
+        if (X < 0 || Y < 0 || X >= W || Y >= H) continue;
+        const j = Y * W + X;
+        if (!seen[j] && g[j] === 0) {
+          seen[j] = 1;
+          q.push(j);
+        }
+      }
+    }
+    return n === total;
+  }
+  function lineOfSight(map, ax, ay, bx, by) {
+    const d = Math.hypot(bx - ax, by - ay), steps = Math.ceil(d / 0.2);
+    for (let i = 1; i < steps; i++) {
+      const t = i / steps, x = Math.floor(ax + (bx - ax) * t), y = Math.floor(ay + (by - ay) * t);
+      if (map.at(x, y) === 1) return false;
+    }
+    return true;
+  }
+  function findPath(map, sx, sy, tx, ty, maxLen = 400) {
+    const { W, H } = map;
+    sx = Math.floor(sx);
+    sy = Math.floor(sy);
+    tx = Math.floor(tx);
+    ty = Math.floor(ty);
+    if (map.solid(tx, ty)) return null;
+    const prev = new Int32Array(W * H).fill(-1), s = sy * W + sx, t = ty * W + tx;
+    prev[s] = s;
+    const q = [s];
+    let head = 0;
+    while (head < q.length && head < maxLen * 8) {
+      const i = q[head++];
+      if (i === t) break;
+      const x = i % W, y = i / W | 0;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const X = x + dx, Y = y + dy;
+        if (map.solid(X, Y)) continue;
+        const j = Y * W + X;
+        if (prev[j] < 0) {
+          prev[j] = i;
+          q.push(j);
+        }
+      }
+    }
+    if (prev[t] < 0) return null;
+    const path = [];
+    for (let i = t; i !== s; i = prev[i]) path.push({ x: i % W + 0.5, y: (i / W | 0) + 0.5 });
+    return path.reverse();
+  }
+
+  // js/game.js
+  var IMG = {};
+  function loadImages(names) {
+    return Promise.all(names.map((n) => new Promise((res) => {
+      const im = new Image();
+      im.onload = () => {
+        IMG[n] = im;
+        res();
+      };
+      im.onerror = () => res();
+      im.src = `img/${n}.png`;
+    })));
+  }
+  var emojiCache = /* @__PURE__ */ new Map();
+  function emojiCanvas(e, px) {
+    px = Math.max(8, Math.round(px));
+    const k = e + px;
+    let c = emojiCache.get(k);
+    if (!c) {
+      c = document.createElement("canvas");
+      c.width = c.height = Math.ceil(px * 1.25);
+      const g = c.getContext("2d");
+      g.textAlign = "center";
+      g.textBaseline = "middle";
+      g.font = `${px}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+      g.fillText(e, c.width / 2, c.height / 2 + px * 0.06);
+      emojiCache.set(k, c);
+    }
+    return c;
+  }
+  var rand = (a, b) => a + Math.random() * (b - a);
+  function shuffled(a) {
+    a = a.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  var TUTORIAL = [
+    { ev: "search", text: "\uAC10\uC9C0\uAE30(\uD654\uBA74 \uC704)\uB97C \uBCF4\uBA74\uC11C <b>?</b> \uAC00\uAD6C\uB85C \uAC00\uC11C <b>\uC0B4\uD3B4\uBCF4\uAE30</b>\uB97C \uB20C\uB7EC\uC694." },
+    { ev: "hide", text: "<b>{hide}</b>\uC5D0 \uB4E4\uC5B4\uAC00 \uBCF4\uC138\uC694. \uC228\uC5B4 \uC788\uC73C\uBA74 \uADE0\uC774 \uB098\uB97C \uBABB \uCC3E\uC544\uC694." },
+    { ev: "unhide", text: "\uB2E4\uC2DC <b>\uB098\uC624\uAE30</b>\uB97C \uB20C\uB7EC \uBC16\uC73C\uB85C \uB098\uC640\uC694." },
+    { ev: "stun", text: "\uADE0\uC774 \uB098\uD0C0\uB0AC\uC5B4\uC694! <b>\u{1FAE7} \uBE44\uB217\uBC29\uC6B8</b>\uC744 \uB358\uC838\uC11C \uBA48\uCDB0 \uBCF4\uC138\uC694. \uB9DE\uC740 \uADE0\uC740 4\uCD08 \uB3D9\uC548 \uAF3C\uC9DD \uBABB \uD574\uC694." },
+    { ev: "water", text: "<b>\u{1F4A7} \uBB3C \uD55C \uCEF5</b>\uC744 \uBC1B\uC558\uC5B4\uC694. <b>\uC544\uC774\uD15C</b> \uB2E8\uCD94\uB97C \uB20C\uB7EC \uB9C8\uC154 \uBCF4\uC138\uC694. 5\uCD08 \uB3D9\uC548 \uBE68\uB77C\uC838\uC694!" },
+    { ev: "mask", text: "<b>\u{1F637} \uB9C8\uC2A4\uD06C</b>\uB97C \uBC1B\uC558\uC5B4\uC694. \uC368 \uBCF4\uC138\uC694. 6\uCD08 \uB3D9\uC548 \uADE0\uC774 \uB098\uB97C \uC54C\uC544\uCC44\uC9C0 \uBABB\uD574\uC694!" },
+    { ev: "allFound", text: "\uB0A8\uC740 \uCABD\uC9C0 \uC870\uAC01\uC744 \uBAA8\uB450 \uCC3E\uC544\uC694. \uAC10\uC9C0\uAE30\uAC00 <b>\uAC00\uAE4C\uC6CC\uC694</b>\uB85C \uBC14\uB00C\uB294 \uACF3\uC744 \uCC3E\uC544\uBD10\uC694." },
+    { ev: "noteSolved", text: "<b>\u{1F4DC} \uCABD\uC9C0</b>\uB97C \uC5F4\uC5B4 \uC870\uAC01\uC744 \uC21C\uC11C\uB300\uB85C \uBD99\uC774\uACE0 \uBB38\uC81C\uB97C \uD480\uC5B4\uC694." },
+    { ev: "exit", text: "\uD0C8\uCD9C\uBB38\uC774 \uC5F4\uB838\uC5B4\uC694! <b>\uD654\uC0B4\uD45C</b>\uB97C \uB530\uB77C \uD0C8\uCD9C\uBB38\uC73C\uB85C \uB098\uAC00\uC694." }
+  ];
+  var Game = class {
+    // opts: { stageId, band, diff, char, pool(문제 배열), run(저장된 상태 또는 null), ui }
+    constructor(canvas, opts) {
+      this.cv = canvas;
+      this.cx = canvas.getContext("2d");
+      this.o = opts;
+      this.ui = opts.ui;
+      this.map = buildStage(opts.stageId);
+      this.tut = opts.stageId === 0;
+      this.input = { x: 0, y: 0 };
+      this.keys = /* @__PURE__ */ new Set();
+      this.fx = [];
+      this.bubbles = [];
+      this.paused = false;
+      this.over = false;
+      this.time = 0;
+      this.saveT = 0;
+      this.dirty = true;
+      this.locks = {};
+      this.run = opts.run && opts.run.stageId === opts.stageId ? opts.run : this.newRun();
+      this.germs = this.run.germs.map((g) => this.makeGerm(g.type, g.x, g.y));
+      this.invuln = opts.run ? 3 : 1.5;
+      this.waterT = 0;
+      this.maskT = 0;
+      this.face = 1;
+      this.walkT = 0;
+      this.resize();
+      this._loop = (t) => this.loop(t);
+      this.last = performance.now();
+      this.raf = requestAnimationFrame(this._loop);
+    }
+    newRun() {
+      const m = this.map, nReal = this.tut ? 2 : 4;
+      const searchIds = m.objects.filter((o) => o.kind === "search").map((o) => o.id);
+      const pool = this.o.pool, noteQ = Math.floor(Math.random() * pool.length);
+      const germs = [];
+      if (!this.tut) {
+        const list = [...this.stageGermList()];
+        list.forEach((type, i) => {
+          const s = m.germSpots[i % m.germSpots.length];
+          germs.push({ type, x: s.x, y: s.y });
+        });
+      }
+      return {
+        stageId: m.id,
+        diff: this.o.diff,
+        lives: DIFFS[this.o.diff].lives === Infinity ? -1 : DIFFS[this.o.diff].lives,
+        px: m.start.x,
+        py: m.start.y,
+        soap: this.tut ? 0 : 3,
+        soapGot: 0,
+        soapTotal: m.pickups.filter((p) => p.kind === "soap").length,
+        item: null,
+        picked: [],
+        searched: {},
+        realIds: shuffled(searchIds).slice(0, nReal),
+        noteQ,
+        deck: shuffled(pool.map((_, i) => i).filter((i) => i !== noteQ)),
+        deckPos: 0,
+        disabled: [],
+        noteSolved: false,
+        exitOpen: false,
+        wrong: 0,
+        correct: 0,
+        hidden: null,
+        hideFrom: null,
+        germs,
+        tut: 0,
+        tutSeen: [],
+        scattered: 0
+      };
+    }
+    stageGermList() {
+      const list = this.map.S.germs.slice();
+      if (DIFFS[this.o.diff].extraGerms) list.push("basic", "cavity");
+      return list;
+    }
+    makeGerm(type, x, y) {
+      return { type, def: GERMS[type], x, y, state: "wander", path: null, repath: 0, stun: 0, seen: 0, chaseT: 0, tired: 0, cool: 0, lx: x, ly: y, bob: Math.random() * 6, alertT: 0 };
+    }
+    get found() {
+      return this.run.realIds.filter((id) => this.run.searched[id] === "found").length;
+    }
+    get need() {
+      return this.run.realIds.length;
+    }
+    get lives() {
+      return this.run.lives < 0 ? Infinity : this.run.lives;
+    }
+    get hideLabel() {
+      return hideName(this.o.band);
+    }
+    destroy() {
+      cancelAnimationFrame(this.raf);
+      this.over = true;
+    }
+    resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const w = this.cv.clientWidth || innerWidth, h = this.cv.clientHeight || innerHeight;
+      this.cv.width = Math.round(w * dpr);
+      this.cv.height = Math.round(h * dpr);
+      this.dpr = dpr;
+      this.vw = w;
+      this.vh = h;
+      this.TS = Math.round(Math.max(36, Math.min(h / 10.5, w / 15)));
+    }
+    serialize() {
+      const r = this.run;
+      r.germs = this.germs.map((g) => ({ type: g.type, x: +g.x.toFixed(2), y: +g.y.toFixed(2) }));
+      r.px = +this.px.toFixed(2);
+      r.py = +this.py.toFixed(2);
+      return r;
+    }
+    get px() {
+      return this.run.px;
+    }
+    set px(v) {
+      this.run.px = v;
+    }
+    get py() {
+      return this.run.py;
+    }
+    set py(v) {
+      this.run.py = v;
+    }
+    // ---------- 루프 ----------
+    loop(t) {
+      if (this.over) return;
+      const dt = Math.min(0.05, (t - this.last) / 1e3);
+      this.last = t;
+      if (!this.paused) this.update(dt);
+      this.draw();
+      this.raf = requestAnimationFrame(this._loop);
+    }
+    update(dt) {
+      this.time += dt;
+      this.invuln = Math.max(0, this.invuln - dt);
+      this.waterT = Math.max(0, this.waterT - dt);
+      this.maskT = Math.max(0, this.maskT - dt);
+      for (const k in this.locks) if ((this.locks[k] -= dt) <= 0) delete this.locks[k];
+      this.movePlayer(dt);
+      this.pickups();
+      for (const g of this.germs) this.updateGerm(g, dt);
+      this.updateBubbles(dt);
+      this.fx = this.fx.filter((f) => (f.t -= dt) > 0);
+      this.checkCaught();
+      if ((this.saveT += dt) > 2) {
+        this.saveT = 0;
+        this.dirty = true;
+      }
+    }
+    movePlayer(dt) {
+      if (this.run.hidden != null) return;
+      let dx = this.input.x, dy = this.input.y;
+      const K = this.keys;
+      if (K.has("ArrowLeft") || K.has("KeyA")) dx -= 1;
+      if (K.has("ArrowRight") || K.has("KeyD")) dx += 1;
+      if (K.has("ArrowUp") || K.has("KeyW")) dy -= 1;
+      if (K.has("ArrowDown") || K.has("KeyS")) dy += 1;
+      const len = Math.hypot(dx, dy);
+      if (len < 0.15) {
+        this.walkT = 0;
+        return;
+      }
+      if (len > 1) {
+        dx /= len;
+        dy /= len;
+      }
+      if (Math.abs(dx) > 0.2) this.face = dx > 0 ? 1 : -1;
+      const sp = PLAYER_SPEED * (this.waterT > 0 ? 1.6 : 1) * dt;
+      this.walkT += dt;
+      this.slide(dx * sp, dy * sp);
+    }
+    slide(mx, my) {
+      const r = 0.3, m = this.map;
+      const blocked = (x, y) => m.solid(Math.floor(x - r), Math.floor(y - r)) || m.solid(Math.floor(x + r), Math.floor(y - r)) || m.solid(Math.floor(x - r), Math.floor(y + r)) || m.solid(Math.floor(x + r), Math.floor(y + r));
+      if (!blocked(this.px + mx, this.py)) this.px += mx;
+      if (!blocked(this.px, this.py + my)) this.py += my;
+    }
+    pickups() {
+      const r = this.run;
+      for (const p of this.map.pickups) {
+        if (r.picked.includes(p.id)) continue;
+        if (Math.hypot(p.x + 0.5 - this.px, p.y + 0.5 - this.py) > 0.65) continue;
+        if (p.kind === "soap") {
+          r.soap++;
+          r.soapGot++;
+          this.float("\u{1FAE7} +1", p.x + 0.5, p.y, "#2b7bd6");
+        } else {
+          if (r.item) {
+            if (!p.warned) {
+              p.warned = true;
+              this.ui.toast("\uC544\uC774\uD15C\uC740 \uD558\uB098\uB9CC \uB4E4 \uC218 \uC788\uC5B4\uC694. \uBA3C\uC800 \uC4F0\uACE0 \uC624\uC138\uC694!");
+            }
+            continue;
+          }
+          r.item = p.kind;
+          this.float(p.kind === "water" ? "\u{1F4A7} \uBB3C \uD55C \uCEF5!" : "\u{1F637} \uB9C8\uC2A4\uD06C!", p.x + 0.5, p.y, "#2b7bd6");
+          this.ui.toast(p.kind === "water" ? "\u{1F4A7} \uBB3C \uD55C \uCEF5\uC744 \uC8FC\uC6E0\uC5B4\uC694! \uC544\uC774\uD15C \uB2E8\uCD94\uB85C \uB9C8\uC2DC\uBA74 5\uCD08 \uB3D9\uC548 \uBE68\uB77C\uC838\uC694." : "\u{1F637} \uB9C8\uC2A4\uD06C\uB97C \uC8FC\uC6E0\uC5B4\uC694! \uC4F0\uBA74 6\uCD08 \uB3D9\uC548 \uADE0\uC774 \uB098\uB97C \uC54C\uC544\uCC44\uC9C0 \uBABB\uD574\uC694.");
+        }
+        r.picked.push(p.id);
+        Sound.pickup();
+        this.dirty = true;
+      }
+    }
+    // ---------- 균 ----------
+    canSee(g) {
+      if (this.run.hidden != null || this.maskT > 0 || this.invuln > 0 || g.cool > 0) return false;
+      const d = Math.hypot(this.px - g.x, this.py - g.y);
+      return d < g.def.sight && lineOfSight(this.map, g.x, g.y, this.px, this.py);
+    }
+    updateGerm(g, dt) {
+      g.bob += dt * 4;
+      g.alertT = Math.max(0, g.alertT - dt);
+      if (g.stun > 0) {
+        g.stun -= dt;
+        return;
+      }
+      if (g.cool > 0) g.cool -= dt;
+      if (g.tired > 0) {
+        g.tired -= dt;
+        return;
+      }
+      const spd = DIFFS[this.run.diff].speed * (this.tut ? 0.6 : 1);
+      if (this.canSee(g)) {
+        if (g.state !== "chase") {
+          g.alertT = 1;
+          Sound.spotted();
+        }
+        g.state = "chase";
+        g.seen = 0;
+        g.lx = this.px;
+        g.ly = this.py;
+      }
+      if (g.state === "chase") {
+        g.seen += dt;
+        g.chaseT += dt;
+        if (g.def.tires && g.chaseT > 4) {
+          g.tired = 3;
+          g.chaseT = 0;
+          g.state = "wander";
+          g.path = null;
+          this.float("\uD5E5\uD5E5\u2026", g.x, g.y - 0.8, "#8a5cc7");
+          return;
+        }
+        if (g.seen > 3) {
+          g.state = "wander";
+          g.path = null;
+          g.chaseT = 0;
+        }
+        if ((g.repath -= dt) <= 0) {
+          g.repath = 0.35;
+          g.path = findPath(this.map, g.x, g.y, g.lx, g.ly);
+        }
+        if (Math.floor(g.x) === Math.floor(g.lx) && Math.floor(g.y) === Math.floor(g.ly)) this.stepTo(g, g.lx, g.ly, g.def.run * spd * dt);
+        else this.follow(g, g.def.run * spd * dt);
+      } else {
+        if (!g.path || !g.path.length) {
+          for (let t = 0; t < 10; t++) {
+            const tx = Math.floor(g.x + rand(-7, 7)), ty = Math.floor(g.y + rand(-6, 6));
+            if (!this.map.solid(tx, ty)) {
+              g.path = findPath(this.map, g.x, g.y, tx, ty, 60);
+              if (g.path) break;
+            }
+          }
+        }
+        this.follow(g, g.def.walk * spd * dt);
+      }
+    }
+    follow(g, step) {
+      if (!g.path || !g.path.length) return;
+      const n = g.path[0];
+      if (this.stepTo(g, n.x, n.y, step)) g.path.shift();
+    }
+    stepTo(g, tx, ty, step) {
+      const dx = tx - g.x, dy = ty - g.y, d = Math.hypot(dx, dy);
+      if (d <= step) {
+        g.x = tx;
+        g.y = ty;
+        return true;
+      }
+      g.x += dx / d * step;
+      g.y += dy / d * step;
+      g.face = dx >= 0 ? 1 : -1;
+      return false;
+    }
+    checkCaught() {
+      if (this.invuln > 0 || this.run.hidden != null || this.paused) return;
+      for (const g of this.germs) {
+        if (g.stun > 0 || g.tired > 0 || g.cool > 0) continue;
+        if (Math.hypot(g.x - this.px, g.y - this.py) < 0.6) {
+          this.caught(g);
+          return;
+        }
+      }
+    }
+    caught(g) {
+      Sound.caught();
+      g.cool = 4;
+      g.state = "wander";
+      g.path = null;
+      for (const o of this.germs) if (o.state === "chase") {
+        o.state = "wander";
+        o.path = null;
+      }
+      if (this.tut) {
+        this.respawn();
+        this.ui.toast(`${g.def.name}\uC5D0\uAC8C \uC7A1\uD614\uC5B4\uC694! \uC5F0\uC2B5\uC774\uB77C \uAD1C\uCC2E\uC544\uC694. \uCC98\uC74C \uC790\uB9AC\uC5D0\uC11C \uB2E4\uC2DC \uD574\uC694.`);
+        return;
+      }
+      if (this.run.lives > 0) this.run.lives--;
+      this.dirty = true;
+      this.paused = true;
+      this.ui.onCaught({ name: g.def.name, lives: this.lives, diff: this.run.diff });
+    }
+    respawn() {
+      this.px = this.map.start.x;
+      this.py = this.map.start.y;
+      this.run.hidden = null;
+      this.invuln = 2.5;
+      this.paused = false;
+      this.dirty = true;
+    }
+    // ---------- 비눗방울·아이템 ----------
+    throwBubble() {
+      const r = this.run;
+      if (this.paused || r.hidden != null) return;
+      if (r.soap <= 0) {
+        this.ui.toast("\uBE44\uB217\uBC29\uC6B8\uC774 \uC5C6\uC5B4\uC694. \uBC14\uB2E5\uC758 \u{1F9FC} \uBE44\uB204\uB97C \uC8FC\uC6CC\uC694!");
+        Sound.bad();
+        return;
+      }
+      let best = null, bd = THROW_RANGE;
+      for (const g of this.germs) {
+        if (g.stun > 0) continue;
+        const d = Math.hypot(g.x - this.px, g.y - this.py);
+        if (d < bd && lineOfSight(this.map, this.px, this.py, g.x, g.y)) {
+          bd = d;
+          best = g;
+        }
+      }
+      let vx = this.face, vy = 0;
+      if (best) {
+        const d = Math.hypot(best.x - this.px, best.y - this.py) || 1;
+        vx = (best.x - this.px) / d;
+        vy = (best.y - this.py) / d;
+      } else if (Math.hypot(this.input.x, this.input.y) > 0.3) {
+        const d = Math.hypot(this.input.x, this.input.y);
+        vx = this.input.x / d;
+        vy = this.input.y / d;
+      }
+      r.soap--;
+      this.dirty = true;
+      this.bubbles.push({ x: this.px, y: this.py - 0.2, vx: vx * 9, vy: vy * 9, dist: 0 });
+      Sound.pop();
+    }
+    updateBubbles(dt) {
+      for (const b of this.bubbles) {
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        b.dist += 9 * dt;
+        if (this.map.at(Math.floor(b.x), Math.floor(b.y)) === 1 || b.dist > THROW_RANGE) {
+          b.dead = true;
+          this.float("\uD401", b.x, b.y, "#5aa9e6");
+          continue;
+        }
+        for (const g of this.germs) {
+          if (g.stun > 0) continue;
+          if (Math.hypot(g.x - b.x, g.y - b.y) < 0.7) {
+            g.stun = STUN_TIME;
+            g.state = "wander";
+            g.path = null;
+            g.chaseT = 0;
+            b.dead = true;
+            this.float("\uBF40\uB4DD! \uBA48\uCDA4", g.x, g.y - 0.9, "#2b7bd6");
+            Sound.good();
+            this.event("stun");
+            break;
+          }
+        }
+      }
+      this.bubbles = this.bubbles.filter((b) => !b.dead);
+    }
+    useItem() {
+      const r = this.run;
+      if (this.paused || !r.item) {
+        if (!r.item) this.ui.toast("\uAC00\uC9C4 \uC544\uC774\uD15C\uC774 \uC5C6\uC5B4\uC694.");
+        return;
+      }
+      const used = r.item;
+      r.item = null;
+      if (used === "water") {
+        this.waterT = WATER_TIME;
+        this.float("\u{1F4A7} \uBE68\uB77C\uC84C\uC5B4\uC694!", this.px, this.py - 1, "#2b7bd6");
+      } else {
+        this.maskT = MASK_TIME;
+        this.float("\u{1F637} \uADE0\uC774 \uBABB \uC54C\uC544\uBD10\uC694!", this.px, this.py - 1, "#2b7bd6");
+        for (const g of this.germs) if (g.state === "chase") {
+          g.state = "wander";
+          g.path = null;
+        }
+      }
+      Sound.good();
+      this.dirty = true;
+      this.event(used);
+    }
+    // ---------- 상호작용 ----------
+    nearby() {
+      const r = this.run, m = this.map;
+      if (r.hidden != null) return { type: "unhide", label: "\uB098\uC624\uAE30" };
+      const e = m.exit;
+      if (r.exitOpen && Math.hypot(e.ix + 0.5 - this.px, e.iy + 0.5 - this.py) < 1.4) return { type: "exit", label: "\uD0C8\uCD9C!" };
+      let best = null, bd = 1.45;
+      for (const o of m.objects) {
+        if (o.kind === "decor") continue;
+        if (o.kind === "search" && r.searched[o.id]) continue;
+        const d = Math.hypot(o.x + 0.5 - this.px, o.y + 0.5 - this.py);
+        if (d < bd) {
+          bd = d;
+          best = o;
+        }
+      }
+      if (!best) return null;
+      if (best.kind === "hide") return { type: "hide", obj: best, label: `${this.hideLabel}\uC5D0 \uC228\uAE30` };
+      return { type: "search", obj: best, label: this.locks[best.id] ? `\u{1F512} ${Math.ceil(this.locks[best.id])}\uCD08` : "\uC0B4\uD3B4\uBCF4\uAE30" };
+    }
+    interact() {
+      if (this.paused) return;
+      const n = this.nearby();
+      if (!n) return;
+      const r = this.run;
+      if (n.type === "unhide") {
+        const o = this.map.objects[r.hidden];
+        r.hidden = null;
+        if (r.hideFrom) {
+          this.px = r.hideFrom.x;
+          this.py = r.hideFrom.y;
+        } else {
+          this.px = o.x + 0.5;
+          this.py = o.y + 1.5;
+        }
+        this.invuln = Math.max(this.invuln, 0.8);
+        this.dirty = true;
+        this.event("unhide");
+        return;
+      }
+      if (n.type === "hide") {
+        r.hideFrom = { x: this.px, y: this.py };
+        r.hidden = n.obj.id;
+        for (const g of this.germs) if (g.state === "chase") g.seen = Math.max(g.seen, 2);
+        this.float("\uC27F!", n.obj.x + 0.5, n.obj.y - 0.2, "#3a9a4a");
+        this.dirty = true;
+        this.event("hide");
+        return;
+      }
+      if (n.type === "exit") {
+        this.clear();
+        return;
+      }
+      if (n.type === "search") {
+        if (this.locks[n.obj.id]) {
+          this.ui.bigMsg(`\u{1F512} \uC544\uC9C1 ${Math.ceil(this.locks[n.obj.id])}\uCD08 \uB3D9\uC548 \uB4A4\uC9C8 \uC218 \uC5C6\uC5B4\uC694!`, "bad");
+          Sound.bad();
+          return;
+        }
+        this.askSearch(n.obj);
+      }
+    }
+    nextQuestion() {
+      const r = this.run, pool = this.o.pool;
+      if (r.deckPos >= r.deck.length) {
+        r.deck = shuffled(pool.map((_, i) => i).filter((i) => i !== r.noteQ));
+        r.deckPos = 0;
+      }
+      return pool[r.deck[r.deckPos++]];
+    }
+    askSearch(obj) {
+      const q = this.nextQuestion();
+      this.paused = true;
+      this.ui.openQuiz({ title: `${obj.emoji} ${obj.name} \uC0B4\uD3B4\uBCF4\uAE30`, q, disabled: [] }, (ok) => {
+        this.paused = false;
+        this.invuln = Math.max(this.invuln, 1);
+        const r = this.run;
+        if (!ok) {
+          r.wrong++;
+          this.locks[obj.id] = SEARCH_LOCK;
+          this.dirty = true;
+          this.ui.bigMsg(`\u274C \uD2C0\uB838\uC5B4\uC694! ${SEARCH_LOCK}\uCD08 \uB3D9\uC548 \uC774 \uAC00\uAD6C\uB97C \uB4A4\uC9C8 \uC218 \uC5C6\uC5B4\uC694!`, "bad");
+          Sound.bad();
+          this.event("search");
+          return;
+        }
+        r.correct++;
+        if (r.realIds.includes(obj.id)) {
+          r.searched[obj.id] = "found";
+          Sound.open();
+          const n = this.found;
+          this.ui.bigMsg(`\u{1F4DC} \uCABD\uC9C0 \uC870\uAC01\uC744 \uCC3E\uC558\uC5B4\uC694! (${n}/${this.need})`, "good");
+          this.ui.say(n >= this.need ? FOUND_LINES[3] : FOUND_LINES[Math.min(n - 1, 2)]);
+          if (n >= this.need) this.event("allFound");
+        } else {
+          r.searched[obj.id] = "miss";
+          const roll = Math.random();
+          if (roll < 0.5) {
+            r.soap += 2;
+            this.ui.bigMsg("\uAF5D! \uB300\uC2E0 \u{1FAE7} \uBE44\uB217\uBC29\uC6B8 2\uAC1C\uB97C \uC5BB\uC5C8\uC5B4\uC694", "info");
+          } else if (roll < 0.75 && !r.item && !this.tut) {
+            r.item = Math.random() < 0.5 ? "water" : "mask";
+            this.ui.bigMsg(r.item === "water" ? "\uAF5D! \uB300\uC2E0 \u{1F4A7} \uBB3C \uD55C \uCEF5\uC744 \uC5BB\uC5C8\uC5B4\uC694" : "\uAF5D! \uB300\uC2E0 \u{1F637} \uB9C8\uC2A4\uD06C\uB97C \uC5BB\uC5C8\uC5B4\uC694", "info");
+          } else {
+            r.soap += 1;
+            this.ui.bigMsg("\uAF5D! \uC870\uAC01\uC774 \uC5C6\uC5B4\uC694 (\u{1FAE7} +1)", "info");
+            this.ui.say(MISS_LINES[Math.floor(Math.random() * MISS_LINES.length)]);
+          }
+          Sound.pickup();
+        }
+        this.dirty = true;
+        this.event("search");
+      });
+    }
+    // 쪽지 문제를 풀었을 때(ui에서 부름)
+    noteAnswer(choice, ok) {
+      const r = this.run;
+      if (ok) {
+        r.noteSolved = true;
+        r.exitOpen = true;
+        this.dirty = true;
+        Sound.open();
+        this.ui.bigMsg("\u{1F6AA} \uD0C8\uCD9C\uBB38\uC774 \uC5F4\uB838\uC5B4\uC694! \uD654\uC0B4\uD45C\uB97C \uB530\uB77C\uAC00\uC694!", "good");
+        this.event("noteSolved");
+        return "open";
+      }
+      r.wrong++;
+      if (r.diff === "hell") {
+        const ids = this.map.objects.filter((o) => o.kind === "search").map((o) => o.id);
+        r.searched = {};
+        r.realIds = shuffled(ids).slice(0, this.need);
+        r.scattered++;
+        r.disabled.push(choice);
+        this.dirty = true;
+        Sound.bad();
+        this.ui.bigMsg("\u{1F525} \uD2C0\uB838\uC5B4\uC694! \uCABD\uC9C0 \uC870\uAC01\uC774 \uB2E4\uC2DC \uD769\uC5B4\uC84C\uC5B4\uC694!", "bad");
+        return "scatter";
+      }
+      r.disabled.push(choice);
+      this.dirty = true;
+      Sound.bad();
+      return "retry";
+    }
+    clear() {
+      const r = this.run;
+      this.paused = true;
+      this.over = true;
+      this.event("exit");
+      const stars = 1 + (r.wrong <= 2 ? 1 : 0) + (r.soapTotal && r.soapGot / r.soapTotal >= 0.6 ? 1 : 0);
+      Sound.open();
+      this.ui.onClear({ stageId: r.stageId, stars, diff: r.diff, wrong: r.wrong, correct: r.correct, soapGot: r.soapGot, soapTotal: r.soapTotal });
+    }
+    // 감지기: 가장 가까운 (못 찾은) 진짜 조각까지 거리
+    detector() {
+      const r = this.run;
+      if (r.exitOpen) return { level: 5, text: "\uD0C8\uCD9C\uBB38\uC774 \uC5F4\uB838\uC5B4\uC694!", room: null };
+      if (this.found >= this.need) return { level: 5, text: "\uCABD\uC9C0\uB97C \uC5F4\uC5B4 \uBCF4\uC138\uC694!", room: null };
+      let best = null, bd = 1e9;
+      for (const id of r.realIds) {
+        if (r.searched[id] === "found") continue;
+        const o = this.map.objects[id], d = Math.hypot(o.x + 0.5 - this.px, o.y + 0.5 - this.py);
+        if (d < bd) {
+          bd = d;
+          best = o;
+        }
+      }
+      if (!best) return null;
+      const room = this.map.roomAt(best.x + 0.5, best.y + 0.5).name;
+      if (bd > 13) return { level: 1, text: "\uC870\uAC01\uACFC \uBA40\uC5B4\uC694", room };
+      if (bd > 8) return { level: 2, text: "\uC870\uAE08 \uAC00\uAE4C\uC6CC\uC694", room };
+      if (bd > 4.5) return { level: 3, text: "\uAC00\uAE4C\uC6CC\uC694!", room };
+      if (bd > 2) return { level: 4, text: "\uC544\uC8FC \uAC00\uAE4C\uC6CC\uC694!", room };
+      return { level: 5, text: "\uBC14\uB85C \uC5EC\uAE30\uC608\uC694!", room };
+    }
+    currentRoom() {
+      var _a;
+      return ((_a = this.map.roomAt(this.px, this.py)) == null ? void 0 : _a.name) || "";
+    }
+    exitAngle() {
+      const e = this.map.exit;
+      return { a: Math.atan2(e.y + 0.5 - this.py, e.x + 0.5 - this.px), d: Math.hypot(e.x + 0.5 - this.px, e.y + 0.5 - this.py) };
+    }
+    // ---------- 연습 층 ----------
+    event(ev) {
+      if (!this.tut) return;
+      const r = this.run;
+      if (!r.tutSeen.includes(ev)) r.tutSeen.push(ev);
+      let changed = false;
+      while (r.tut < TUTORIAL.length && r.tutSeen.includes(TUTORIAL[r.tut].ev)) {
+        r.tut++;
+        changed = true;
+        this.enterTutStep();
+      }
+      if (changed) {
+        this.dirty = true;
+        this.ui.tutorial(r.tut);
+      }
+    }
+    enterTutStep() {
+      const r = this.run, step = TUTORIAL[r.tut];
+      if (!step) return;
+      if (step.ev === "stun") {
+        if (r.soap < 3) r.soap = 3;
+        if (!this.germs.length) {
+          const rm = this.map.rooms[1] || this.map.rooms[0];
+          this.germs.push(this.makeGerm("basic", (rm.x0 + rm.x1) / 2 + 0.5, (rm.y0 + rm.y1) / 2 + 0.5));
+        }
+      }
+      if (step.ev === "water") r.item = "water";
+      if (step.ev === "mask") r.item = "mask";
+    }
+    float(text, x, y, color = "#333") {
+      this.fx.push({ text, x, y, t: 1.2, max: 1.2, color });
+    }
+    // ---------- 그리기 ----------
+    draw() {
+      const c = this.cx, TS = this.TS, m = this.map, T = m.T, r = this.run;
+      c.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      c.fillStyle = T.line;
+      c.fillRect(0, 0, this.vw, this.vh);
+      let camX = this.px * TS - this.vw / 2, camY = this.py * TS - this.vh / 2;
+      camX = Math.max(-TS, Math.min(m.W * TS - this.vw + TS, camX));
+      camY = Math.max(-TS, Math.min(m.H * TS - this.vh + TS * 1.5, camY));
+      if (m.W * TS + 2 * TS < this.vw) camX = (m.W * TS - this.vw) / 2;
+      if (m.H * TS + 2 * TS < this.vh) camY = (m.H * TS - this.vh) / 2;
+      c.save();
+      c.translate(-Math.round(camX), -Math.round(camY));
+      const x0 = Math.max(0, Math.floor(camX / TS)), y0 = Math.max(0, Math.floor(camY / TS));
+      const x1 = Math.min(m.W - 1, Math.ceil((camX + this.vw) / TS)), y1 = Math.min(m.H - 1, Math.ceil((camY + this.vh) / TS));
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+        const v = m.at(x, y);
+        if (v === 1) {
+          const front = m.at(x, y + 1) !== 1;
+          c.fillStyle = T.wallTop;
+          c.fillRect(x * TS, y * TS, TS, TS);
+          if (front) {
+            c.fillStyle = T.wall;
+            c.fillRect(x * TS, y * TS + TS * 0.55, TS, TS * 0.45);
+          }
+        } else {
+          c.fillStyle = T.floor[x + y & 1];
+          c.fillRect(x * TS, y * TS, TS, TS);
+        }
+      }
+      c.font = `${Math.round(TS * 0.32)}px "Ssurround",sans-serif`;
+      c.textAlign = "left";
+      c.textBaseline = "top";
+      for (const rm of m.rooms) {
+        c.fillStyle = "rgba(0,0,0,0.18)";
+        c.fillText(rm.name, rm.x0 * TS + 6, rm.y0 * TS + 4);
+      }
+      this.drawExit(c, TS);
+      for (const p of m.pickups) {
+        if (r.picked.includes(p.id)) continue;
+        const bob = Math.sin(this.time * 3 + p.id) * TS * 0.06;
+        const e = p.kind === "soap" ? "\u{1F9FC}" : p.kind === "water" ? "\u{1F4A7}" : "\u{1F637}";
+        const im = emojiCanvas(e, TS * 0.5);
+        c.fillStyle = "rgba(0,0,0,0.08)";
+        c.beginPath();
+        c.ellipse((p.x + 0.5) * TS, (p.y + 0.8) * TS, TS * 0.22, TS * 0.08, 0, 0, 7);
+        c.fill();
+        c.drawImage(im, (p.x + 0.5) * TS - im.width / 2, (p.y + 0.5) * TS - im.height / 2 + bob);
+      }
+      const list = [];
+      for (const o of m.objects) list.push({ y: o.y + 0.9, d: () => this.drawObject(c, o, TS) });
+      for (const g of this.germs) list.push({ y: g.y, d: () => this.drawGerm(c, g, TS) });
+      if (r.hidden == null) list.push({ y: this.py, d: () => this.drawPlayer(c, TS) });
+      list.sort((a, b) => a.y - b.y).forEach((it) => it.d());
+      for (const b of this.bubbles) {
+        c.fillStyle = "rgba(160,215,255,0.55)";
+        c.strokeStyle = "#5aa9e6";
+        c.lineWidth = 2;
+        c.beginPath();
+        c.arc(b.x * TS, b.y * TS, TS * 0.22, 0, 7);
+        c.fill();
+        c.stroke();
+        c.fillStyle = "#fff";
+        c.beginPath();
+        c.arc(b.x * TS - TS * 0.07, b.y * TS - TS * 0.07, TS * 0.05, 0, 7);
+        c.fill();
+      }
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      for (const f of this.fx) {
+        const k = f.t / f.max;
+        c.globalAlpha = Math.min(1, k * 2);
+        this.label(c, f.text, f.x * TS, (f.y - (1 - k) * 0.6) * TS, Math.round(TS * 0.36), f.color);
+      }
+      c.globalAlpha = 1;
+      c.restore();
+    }
+    label(c, text, x, y, size, color = "#333", stroke = "#fff") {
+      c.font = `${size}px "Ssurround","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif`;
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      c.lineJoin = "round";
+      c.lineWidth = Math.max(3, size * 0.28);
+      c.strokeStyle = stroke;
+      c.strokeText(text, x, y);
+      c.fillStyle = color;
+      c.fillText(text, x, y);
+    }
+    drawExit(c, TS) {
+      const e = this.map.exit, open = this.run.exitOpen, x = e.x * TS, y = e.y * TS;
+      c.fillStyle = open ? "#4cc36a" : "#9aa0a6";
+      c.fillRect(x + 3, y + 3, TS - 6, TS - 6);
+      if (open) {
+        c.strokeStyle = `rgba(76,195,106,${0.5 + 0.4 * Math.sin(this.time * 5)})`;
+        c.lineWidth = 6;
+        c.strokeRect(x - 2, y - 2, TS + 4, TS + 4);
+      }
+      const im = emojiCanvas(open ? "\u{1F6AA}" : "\u{1F512}", TS * 0.6);
+      c.drawImage(im, x + TS / 2 - im.width / 2, y + TS / 2 - im.height / 2);
+      const lx = e.ix * TS + TS / 2, ly = e.iy * TS + (e.dir === "s" ? -TS * 0.2 : e.dir === "n" ? TS * 1.1 : -TS * 0.3);
+      this.label(c, open ? "\uD0C8\uCD9C\uBB38 \uC5F4\uB9BC!" : "\uD0C8\uCD9C\uBB38", lx, ly, Math.round(TS * 0.3), open ? "#1f8a3a" : "#666");
+    }
+    drawObject(c, o, TS) {
+      const r = this.run, cx = (o.x + 0.5) * TS, cy = (o.y + 0.5) * TS;
+      if (o.kind === "decor") {
+        const im2 = emojiCanvas(o.emoji, TS * 0.75);
+        c.drawImage(im2, cx - im2.width / 2, cy - im2.height / 2);
+        return;
+      }
+      if (o.kind === "hide") {
+        const hiding = r.hidden === o.id;
+        c.fillStyle = hiding ? "rgba(76,195,106,0.35)" : "rgba(76,195,106,0.18)";
+        c.strokeStyle = "#2e9a4a";
+        c.lineWidth = 3;
+        c.beginPath();
+        c.roundRect(o.x * TS + 2, o.y * TS + 2, TS - 4, TS - 4, TS * 0.2);
+        c.fill();
+        c.stroke();
+        const im2 = emojiCanvas(o.emoji, TS * 0.85);
+        c.drawImage(im2, cx - im2.width / 2, cy - im2.height / 2);
+        this.label(c, hiding ? "\uC228\uB294 \uC911\u2026" : this.hideLabel, cx, o.y * TS - TS * 0.28, Math.round(TS * 0.34), "#fff", "#1f7a36");
+        if (hiding) {
+          const p = IMG[this.o.char];
+          if (p) {
+            c.globalAlpha = 0.45;
+            const h = TS * 0.9, w = h * p.width / p.height;
+            c.drawImage(p, cx - w / 2, cy - h / 2, w, h);
+            c.globalAlpha = 1;
+          }
+        }
+        return;
+      }
+      const st = r.searched[o.id], lock = this.locks[o.id];
+      c.fillStyle = st ? "rgba(255,255,255,0.55)" : "#fff";
+      c.strokeStyle = st === "found" ? "#4cc36a" : lock ? "#e0524a" : "#f0a640";
+      c.lineWidth = 3;
+      c.beginPath();
+      c.roundRect(o.x * TS + 3, o.y * TS + 3, TS - 6, TS - 6, TS * 0.18);
+      c.fill();
+      c.stroke();
+      c.globalAlpha = st ? 0.5 : 1;
+      const im = emojiCanvas(o.emoji, TS * 0.62);
+      c.drawImage(im, cx - im.width / 2, cy - im.height / 2);
+      c.globalAlpha = 1;
+      if (lock) this.label(c, `\u{1F512}${Math.ceil(lock)}`, cx, o.y * TS - TS * 0.25, Math.round(TS * 0.34), "#e0524a");
+      else if (!st) {
+        const b = Math.sin(this.time * 4 + o.id) * TS * 0.06;
+        c.fillStyle = "#ffb627";
+        c.beginPath();
+        c.arc(cx, o.y * TS - TS * 0.22 + b, TS * 0.2, 0, 7);
+        c.fill();
+        this.label(c, "?", cx, o.y * TS - TS * 0.22 + b, Math.round(TS * 0.3), "#fff", "#c97a00");
+      } else if (st === "found") this.label(c, "\u2713", cx, o.y * TS - TS * 0.2, Math.round(TS * 0.34), "#2e9a4a");
+    }
+    drawPlayer(c, TS) {
+      const im = IMG[this.o.char];
+      const blink = this.invuln > 0 && Math.floor(this.time * 10) % 2 === 0;
+      const x = this.px * TS, y = this.py * TS;
+      c.fillStyle = "rgba(0,0,0,0.15)";
+      c.beginPath();
+      c.ellipse(x, y + TS * 0.3, TS * 0.32, TS * 0.1, 0, 0, 7);
+      c.fill();
+      if (this.maskT > 0) {
+        c.fillStyle = "rgba(120,180,255,0.25)";
+        c.beginPath();
+        c.arc(x, y - TS * 0.3, TS * 0.7, 0, 7);
+        c.fill();
+      }
+      if (blink) c.globalAlpha = 0.4;
+      if (im) {
+        const h = TS * 1.35, w = h * im.width / im.height, hop = this.walkT > 0 ? Math.abs(Math.sin(this.walkT * 12)) * TS * 0.08 : 0;
+        c.save();
+        c.translate(x, y + TS * 0.35 - hop);
+        c.scale(this.face, 1);
+        c.drawImage(im, -w / 2, -h, w, h);
+        c.restore();
+      } else {
+        c.fillStyle = "#ff8a3d";
+        c.beginPath();
+        c.arc(x, y, TS * 0.35, 0, 7);
+        c.fill();
+      }
+      c.globalAlpha = 1;
+      if (this.waterT > 0) this.label(c, "\u{1F4A7}", x + TS * 0.45, y - TS * 1, Math.round(TS * 0.32));
+      if (this.maskT > 0) this.label(c, "\u{1F637}", x - TS * 0.45, y - TS * 1, Math.round(TS * 0.32));
+    }
+    drawGerm(c, g, TS) {
+      const im = IMG[g.def.img], x = g.x * TS, y = g.y * TS, sz = TS * 1 * g.def.size;
+      const squash = g.stun > 0 ? 1 : 1 + Math.sin(g.bob) * 0.05;
+      c.fillStyle = g.state === "chase" ? "rgba(230,70,70,0.22)" : "rgba(0,0,0,0.12)";
+      c.beginPath();
+      c.ellipse(x, y + sz * 0.38, sz * 0.38, sz * 0.12, 0, 0, 7);
+      c.fill();
+      if (im) {
+        c.save();
+        c.translate(x, y + sz * 0.4);
+        c.scale((g.face || 1) * (2 - squash), squash);
+        if (g.cool > 0) c.globalAlpha = 0.55;
+        c.drawImage(im, -sz / 2, -sz, sz, sz);
+        c.restore();
+        c.globalAlpha = 1;
+      }
+      if (g.stun > 0) {
+        c.fillStyle = "rgba(160,215,255,0.35)";
+        c.strokeStyle = "#5aa9e6";
+        c.lineWidth = 2;
+        c.beginPath();
+        c.arc(x, y - sz * 0.1, sz * 0.62, 0, 7);
+        c.fill();
+        c.stroke();
+        this.label(c, `\u{1FAE7} ${Math.ceil(g.stun)}`, x, y - sz * 0.85, Math.round(TS * 0.3), "#2b7bd6");
+      } else if (g.tired > 0) this.label(c, "\uD5E5\uD5E5 \u{1F4A4}", x, y - sz * 0.85, Math.round(TS * 0.28), "#8a5cc7");
+      else if (g.state === "chase") this.label(c, "!", x, y - sz * 0.85 - (g.alertT > 0 ? TS * 0.15 : 0), Math.round(TS * 0.5), "#e0524a");
+    }
+  };
+
+  // js/ui.js
+  var $ = (id) => document.getElementById(id);
+  var esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]);
+  function shuffled2(a) {
+    a = a.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+      this.moveTo(x + r, y);
+      this.arcTo(x + w, y, x + w, y + h, r);
+      this.arcTo(x + w, y + h, x, y + h, r);
+      this.arcTo(x, y + h, x, y, r);
+      this.arcTo(x, y, x + w, y, r);
+      this.closePath();
+    };
+  }
+  var S = { cls: 0, num: 0, save: null, game: null, diff: Save.diff };
+  var SCREENS = ["sTitle", "sClass", "sNum", "sResume", "sBand", "sCourse", "sChar", "sTeacher"];
+  function show(id) {
+    for (const s of SCREENS) $(s).hidden = s !== id;
+    $("hud").hidden = id !== null;
+    if (id !== null && S.game) {
+      S.game.destroy();
+      S.game = null;
+    }
+    closeModal();
+    $("say").hidden = true;
+    if (id === "sTitle") renderTitle();
+  }
+  document.querySelectorAll("[data-back]").forEach((b) => b.addEventListener("click", () => show(b.dataset.back)));
+  function renderTitle() {
+    const box = $("diffs");
+    box.innerHTML = "";
+    for (const [k, d] of Object.entries(DIFFS)) {
+      const b = document.createElement("button");
+      b.className = (k === S.diff ? "on " : "") + k;
+      b.innerHTML = `<b>${d.icon} ${d.name}</b><small>${d.desc}</small>`;
+      b.onclick = () => {
+        S.diff = k;
+        Save.diff = k;
+        renderTitle();
+      };
+      box.appendChild(b);
+    }
+    syncSound();
+  }
+  function syncSound() {
+    $("soundBtn").textContent = Sound.on ? "\u{1F50A}" : "\u{1F507}";
+    $("soundBtn2").textContent = Sound.on ? "\u{1F50A} \uC18C\uB9AC \uCF1C\uC9D0" : "\u{1F507} \uC18C\uB9AC \uAEBC\uC9D0";
+  }
+  $("soundBtn").onclick = $("soundBtn2").onclick = () => {
+    Sound.toggle();
+    syncSound();
+  };
+  $("fullBtn").onclick = () => {
+    var _a, _b;
+    const d = document.documentElement;
+    if (!document.fullscreenElement) (_a = d.requestFullscreen || d.webkitRequestFullscreen) == null ? void 0 : _a.call(d);
+    else (_b = document.exitFullscreen) == null ? void 0 : _b.call(document);
+  };
+  $("startBtn").onclick = () => {
+    Sound.unlock();
+    renderClass();
+    show("sClass");
+  };
+  function renderClass() {
+    const g = $("classGrid");
+    g.innerHTML = "";
+    const used = new Set(Save.classesWithData());
+    for (let c = 1; c <= 15; c++) {
+      const b = document.createElement("button");
+      b.innerHTML = `${c}\uBC18${used.has(c) ? "<small>\uAE30\uB85D \uC788\uC74C</small>" : ""}`;
+      if (c === Save.lastClass) b.className = "has";
+      b.onclick = () => {
+        S.cls = c;
+        Save.lastClass = c;
+        renderNum();
+        show("sNum");
+      };
+      g.appendChild(b);
+    }
+  }
+  function progressText(s) {
+    var _a;
+    if (!s) return "";
+    if (s.finished) return "\u{1F3C6} \uC644\uC8FC";
+    if (s.inTutorial) return "\uC5F0\uC2B5 \uCE35";
+    const st = (_a = COURSES[s.course]) == null ? void 0 : _a.stages[s.stageIdx];
+    return st ? `${st}\uCE35` : "";
+  }
+  function totalStars(s) {
+    return Object.values((s == null ? void 0 : s.results) || {}).reduce((a, r) => a + (r.stars || 0), 0);
+  }
+  function renderNum() {
+    $("numTitle").textContent = `${S.cls}\uBC18, \uBA87 \uBC88\uC778\uAC00\uC694?`;
+    const g = $("numGrid");
+    g.innerHTML = "";
+    for (let n = 1; n <= 30; n++) {
+      const s = Save.load(S.cls, n), b = document.createElement("button");
+      b.innerHTML = `${n}\uBC88${s ? `<small>${progressText(s)} \u2B50${totalStars(s)}</small>` : ""}`;
+      if (s) b.className = "has";
+      b.onclick = () => pickStudent(n);
+      g.appendChild(b);
+    }
+  }
+  function pickStudent(n) {
+    S.num = n;
+    S.save = Save.load(S.cls, n);
+    if (S.save && S.save.course) {
+      renderResume();
+      show("sResume");
+    } else {
+      S.save = { results: {} };
+      renderBand();
+      show("sBand");
+    }
+  }
+  function renderResume() {
+    const s = S.save, d = DIFFS[s.diff] || DIFFS.easy;
+    $("resumeTitle").textContent = `${S.cls}\uBC18 ${S.num}\uBC88, \uC774\uC5B4 \uD560\uAE4C\uC694?`;
+    $("resumeInfo").innerHTML = `\uD559\uB144: <b>${BANDS[s.band].name}</b> \xB7 ${COURSES[s.course].name}<br>
+    \uC9C4\uD589: <b>${s.finished ? "\u{1F3C6} \uBAA8\uB450 \uD0C8\uCD9C!" : s.inTutorial ? "\uC5F0\uC2B5 \uCE35" : esc(STAGES[COURSES[s.course].stages[s.stageIdx]].name)}</b><br>
+    \uB09C\uC774\uB3C4: <b>${d.icon} ${d.name}</b> \xB7 \uBAA8\uC740 \uBCC4 \u2B50 <b>${totalStars(s)}</b>`;
+    $("contBtn").disabled = !!s.finished;
+    $("contBtn").onclick = () => startPlay();
+    $("newBtn").onclick = () => confirmBox("\uCC98\uC74C\uBD80\uD130 \uC0C8\uB85C \uD560\uAE4C\uC694? \uC9C0\uAE08\uAE4C\uC9C0\uC758 \uAE30\uB85D\uC774 \uC9C0\uC6CC\uC838\uC694.", "\uC0C8\uB85C \uD558\uAE30", () => {
+      Save.remove(S.cls, S.num);
+      S.save = { results: {} };
+      renderBand();
+      show("sBand");
+    });
+  }
+  function renderBand() {
+    const box = $("bandCards");
+    box.innerHTML = "";
+    const em = { low: "\u{1F331}", mid: "\u{1F33F}", high: "\u{1F333}" };
+    for (const [k, b] of Object.entries(BANDS)) {
+      const el = document.createElement("button");
+      el.innerHTML = `<span class="em">${em[k]}</span><b>${b.name}</b><span>${b.sub}</span>`;
+      el.onclick = () => {
+        S.save.band = k;
+        renderCourse();
+        show("sCourse");
+      };
+      box.appendChild(el);
+    }
+  }
+  function renderCourse() {
+    const box = $("courseCards");
+    box.innerHTML = "";
+    for (const [k, c] of Object.entries(COURSES)) {
+      const el = document.createElement("button");
+      el.innerHTML = `<span class="em">${k === "short" ? "\u23F1\uFE0F" : "\u23F3"}</span><b>${c.name}</b><span>${c.sub}</span><span>${c.stages.map((s) => STAGES[s].place).join(" \xB7 ")}</span>`;
+      el.onclick = () => {
+        S.save.course = k;
+        renderChar();
+        show("sChar");
+      };
+      box.appendChild(el);
+    }
+  }
+  function renderChar() {
+    const box = $("charCards");
+    box.innerHTML = "";
+    for (const c of CHARS) {
+      const el = document.createElement("button");
+      el.innerHTML = `<img src="img/${c.id}.png" alt=""><b>${c.name}</b>`;
+      el.onclick = () => {
+        Object.assign(S.save, { char: c.id, diff: S.diff, stageIdx: 0, inTutorial: true, tutorialDone: false, run: null, results: {}, finished: false });
+        persist();
+        startPlay();
+      };
+      box.appendChild(el);
+    }
+  }
+  function persist() {
+    if (S.cls && S.num && S.save) Save.store(S.cls, S.num, S.save);
+  }
+  function currentStageId() {
+    const s = S.save;
+    return s.inTutorial ? 0 : COURSES[s.course].stages[s.stageIdx];
+  }
+  function poolFor(stageId) {
+    return stageId === 0 ? PRACTICE_QUESTIONS : QUESTIONS[S.save.band][stageId];
+  }
+  var imgReady = Promise.all([
+    loadImages(["boy1", "boy2", "girl1", "girl2", "germ_basic", "germ_mold", "germ_cavity", "yeongyang"]),
+    // 지도 위 글자(숨는 곳, ? 등)도 같은 글꼴로 그리도록 먼저 불러 둔다
+    document.fonts ? document.fonts.load('20px "Ssurround"').catch(() => {
+    }) : null
+  ]);
+  async function startPlay() {
+    await imgReady;
+    if (S.game) {
+      S.game.destroy();
+      S.game = null;
+    }
+    show(null);
+    const s = S.save, stageId = currentStageId(), st = STAGES[stageId];
+    const resumed = !!(s.run && s.run.stageId === stageId);
+    S.game = new Game($("cv"), { stageId, band: s.band, diff: s.diff, char: s.char, pool: poolFor(stageId), run: resumed ? s.run : null, ui: UI });
+    $("stageName").textContent = st.name;
+    $("tutBox").hidden = stageId !== 0;
+    if (stageId === 0) UI.tutorial(S.game.run.tut);
+    const intro = STAGE_INTRO[stageId];
+    UI.say(resumed ? "\uC774\uC5B4\uC11C \uD574 \uBCF4\uC790! \uADE0\uC744 \uC870\uC2EC\uD574!" : intro.all || intro[s.band]);
+    if (!resumed) {
+      s.run = S.game.serialize();
+      persist();
+    }
+    updateHud();
+  }
+  var hudT = 0;
+  function hudLoop(t) {
+    requestAnimationFrame(hudLoop);
+    const g = S.game;
+    if (!g) return;
+    if (t - hudT > 120) {
+      hudT = t;
+      updateHud();
+    }
+    if (g.dirty && !g.over) {
+      g.dirty = false;
+      S.save.run = g.serialize();
+      persist();
+    }
+    if (!$("compass").hidden) {
+      const e = g.exitAngle();
+      $("arrow").style.transform = `rotate(${e.a}rad)`;
+    }
+  }
+  requestAnimationFrame(hudLoop);
+  function updateHud() {
+    const g = S.game;
+    if (!g) return;
+    const r = g.run;
+    $("roomName").textContent = "\u{1F4CD} " + g.currentRoom();
+    $("lives").textContent = g.tut ? "\uC5F0\uC2B5 \uC911" : g.lives === Infinity ? `${DIFFS[r.diff].icon} ${DIFFS[r.diff].name} \xB7 \u2764\uFE0F \uBB34\uD55C` : `${DIFFS[r.diff].icon} ${DIFFS[r.diff].name} \xB7 ${"\u2764\uFE0F".repeat(g.lives)}${"\u{1F90D}".repeat(Math.max(0, DIFFS[r.diff].lives - g.lives))}`;
+    const d = g.detector();
+    const det = $("detector");
+    det.dataset.l = d ? d.level : 0;
+    $("detText").textContent = d ? d.text : "";
+    $("compass").hidden = !r.exitOpen;
+    $("noteN").textContent = `${g.found}/${g.need}`;
+    $("noteBtn").classList.toggle("ready", g.found >= g.need && !r.noteSolved);
+    $("soapN").textContent = r.soap;
+    $("itemIco").textContent = r.item === "water" ? "\u{1F4A7}" : r.item === "mask" ? "\u{1F637}" : "\u270B";
+    $("itemName").textContent = r.item === "water" ? "\uBB3C \uD55C \uCEF5" : r.item === "mask" ? "\uB9C8\uC2A4\uD06C" : "\uBE48\uC190";
+    $("itemBtn").classList.toggle("ready", !!r.item);
+    const n = g.nearby();
+    $("actBtn").hidden = !n;
+    if (n) $("actLabel").textContent = n.label;
+  }
+  var press = (el, fn) => el.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    Sound.unlock();
+    fn();
+  });
+  press($("actBtn"), () => {
+    var _a;
+    return (_a = S.game) == null ? void 0 : _a.interact();
+  });
+  press($("bubbleBtn"), () => {
+    var _a;
+    return (_a = S.game) == null ? void 0 : _a.throwBubble();
+  });
+  press($("itemBtn"), () => {
+    var _a;
+    return (_a = S.game) == null ? void 0 : _a.useItem();
+  });
+  press($("noteBtn"), () => openNote());
+  press($("menuBtn"), () => openMenu());
+  press($("detector"), () => {
+    const g = S.game;
+    if (!g) return;
+    const d = g.detector();
+    if (!d) return;
+    if (g.run.exitOpen) UI.say("\uD0C8\uCD9C\uBB38\uC774 \uC5F4\uB838\uC5B4! \uCD08\uB85D \uD654\uC0B4\uD45C\uB97C \uB530\uB77C\uAC00!");
+    else if (!d.room) UI.say("\uC870\uAC01\uC744 \uB2E4 \uBAA8\uC558\uC5B4! \u{1F4DC} \uCABD\uC9C0 \uB2E8\uCD94\uB97C \uB20C\uB7EC \uC21C\uC11C\uB300\uB85C \uBD99\uC5EC \uBD10!");
+    else UI.say(`\uCABD\uC9C0 \uC870\uAC01\uC740 <b>${esc(d.room)}</b> \uCABD\uC5D0 \uC788\uC5B4! \uAC10\uC9C0\uAE30\uAC00 "\uAC00\uAE4C\uC6CC\uC694"\uB85C \uBC14\uB00C\uB294 \uACF3\uC744 \uCC3E\uC544\uBD10.`);
+  });
+  $("tutSkip").onclick = () => {
+    if (S.game) {
+      S.game.pausedBefore = S.game.paused;
+      S.game.paused = true;
+    }
+    confirmBox("\uC5F0\uC2B5\uC744 \uAC74\uB108\uB6F0\uACE0 \uBC14\uB85C 1\uCE35\uC73C\uB85C \uAC08\uAE4C\uC694?", "\uAC74\uB108\uB6F0\uAE30", () => finishTutorial());
+  };
+  addEventListener("keydown", (e) => {
+    const g = S.game;
+    if (!g || !$("modal").hidden) {
+      if (e.code === "Escape") closeModal();
+      return;
+    }
+    if (["Tab", "Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) e.preventDefault();
+    if (e.repeat) return;
+    g.keys.add(e.code);
+    if (e.code === "KeyE" || e.code === "Space" || e.code === "Enter") g.interact();
+    else if (e.code === "KeyF") g.throwBubble();
+    else if (e.code === "KeyQ") g.useItem();
+    else if (e.code === "Tab") openNote();
+    else if (e.code === "Escape") openMenu();
+  });
+  addEventListener("keyup", (e) => {
+    var _a;
+    return (_a = S.game) == null ? void 0 : _a.keys.delete(e.code);
+  });
+  addEventListener("blur", () => {
+    var _a;
+    return (_a = S.game) == null ? void 0 : _a.keys.clear();
+  });
+  addEventListener("resize", () => {
+    var _a;
+    return (_a = S.game) == null ? void 0 : _a.resize();
+  });
+  var joyId = null;
+  var joyX = 0;
+  var joyY = 0;
+  var cv = $("cv");
+  cv.addEventListener("pointerdown", (e) => {
+    if (!S.game || e.clientX > innerWidth * 0.55) return;
+    joyId = e.pointerId;
+    joyX = e.clientX;
+    joyY = e.clientY;
+    const j = $("joy");
+    j.hidden = false;
+    j.style.left = joyX + "px";
+    j.style.top = joyY + "px";
+    $("knob").style.transform = "";
+    cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener("pointermove", (e) => {
+    if (e.pointerId !== joyId || !S.game) return;
+    let dx = e.clientX - joyX, dy = e.clientY - joyY;
+    const R = 55, d = Math.hypot(dx, dy);
+    if (d > R) {
+      dx = dx / d * R;
+      dy = dy / d * R;
+    }
+    $("knob").style.transform = `translate(${dx}px, ${dy}px)`;
+    S.game.input.x = dx / R;
+    S.game.input.y = dy / R;
+  });
+  var joyEnd = (e) => {
+    if (e.pointerId !== joyId) return;
+    joyId = null;
+    $("joy").hidden = true;
+    if (S.game) {
+      S.game.input.x = 0;
+      S.game.input.y = 0;
+    }
+  };
+  cv.addEventListener("pointerup", joyEnd);
+  cv.addEventListener("pointercancel", joyEnd);
+  var flush = () => {
+    if (S.game && !S.game.over) {
+      S.save.run = S.game.serialize();
+      persist();
+    }
+  };
+  addEventListener("pagehide", flush);
+  document.addEventListener("visibilitychange", () => {
+    var _a;
+    if (document.hidden) {
+      flush();
+      (_a = S.game) == null ? void 0 : _a.keys.clear();
+    }
+  });
+  var sayT = 0;
+  var bigT = 0;
+  var UI = {
+    say(html) {
+      $("sayText").innerHTML = html;
+      $("say").hidden = false;
+      clearTimeout(sayT);
+      sayT = setTimeout(() => {
+        $("say").hidden = true;
+      }, 6e3);
+    },
+    bigMsg(text, kind = "info") {
+      const el = $("bigMsg");
+      el.textContent = text;
+      el.className = kind;
+      el.hidden = false;
+      el.style.animation = "none";
+      void el.offsetWidth;
+      el.style.animation = "";
+      clearTimeout(bigT);
+      bigT = setTimeout(() => {
+        el.hidden = true;
+      }, 2e3);
+    },
+    toast(text) {
+      const el = document.createElement("div");
+      el.className = "toast";
+      el.textContent = text;
+      $("toasts").appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    },
+    tutorial(i) {
+      if (i >= TUTORIAL.length) {
+        $("tutBox").hidden = true;
+        return;
+      }
+      $("tutStep").textContent = `\uC5F0\uC2B5 ${i + 1}/${TUTORIAL.length}`;
+      $("tutText").innerHTML = TUTORIAL[i].text.replace("{hide}", hideName(S.save.band));
+      if (i === 0) $("tutText").innerHTML += "<br><small>\u{1F4A1} ?\uAC00\uAD6C 10\uAC1C \uC911 4\uAC1C\uC5D0\uB9CC \uC9C4\uC9DC \uCABD\uC9C0 \uC870\uAC01\uC774 \uC788\uC5B4\uC694. (\uC5F0\uC2B5\uC5D0\uC11C\uB294 4\uAC1C \uC911 2\uAC1C) \uBB38\uC81C\uB97C \uD2C0\uB9AC\uBA74 6\uCD08 \uB3D9\uC548 \uADF8 \uAC00\uAD6C\uB97C \uB4A4\uC9C8 \uC218 \uC5C6\uC5B4\uC694!</small>";
+    },
+    openQuiz,
+    onCaught,
+    onClear
+  };
+  function openModal(html) {
+    $("sheet").innerHTML = html;
+    $("modal").hidden = false;
+    return $("sheet");
+  }
+  function closeModal() {
+    $("modal").hidden = true;
+    $("sheet").innerHTML = "";
+  }
+  function confirmBox(text, okText, onOk) {
+    const sh = openModal(`<h3>\uD655\uC778</h3><p class="q">${esc(text)}</p><div class="acts"><button class="big alt" id="cNo">\uC544\uB2C8\uC694</button><button class="big" id="cYes">${esc(okText)}</button></div>`);
+    sh.querySelector("#cNo").onclick = () => {
+      var _a;
+      closeModal();
+      if (S.game) S.game.paused = (_a = S.game.pausedBefore) != null ? _a : false;
+    };
+    sh.querySelector("#cYes").onclick = () => {
+      closeModal();
+      onOk();
+    };
+  }
+  function choiceButtons(q, disabled) {
+    const opts = shuffled2(q.c);
+    return opts.map((c, i) => `<button data-c="${esc(c)}" ${disabled.includes(c) ? "disabled" : ""}><i>${i + 1}</i><span>${esc(c)}</span></button>`).join("");
+  }
+  function openQuiz({ title, q }, cb) {
+    const sh = openModal(`<h3>${esc(title)}</h3><p class="q">${esc(q.q)}</p><div class="choices">${choiceButtons(q, [])}</div>`);
+    let done = false;
+    sh.querySelectorAll(".choices button").forEach((b) => b.onclick = () => {
+      if (done) return;
+      done = true;
+      const ok = b.dataset.c === q.c[0];
+      b.classList.add(ok ? "ok" : "no");
+      if (!ok) sh.querySelectorAll(".choices button").forEach((x) => {
+        if (x.dataset.c === q.c[0]) x.classList.add("ok");
+      });
+      setTimeout(() => {
+        closeModal();
+        cb(ok);
+      }, ok ? 500 : 1100);
+    });
+  }
+  function splitPieces(text, n) {
+    const words = text.split(" ");
+    if (words.length >= n) {
+      const out2 = [];
+      let at = 0;
+      for (let i = 0; i < n; i++) {
+        const take = Math.round((words.length - at) / (n - i));
+        out2.push(words.slice(at, at + take).join(" "));
+        at += take;
+      }
+      return out2;
+    }
+    const out = [], len = Math.ceil(text.length / n);
+    for (let i = 0; i < n; i++) out.push(text.slice(i * len, (i + 1) * len));
+    return out;
+  }
+  function openNote() {
+    const g = S.game;
+    if (!g) return;
+    const r = g.run, q = g.o.pool[r.noteQ], n = g.need, pieces = splitPieces(q.q, n);
+    if (!r.pieceOrder || r.pieceOrder.length !== n) r.pieceOrder = shuffled2([...Array(n).keys()]);
+    g.pausedBefore = g.paused;
+    g.paused = true;
+    const close = () => {
+      closeModal();
+      g.paused = false;
+      g.invuln = Math.max(g.invuln, 1);
+    };
+    const numbered = S.save.band === "low";
+    const pieceHtml = (i) => `${numbered ? `<sup>${i + 1}</sup> ` : ""}${esc(pieces[i])}`;
+    if (r.noteSolved) {
+      const sh = openModal(`<h3>\u{1F4DC} \uCABD\uC9C0</h3><p class="q">\uD0C8\uCD9C\uBB38\uC774 \uC5F4\uB838\uC5B4\uC694! \uCD08\uB85D \uD654\uC0B4\uD45C\uB97C \uB530\uB77C \uD0C8\uCD9C\uBB38\uC73C\uB85C \uAC00\uC694.</p><div class="acts"><button class="big" id="nClose">\uB2EB\uAE30</button></div>`);
+      sh.querySelector("#nClose").onclick = close;
+      return;
+    }
+    if (g.found < n) {
+      const got = r.pieceOrder.slice(0, g.found);
+      const sh = openModal(`<h3>\u{1F4DC} \uCC22\uC5B4\uC9C4 \uCABD\uC9C0 (${g.found}/${n})</h3>
+      <p class="hint">\uC870\uAC01\uC744 ${n}\uAC1C \uBAA8\uB450 \uBAA8\uC73C\uBA74 \uC21C\uC11C\uB300\uB85C \uBD99\uC5EC\uC11C \uBB38\uC81C\uB97C \uD480 \uC218 \uC788\uC5B4\uC694. ?\uAC00\uAD6C \uC911 \uC9C4\uC9DC\uB294 ${n}\uAC1C\uBFD0! \uAC10\uC9C0\uAE30\uB97C \uBCF4\uBA70 \uCC3E\uC544\uC694.</p>
+      <div class="pieces">${got.map((i) => `<span class="piece">${pieceHtml(i)}</span>`).join("")}${Array(n - g.found).fill('<span class="piece ghost">? \uC544\uC9C1 \uBABB \uCC3E\uC74C</span>').join("")}</div>
+      <div class="acts"><button class="big" id="nClose">\uB2EB\uAE30</button></div>`);
+      sh.querySelector("#nClose").onclick = close;
+      return;
+    }
+    if (!r.noteOrdered) {
+      const placed = [];
+      const draw = () => {
+        const left = r.pieceOrder.filter((i) => !placed.includes(i));
+        const sh = openModal(`<h3>\u{1F4DC} \uC870\uAC01\uC744 \uC21C\uC11C\uB300\uB85C \uBD99\uC5EC\uC694</h3>
+        <p class="hint">\uC870\uAC01\uC744 \uB204\uB974\uBA74 \uBE48\uCE78\uC5D0 \uCC28\uB840\uB85C \uB4E4\uC5B4\uAC00\uC694. \uCE78\uC744 \uB204\uB974\uBA74 \uBE60\uC838\uC694.</p>
+        <div class="slots" style="--n:${n}">${[...Array(n).keys()].map((k) => placed[k] != null ? `<button class="slot filled" data-s="${k}">${pieceHtml(placed[k])}</button>` : `<div class="slot"><span class="num">${k + 1}</span></div>`).join("")}</div>
+        <div class="pieces">${left.map((i) => `<button class="piece" data-p="${i}">${pieceHtml(i)}</button>`).join("")}</div>
+        <div class="acts"><button class="big alt" id="nClose">\uB2EB\uAE30</button><button class="big green" id="nGlue" ${placed.length < n ? "disabled" : ""}>\uC774\uB300\uB85C \uBD99\uC774\uAE30</button></div>`);
+        sh.querySelectorAll("[data-p]").forEach((b) => b.onclick = () => {
+          placed.push(+b.dataset.p);
+          draw();
+        });
+        sh.querySelectorAll("[data-s]").forEach((b) => b.onclick = () => {
+          placed.splice(+b.dataset.s, 1);
+          draw();
+        });
+        sh.querySelector("#nClose").onclick = close;
+        sh.querySelector("#nGlue").onclick = () => {
+          if (placed.every((p, k) => p === k)) {
+            r.noteOrdered = true;
+            g.dirty = true;
+            Sound.good();
+            askNote();
+          } else {
+            Sound.bad();
+            UI.bigMsg("\uC21C\uC11C\uAC00 \uB9DE\uC9C0 \uC54A\uC544\uC694. \uB2E4\uC2DC \uD574 \uBD10\uC694!", "bad");
+          }
+        };
+      };
+      draw();
+      return;
+    }
+    askNote();
+    function askNote() {
+      const hint = r.disabled.length && r.diff !== "hell" ? `<p class="hint">\u{1F4A1} \uD78C\uD2B8: ${esc(q.h)}</p>` : "";
+      const sh = openModal(`<h3>\u{1F4DC} \uCABD\uC9C0 \uBB38\uC81C \xB7 \uB9DE\uD788\uBA74 \uD0C8\uCD9C\uBB38\uC774 \uC5F4\uB824\uC694!</h3>${hint}<p class="q">${esc(q.q)}</p><div class="choices">${choiceButtons(q, r.disabled)}</div>
+      <div class="acts"><button class="big alt" id="nClose">\uB2EB\uAE30</button></div>`);
+      sh.querySelector("#nClose").onclick = close;
+      let done = false;
+      sh.querySelectorAll(".choices button").forEach((b) => b.onclick = () => {
+        if (done) return;
+        done = true;
+        const ok = b.dataset.c === q.c[0];
+        b.classList.add(ok ? "ok" : "no");
+        const res = g.noteAnswer(b.dataset.c, ok);
+        setTimeout(() => {
+          if (res === "open") close();
+          else if (res === "scatter") {
+            r.noteOrdered = false;
+            r.pieceOrder = null;
+            close();
+          } else askNote();
+        }, ok ? 600 : 900);
+      });
+    }
+  }
+  function diffButtons(current) {
+    return `<div class="diffrow">${Object.entries(DIFFS).map(([k, d]) => `<button data-d="${k}" class="${k === current ? "on" : ""}">${d.icon} ${d.name}</button>`).join("")}</div>`;
+  }
+  function onCaught({ name, lives, diff }) {
+    var _a;
+    const g = S.game;
+    const out = lives <= 0;
+    const head = out ? `<p class="q">\uBAA9\uC228\uC744 \uBAA8\uB450 \uC37C\uC5B4\uC694! \uC774 \uCE35\uC744 \uCC98\uC74C\uBD80\uD130 \uB2E4\uC2DC \uD574\uC694.</p><p class="hint">\uB09C\uC774\uB3C4\uB97C \uACE8\uB77C \uB2E4\uC2DC \uC2DC\uC791\uD558\uC138\uC694.</p>` : `<p class="q">${lives === Infinity ? "\uC26C\uC6C0 \uBAA8\uB4DC\uB77C \uBAA9\uC228\uC740 \uBB34\uD55C\uC774\uC5D0\uC694." : `\uB0A8\uC740 \uBAA9\uC228: ${"\u2764\uFE0F".repeat(lives)}`}<br>\uCC98\uC74C \uC790\uB9AC\uC5D0\uC11C \uB2E4\uC2DC \uCD9C\uBC1C\uD574\uC694.</p>`;
+    const sh = openModal(`<h3>\u{1F635} ${esc(name)}\uC5D0\uAC8C \uC7A1\uD614\uC5B4\uC694!</h3>${head}
+    ${out ? "" : '<div class="acts"><button class="big" id="cCont">\uACC4\uC18D\uD558\uAE30</button></div><p class="hint" style="margin-top:14px">\uB09C\uC774\uB3C4\uB97C \uBC14\uAFB8\uBA74 \uC774 \uCE35\uC744 \uCC98\uC74C\uBD80\uD130 \uB2E4\uC2DC \uD574\uC694.</p>'}
+    ${diffButtons(diff)}`);
+    (_a = sh.querySelector("#cCont")) == null ? void 0 : _a.addEventListener("click", () => {
+      closeModal();
+      g.respawn();
+      g.dirty = true;
+    });
+    sh.querySelectorAll("[data-d]").forEach((b) => b.onclick = () => {
+      const nd = b.dataset.d;
+      if (!out && nd === diff) {
+        closeModal();
+        g.respawn();
+        return;
+      }
+      closeModal();
+      restartStage(nd);
+    });
+  }
+  function restartStage(diff) {
+    S.save.diff = diff;
+    S.save.run = null;
+    persist();
+    startPlay();
+  }
+  function finishTutorial() {
+    Object.assign(S.save, { inTutorial: false, tutorialDone: true, run: null, stageIdx: 0 });
+    persist();
+    startPlay();
+  }
+  function onClear(res) {
+    const s = S.save;
+    if (res.stageId === 0) {
+      const sh2 = openModal(`<h3>\u{1F389} \uC5F0\uC2B5 \uB05D!</h3><p class="q">\uC798\uD588\uC5B4\uC694! \uC774\uC81C \uC9C4\uC9DC \uD0C8\uCD9C\uC744 \uC2DC\uC791\uD574\uC694.<br>\uADE0\uC744 \uD53C\uD574\uC11C \uCABD\uC9C0 \uC870\uAC01 4\uAC1C\uB97C \uBAA8\uC544\uC694!</p><div class="acts"><button class="big" id="go">1\uCE35\uC73C\uB85C \uCD9C\uBC1C!</button></div>`);
+      sh2.querySelector("#go").onclick = () => finishTutorial();
+      return;
+    }
+    s.results[res.stageId] = { stars: res.stars, diff: res.diff, wrong: res.wrong, correct: res.correct, at: Date.now() };
+    s.stageIdx++;
+    s.run = null;
+    const stages = COURSES[s.course].stages, last = s.stageIdx >= stages.length;
+    if (last) s.finished = true;
+    persist();
+    const d = DIFFS[res.diff];
+    const sh = openModal(`<h3>\u{1F389} ${esc(STAGES[res.stageId].name)} \uD0C8\uCD9C \uC131\uACF5!</h3>
+    <div class="stars">${"\u2B50".repeat(res.stars)}${"\u2606".repeat(3 - res.stars)}</div>
+    <p style="text-align:center"><span class="badge ${res.diff}">${d.icon} ${d.name}${res.diff === "hell" ? " \uD074\uB9AC\uC5B4 \u{1F525}" : ""}</span></p>
+    <ul class="crit">
+      <li>\u2705 \uD0C8\uCD9C\uD558\uAE30</li>
+      <li>${res.wrong <= 2 ? "\u2705" : "\u2B1C"} \uBB38\uC81C\uB97C 2\uBC88 \uC774\uD558\uB85C \uD2C0\uB9AC\uAE30 (\uD2C0\uB9B0 \uD69F\uC218 ${res.wrong}\uBC88)</li>
+      <li>${res.soapTotal && res.soapGot / res.soapTotal >= 0.6 ? "\u2705" : "\u2B1C"} \uBC14\uB2E5\uC758 \uBE44\uB204 60% \uB118\uAC8C \uC90D\uAE30 (${res.soapGot}/${res.soapTotal})</li>
+    </ul>
+    <p class="hint">\uB9DE\uD78C \uBB38\uC81C ${res.correct}\uAC1C \xB7 \uD2C0\uB9B0 \uBB38\uC81C ${res.wrong}\uAC1C</p>
+    <div class="acts"><button class="big" id="go">${last ? "\uCD5C\uC885 \uACB0\uACFC \uBCF4\uAE30" : "\uB2E4\uC74C \uCE35\uC73C\uB85C"}</button></div>`);
+    sh.querySelector("#go").onclick = () => {
+      if (last) showFinal();
+      else startPlay();
+    };
+  }
+  function showFinal() {
+    const s = S.save, stages = COURSES[s.course].stages;
+    const rows = stages.map((id) => {
+      const r = s.results[id];
+      return `<li>${esc(STAGES[id].name)} \u2014 ${r ? "\u2B50".repeat(r.stars) + "\u2606".repeat(3 - r.stars) + ` <span class="badge ${r.diff}">${DIFFS[r.diff].icon} ${DIFFS[r.diff].name}</span>` : "-"}</li>`;
+    }).join("");
+    const sh = openModal(`<h3>\u{1F3C6} \uB0E0\uB0E0 \uD0C8\uCD9C \uB300\uC791\uC804 \uC644\uC8FC!</h3><p class="q">${S.cls}\uBC18 ${S.num}\uBC88, \uBAA8\uB4E0 \uCE35\uC744 \uD0C8\uCD9C\uD588\uC5B4\uC694!<br>\uBAA8\uC740 \uBCC4: \u2B50 ${totalStars(s)} / ${stages.length * 3}</p><ul class="crit">${rows}</ul>
+    <p class="hint">\uC120\uC0DD\uB2D8\uAED8 \uC774 \uD654\uBA74\uC744 \uBCF4\uC5EC \uC8FC\uC138\uC694!</p><div class="acts"><button class="big" id="go">\uCC98\uC74C \uD654\uBA74\uC73C\uB85C</button></div>`);
+    sh.querySelector("#go").onclick = () => show("sTitle");
+  }
+  function openMenu() {
+    const g = S.game;
+    if (!g) return;
+    g.pausedBefore = g.paused;
+    g.paused = true;
+    const sh = openModal(`<h3>\u23F8 \uC7A0\uAE50 \uBA48\uCDA4</h3><p class="hint">\uC9C4\uD589 \uC0C1\uD669\uC740 \uC790\uB3D9\uC73C\uB85C \uC800\uC7A5\uB3FC\uC694. \uC0C8\uB85C\uACE0\uCE68\uD574\uB3C4 \uC774\uC5B4\uC11C \uD560 \uC218 \uC788\uC5B4\uC694.</p>
+    <div class="menu" style="margin:0 auto">
+      <button class="big" id="mGo">\u25B6 \uACC4\uC18D\uD558\uAE30</button>
+      <button class="big alt" id="mSound">${Sound.on ? "\u{1F50A} \uC18C\uB9AC \uB044\uAE30" : "\u{1F507} \uC18C\uB9AC \uCF1C\uAE30"}</button>
+      <button class="big alt" id="mHelp">\u2753 \uC870\uC791 \uBC29\uBC95</button>
+      <button class="big alt" id="mHome">\u{1F3E0} \uCC98\uC74C \uD654\uBA74\uC73C\uB85C</button>
+    </div>`);
+    sh.querySelector("#mGo").onclick = () => {
+      closeModal();
+      g.paused = false;
+    };
+    sh.querySelector("#mSound").onclick = () => {
+      Sound.toggle();
+      syncSound();
+      openMenu();
+    };
+    sh.querySelector("#mHome").onclick = () => {
+      flush();
+      show("sTitle");
+    };
+    sh.querySelector("#mHelp").onclick = () => {
+      const h = openModal(`<h3>\u2753 \uC870\uC791 \uBC29\uBC95</h3><ul class="crit">
+      <li>\u{1F579}\uFE0F \uC6C0\uC9C1\uC774\uAE30: \uD654\uBA74 \uC67C\uCABD\uC744 \uB204\uB978 \uCC44 \uB04C\uAE30 (\uD0A4\uBCF4\uB4DC: \uBC29\uD5A5\uD0A4\xB7WASD)</li>
+      <li>\u{1F50D} \uC0B4\uD3B4\uBCF4\uAE30\xB7\uC228\uAE30\xB7\uD0C8\uCD9C: \uC8FC\uD669 \uB2E8\uCD94 (E \uB610\uB294 \uC2A4\uD398\uC774\uC2A4)</li>
+      <li>\u{1FAE7} \uBE44\uB217\uBC29\uC6B8: \uAC00\uAE4C\uC6B4 \uADE0\uC5D0\uAC8C \uB0A0\uC544\uAC00 4\uCD08 \uB3D9\uC548 \uBA48\uCD94\uAC8C \uD574\uC694 (F)</li>
+      <li>\u{1F4A7} \uBB3C \uD55C \uCEF5: 5\uCD08 \uBE68\uB77C\uC9D0 \xB7 \u{1F637} \uB9C8\uC2A4\uD06C: 6\uCD08 \uB3D9\uC548 \uADE0\uC774 \uBABB \uC54C\uC544\uBD04 (Q)</li>
+      <li>\u{1F4DC} \uCABD\uC9C0: \uBAA8\uC740 \uC870\uAC01 \uBCF4\uAE30\xB7\uBD99\uC774\uAE30 (Tab)</li>
+      <li>\u{1F4F6} \uAC10\uC9C0\uAE30: \uC870\uAC01\uACFC \uBA40\uC5B4\uC694 \u2192 \uAC00\uAE4C\uC6CC\uC694. \uB204\uB974\uBA74 \uC601\uC591\uC774\uAC00 \uBC29 \uC774\uB984\uC744 \uC54C\uB824 \uC918\uC694</li></ul>
+      <div class="acts"><button class="big" id="hBack">\uB3CC\uC544\uAC00\uAE30</button></div>`);
+      h.querySelector("#hBack").onclick = () => openMenu();
+    };
+  }
+  $("teacherBtn").onclick = () => {
+    let pin = "";
+    const draw = () => {
+      const sh = openModal(`<h3>\u{1F469}\u200D\u{1F3EB} \uC120\uC0DD\uB2D8 \uBE44\uBC00\uBC88\uD638</h3><div class="pindots">${"\u25CF".repeat(pin.length)}${"\u25CB".repeat(4 - pin.length)}</div>
+      <div class="pinpad">${[1, 2, 3, 4, 5, 6, 7, 8, 9, "\u2190", 0, "\u2715"].map((k) => `<button data-k="${k}">${k}</button>`).join("")}</div>`);
+      sh.querySelectorAll("[data-k]").forEach((b) => b.onclick = () => {
+        const k = b.dataset.k;
+        if (k === "\u2715") {
+          closeModal();
+          return;
+        }
+        if (k === "\u2190") pin = pin.slice(0, -1);
+        else if (pin.length < 4) pin += k;
+        if (pin.length === 4) {
+          if (pin === TEACHER_PIN) {
+            closeModal();
+            openTeacher();
+            return;
+          }
+          pin = "";
+          UI.toast("\uBE44\uBC00\uBC88\uD638\uAC00 \uB2EC\uB77C\uC694");
+        }
+        draw();
+      });
+    };
+    draw();
+  };
+  function openTeacher() {
+    show("sTeacher");
+    const sel = $("tClass");
+    sel.innerHTML = [...Array(15).keys()].map((i) => `<option value="${i + 1}">${i + 1}\uBC18</option>`).join("");
+    sel.value = Save.lastClass || Save.classesWithData()[0] || 1;
+    sel.onchange = renderTable;
+    renderTable();
+  }
+  function fmtTime(ts) {
+    if (!ts) return "";
+    const d = new Date(ts);
+    return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  }
+  function renderTable() {
+    var _a, _b, _c;
+    const cls = +$("tClass").value;
+    const head = `<tr><th>\uBC88\uD638</th><th>\uD559\uB144</th><th>\uACFC\uC815</th><th>\uC9C4\uD589</th>${[1, 2, 3, 4, 5, 6].map((i) => `<th>${i}\uCE35</th>`).join("")}<th>\uBCC4 \uD569\uACC4</th><th>\uC9C0\uAE08 \uB09C\uC774\uB3C4</th><th>\uB9C8\uC9C0\uB9C9 \uC811\uC18D</th><th></th></tr>`;
+    let rows = "";
+    for (let n = 1; n <= 30; n++) {
+      const s = Save.load(cls, n);
+      if (!s || !s.course) {
+        rows += `<tr><td>${n}</td><td class="empty" colspan="13">\uAE30\uB85D \uC5C6\uC74C</td></tr>`;
+        continue;
+      }
+      const cells = [1, 2, 3, 4, 5, 6].map((id) => {
+        if (!COURSES[s.course].stages.includes(id)) return '<td class="empty">\xB7</td>';
+        const r = s.results[id];
+        return r ? `<td>${"\u2B50".repeat(r.stars)}${r.diff === "hell" ? "\u{1F525}" : r.diff === "hard" ? "\u{1F4AA}" : ""}</td>` : '<td class="empty">-</td>';
+      }).join("");
+      rows += `<tr><td>${n}</td><td>${((_a = BANDS[s.band]) == null ? void 0 : _a.name) || ""}</td><td>${COURSES[s.course].name}</td><td>${progressText(s)}</td>${cells}<td>\u2B50 ${totalStars(s)}</td><td>${((_b = DIFFS[s.diff]) == null ? void 0 : _b.icon) || ""} ${((_c = DIFFS[s.diff]) == null ? void 0 : _c.name) || ""}</td><td>${fmtTime(s.updated)}</td><td><button data-del="${n}">\uC9C0\uC6B0\uAE30</button></td></tr>`;
+    }
+    $("tTable").innerHTML = head + rows;
+    $("tTable").querySelectorAll("[data-del]").forEach((b) => b.onclick = () => confirmBox(`${cls}\uBC18 ${b.dataset.del}\uBC88 \uAE30\uB85D\uC744 \uC9C0\uC6B8\uAE4C\uC694?`, "\uC9C0\uC6B0\uAE30", () => {
+      Save.remove(cls, +b.dataset.del);
+      renderTable();
+    }));
+  }
+  $("tClear").onclick = () => {
+    const cls = +$("tClass").value;
+    confirmBox(`${cls}\uBC18 \uAE30\uB85D\uC744 \uBAA8\uB450 \uC9C0\uC6B8\uAE4C\uC694? \uB418\uB3CC\uB9B4 \uC218 \uC5C6\uC5B4\uC694.`, "\uBAA8\uB450 \uC9C0\uC6B0\uAE30", () => {
+      Save.removeClass(cls);
+      renderTable();
+    });
+  };
+  window.__nyam = S;
+  show("sTitle");
+  if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {
+  });
+})();
