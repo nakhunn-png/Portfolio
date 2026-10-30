@@ -134,7 +134,11 @@ function persist() { if (S.cls && S.num && S.save) Save.store(S.cls, S.num, S.sa
 function currentStageId() { const s = S.save; return s.inTutorial ? 0 : COURSES[s.course].stages[s.stageIdx]; }
 function poolFor(stageId) { return stageId === 0 ? PRACTICE_QUESTIONS : QUESTIONS[S.save.band][stageId]; }
 
-const imgReady = loadImages(['boy1', 'boy2', 'girl1', 'girl2', 'germ_basic', 'germ_mold', 'germ_cavity', 'yeongyang']);
+const imgReady = Promise.all([
+  loadImages(['boy1', 'boy2', 'girl1', 'girl2', 'germ_basic', 'germ_mold', 'germ_cavity', 'yeongyang']),
+  // 지도 위 글자(숨는 곳, ? 등)도 같은 글꼴로 그리도록 먼저 불러 둔다
+  document.fonts ? document.fonts.load('20px "Ssurround"').catch(() => {}) : null,
+]);
 
 async function startPlay() {
   await imgReady;

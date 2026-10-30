@@ -1,8 +1,12 @@
+/* 글꼴: 카페24 써라운드(제목·단추·문제), 카페24 써라운드 에어(설명 글) — 눈누(noonnu.cc) 무료 글꼴 */
+@font-face { font-family: "Ssurround"; src: url("fonts/Cafe24Ssurround.woff") format("woff"); font-display: swap; }
+@font-face { font-family: "SsurroundAir"; src: url("fonts/Cafe24SsurroundAir.woff") format("woff"); font-display: swap; }
 :root {
   --sky: #bfe3ff; --sky2: #e8f5ff; --ink: #2b2f3a; --sub: #5b6475;
   --orange: #ff8a3d; --orange2: #ffb627; --green: #3cb35a; --red: #e0524a; --blue: #2b7bd6; --purple: #8a5cc7;
   --card: #ffffff; --line: #e3e8f0;
-  --font: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+  --font: "SsurroundAir", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+  --title: "Ssurround", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; height: 100%; overflow: hidden; background: var(--sky); color: var(--ink); font-family: var(--font); }
@@ -55,7 +59,7 @@ button { font-family: inherit; cursor: pointer; border: 0; color: inherit; }
 .diffs button small { font-size: 12px; color: var(--sub); line-height: 1.25; text-align: center; }
 .diffs button.on { border-color: var(--orange); background: #fff4e8; }
 .diffs button.on.hell { border-color: var(--red); background: #ffecea; }
-.start { font-size: 30px; padding: 18px; }
+.start { font-size: clamp(36px, 5vw, 56px); padding: 18px 20px 14px; letter-spacing: 2px; }
 .teacher { position: absolute; right: max(14px, env(safe-area-inset-right)); bottom: 14px; font-size: 14px; opacity: .85; }
 
 /* ---------- HUD ---------- */
@@ -83,7 +87,7 @@ button { font-family: inherit; cursor: pointer; border: 0; color: inherit; }
 #arrow { display: inline-block; font-size: 26px; transition: transform .1s linear; }
 #tutBox { position: absolute; left: max(10px, env(safe-area-inset-left)); top: 108px; width: min(420px, calc(100% - 20px)); background: #fffdf2; border: 3px solid var(--orange2); border-radius: 18px; padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; box-shadow: 0 4px 14px rgba(0,0,0,.15); }
 #tutBox img { width: 54px; height: 54px; object-fit: contain; }
-#tutBox div { flex: 1; }
+#tutBox div { flex: 1 1 260px; }
 #tutBox small { color: #c97a00; font-weight: 800; }
 #tutBox p { margin: 2px 0 0; font-size: 17px; line-height: 1.4; }
 #tutSkip { margin-left: auto; background: #fff; border-radius: 12px; padding: 8px 10px; font-size: 14px; font-weight: 800; box-shadow: 0 2px 0 #e6d6a8; white-space: nowrap; }
@@ -173,3 +177,6 @@ label select { font-size: 18px; padding: 6px 10px; border-radius: 10px; }
   #tutBox img { display: none; }
   .g6 { grid-template-columns: repeat(5, 1fr); }
 }
+
+/* 제목·단추·문제는 굵고 둥근 글꼴 */
+.logo, h2, h3, .big, .pbtn, .grid button, .cards button b, .diffs button b, .detector b, #stageName, #bigMsg, .q, .choices button, .piece, .slot, .stars, .badge, .diffrow button, #say b, #tutStep, .pindots, .pinpad button, .tool, .toast, #compass b { font-family: var(--title); font-weight: normal; }

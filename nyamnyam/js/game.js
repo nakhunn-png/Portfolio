@@ -465,7 +465,7 @@ export class Game {
       }
     }
     // 방 이름
-    c.font = `bold ${Math.round(TS * 0.32)}px sans-serif`; c.textAlign = 'left'; c.textBaseline = 'top';
+    c.font = `${Math.round(TS * 0.32)}px "Ssurround",sans-serif`; c.textAlign = 'left'; c.textBaseline = 'top';
     for (const rm of m.rooms) { c.fillStyle = 'rgba(0,0,0,0.18)'; c.fillText(rm.name, rm.x0 * TS + 6, rm.y0 * TS + 4); }
     // 탈출문
     this.drawExit(c, TS);
@@ -501,7 +501,7 @@ export class Game {
     c.restore();
   }
   label(c, text, x, y, size, color = '#333', stroke = '#fff') {
-    c.font = `900 ${size}px "Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif`;
+    c.font = `${size}px "Ssurround","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif`;
     c.textAlign = 'center'; c.textBaseline = 'middle';
     c.lineJoin = 'round'; c.lineWidth = Math.max(3, size * 0.28); c.strokeStyle = stroke; c.strokeText(text, x, y);
     c.fillStyle = color; c.fillText(text, x, y);
