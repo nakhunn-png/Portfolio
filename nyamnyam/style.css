@@ -18,21 +18,21 @@ button { font-family: inherit; cursor: pointer; border: 0; color: inherit; }
 
 /* ---------- 공통 화면 ---------- */
 .screen { position: absolute; inset: 0; overflow: auto; touch-action: pan-y; background: linear-gradient(180deg, var(--sky2), var(--sky)); padding: max(20px, env(safe-area-inset-top)) 16px 24px; }
-.pick { display: flex; flex-direction: column; align-items: center; gap: 18px; }
-.pick h2 { font-size: clamp(24px, 4vw, 38px); margin: 10px 0 0; text-align: center; }
-.grid { display: grid; gap: 10px; width: min(900px, 100%); }
+.pick { display: flex; flex-direction: column; align-items: center; justify-content: safe center; gap: clamp(18px, 3vh, 36px); }
+.pick h2 { font-size: clamp(24px, min(3.4vw, 6vh), 56px); margin: 10px 0 0; text-align: center; }
+.grid { display: grid; gap: clamp(10px, 1vw, 18px); width: min(1300px, 100%); }
 .g5 { grid-template-columns: repeat(5, 1fr); }
 .g6 { grid-template-columns: repeat(6, 1fr); }
-.grid button { background: #fff; border-radius: 16px; padding: 14px 6px; font-size: clamp(18px, 2.6vw, 26px); font-weight: 800; box-shadow: 0 3px 0 #b9d4ea; display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 64px; }
+.grid button { background: #fff; border-radius: 16px; padding: clamp(14px, 1.6vh, 24px) 6px; font-size: clamp(18px, min(2.2vw, 4vh), 36px); font-weight: 800; box-shadow: 0 3px 0 #b9d4ea; display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 64px; }
 .grid button small { font-size: 12px; font-weight: 600; color: var(--sub); }
 .grid button.has { background: #fff7d6; box-shadow: 0 3px 0 #e9c768; }
 .grid button:active, .cards button:active, .big:active, .pbtn:active { transform: translateY(2px); }
-.cards { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; width: min(1000px, 100%); }
-.cards button { background: #fff; border-radius: 22px; padding: 22px 18px; min-width: 200px; flex: 1 1 200px; max-width: 300px; box-shadow: 0 4px 0 #b9d4ea; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.cards button b { font-size: 28px; }
-.cards button span { font-size: 15px; color: var(--sub); }
-.cards button .em { font-size: 44px; }
-.chars button img { height: 170px; object-fit: contain; }
+.cards { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; width: min(1400px, 100%); }
+.cards button { background: #fff; border-radius: 22px; padding: clamp(22px, 3vh, 40px) 18px; min-width: 200px; flex: 1 1 200px; max-width: 400px; box-shadow: 0 4px 0 #b9d4ea; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.cards button b { font-size: clamp(26px, min(2.2vw, 4vh), 40px); }
+.cards button span { font-size: clamp(15px, min(1.1vw, 2vh), 21px); color: var(--sub); }
+.cards button .em { font-size: clamp(44px, min(4vw, 7vh), 72px); }
+.chars button img { height: clamp(150px, 30vh, 320px); object-fit: contain; }
 .card { background: #fff; border-radius: 20px; padding: 18px 22px; width: min(560px, 100%); font-size: 18px; line-height: 1.7; box-shadow: 0 4px 0 #b9d4ea; }
 .menu { display: flex; flex-direction: column; gap: 12px; width: min(420px, 100%); }
 .big { background: var(--orange); color: #fff; font-size: 24px; font-weight: 900; border-radius: 18px; padding: 16px 20px; box-shadow: 0 5px 0 #d26a22; }
@@ -48,18 +48,19 @@ button { font-family: inherit; cursor: pointer; border: 0; color: inherit; }
 /* ---------- 타이틀 ---------- */
 .title { padding: 0; overflow: hidden; background: #cfe9ff; }
 .title-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 50%; }
-.title-panel { position: absolute; left: 0; top: 0; bottom: 0; width: min(46%, 520px); display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 24px 24px 24px max(28px, env(safe-area-inset-left)); }
-.logo { margin: 0; line-height: 1.08; display: flex; flex-direction: column; font-weight: 900; color: var(--orange); font-size: clamp(42px, 7vw, 92px); letter-spacing: -1px;
+.title-panel { position: absolute; left: 0; top: 0; bottom: 0; width: clamp(320px, 40vw, 860px); display: flex; flex-direction: column; justify-content: center; gap: clamp(10px, 1.8vh, 26px); padding: 24px 24px 24px max(28px, env(safe-area-inset-left)); }
+.logo { margin: 0; line-height: 1.08; display: flex; flex-direction: column; font-weight: 900; color: var(--orange); font-size: clamp(42px, min(8.5vw, 15vh), 170px); letter-spacing: -1px;
   --o: #fff; text-shadow: 3px 0 var(--o), -3px 0 var(--o), 0 3px var(--o), 0 -3px var(--o), 2px 2px var(--o), -2px 2px var(--o), 2px -2px var(--o), -2px -2px var(--o), 0 6px 0 #d26a22, 0 10px 18px rgba(0,0,0,.18); }
 .logo span:last-child { color: var(--green); font-size: .72em; text-shadow: 3px 0 var(--o), -3px 0 var(--o), 0 3px var(--o), 0 -3px var(--o), 2px 2px var(--o), -2px 2px var(--o), 2px -2px var(--o), -2px -2px var(--o), 0 6px 0 #23853c, 0 10px 18px rgba(0,0,0,.18); }
-.kicker { margin: 0; font-size: clamp(15px, 1.8vw, 20px); font-weight: 800; color: #2a5d8a; }
-.diffs { display: flex; gap: 8px; }
-.diffs button { flex: 1; background: rgba(255,255,255,.92); border-radius: 16px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; box-shadow: 0 3px 0 #b9d4ea; border: 3px solid transparent; }
-.diffs button b { font-size: 19px; }
-.diffs button small { font-size: 12px; color: var(--sub); line-height: 1.25; text-align: center; }
+.kicker { margin: 0; font-size: clamp(15px, min(1.7vw, 3vh), 32px); font-weight: 800; color: #2a5d8a; }
+.diffs { display: flex; gap: clamp(8px, 0.8vw, 16px); }
+.diffs button { flex: 1; background: rgba(255,255,255,.92); border-radius: 16px; padding: clamp(10px, 1.4vh, 20px) 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; box-shadow: 0 3px 0 #b9d4ea; border: 3px solid transparent; }
+.diffs button b { font-size: clamp(18px, min(1.6vw, 3vh), 32px); }
+.diffs button small { font-size: clamp(12px, min(0.85vw, 1.6vh), 17px); color: var(--sub); line-height: 1.25; text-align: center; }
 .diffs button.on { border-color: var(--orange); background: #fff4e8; }
 .diffs button.on.hell { border-color: var(--red); background: #ffecea; }
-.start { font-size: clamp(36px, 5vw, 56px); padding: 18px 20px 14px; letter-spacing: 2px; }
+.start { font-size: clamp(36px, min(4.6vw, 8.5vh), 88px); padding: clamp(14px, 2vh, 28px) 20px; letter-spacing: 2px; border-radius: 22px; }
+.title .row .tool { font-size: clamp(15px, min(1.1vw, 2vh), 22px); padding: clamp(10px, 1.2vh, 16px) clamp(14px, 1.2vw, 22px); }
 .teacher { position: absolute; right: max(14px, env(safe-area-inset-right)); bottom: 14px; font-size: 14px; opacity: .85; }
 
 /* ---------- HUD ---------- */
@@ -180,3 +181,20 @@ label select { font-size: 18px; padding: 6px 10px; border-radius: 10px; }
 
 /* 제목·단추·문제는 굵고 둥근 글꼴 */
 .logo, h2, h3, .big, .pbtn, .grid button, .cards button b, .diffs button b, .detector b, #stageName, #bigMsg, .q, .choices button, .piece, .slot, .stars, .badge, .diffrow button, #say b, #tutStep, .pindots, .pinpad button, .tool, .toast, #compass b { font-family: var(--title); font-weight: normal; }
+
+/* 큰 화면(교실 TV·모니터): HUD를 키운다 */
+@media (min-width: 1500px) and (min-height: 850px) {
+  .hud-l { padding: 12px 20px; }
+  #stageName { font-size: 26px; } #roomName { font-size: 18px; } #lives { font-size: 20px; }
+  .round { width: 60px; height: 60px; font-size: 28px; }
+  .detector { padding: 10px 26px; } .detector b { font-size: 28px; } .detector .d-ico { font-size: 30px; } .detector small { font-size: 15px; }
+  .bars { height: 28px; } .bars i { width: 9px; }
+  .pbtn { min-width: 130px; height: 116px; font-size: 19px; border-radius: 24px; } .pbtn .e { font-size: 42px; }
+  .pbtn.bubble { min-width: 160px; height: 136px; } .pbtn.act { height: 92px; font-size: 32px; }
+  #tutBox { width: 560px; top: 130px; } #tutBox p { font-size: 22px; } #tutBox img { width: 70px; height: 70px; }
+  #say { width: min(760px, calc(100% - 560px)); } #say p { font-size: 22px; } #say img { width: 66px; height: 66px; }
+  #bigMsg { font-size: 44px; }
+  .sheet { width: min(1000px, 100%); padding: 30px; } .sheet h3 { font-size: 28px; } .sheet .q { font-size: 36px; }
+  .choices button { font-size: 28px; padding: 22px 16px; } .choices button i { width: 42px; height: 42px; flex-basis: 42px; }
+  .piece, .slot { font-size: 24px; } .crit, .hint { font-size: 22px; }
+}

@@ -444,11 +444,8 @@ export class Game {
     c.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     c.fillStyle = T.line; c.fillRect(0, 0, this.vw, this.vh);
     // 카메라
-    let camX = this.px * TS - this.vw / 2, camY = this.py * TS - this.vh / 2;
-    camX = Math.max(-TS, Math.min(m.W * TS - this.vw + TS, camX));
-    camY = Math.max(-TS, Math.min(m.H * TS - this.vh + TS * 1.5, camY));
-    if (m.W * TS + 2 * TS < this.vw) camX = (m.W * TS - this.vw) / 2;
-    if (m.H * TS + 2 * TS < this.vh) camY = (m.H * TS - this.vh) / 2;
+    // 주인공을 늘 화면 가운데에 둔다(가장자리에서도 안내창·단추에 가려지지 않게)
+    const camX = this.px * TS - this.vw / 2, camY = this.py * TS - this.vh / 2;
     c.save(); c.translate(-Math.round(camX), -Math.round(camY));
     const x0 = Math.max(0, Math.floor(camX / TS)), y0 = Math.max(0, Math.floor(camY / TS));
     const x1 = Math.min(m.W - 1, Math.ceil((camX + this.vw) / TS)), y1 = Math.min(m.H - 1, Math.ceil((camY + this.vh) / TS));
