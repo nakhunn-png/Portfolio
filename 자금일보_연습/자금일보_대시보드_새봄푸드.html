@@ -1,0 +1,670 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>(주)새봄푸드 (가상) 자금일보</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap">
+<style>
+/* ============================================================
+   테마 토큰. 색은 여기서만 정한다.
+   ============================================================ */
+:root{
+  --page:#F1F4F9; --card:#FFFFFF; --tint:#F7F9FC;
+  --ink:#0A1628; --body:#39445A; --muted:#6B7688; --faint:#9AA3B2;
+  --line:#E3E7EE; --line2:#F1F3F7; --rule:#0A1628;
+  --a1:#1E50D8; --a1t:#1741B4; --a1b:#EAF0FF;
+  --a2:#4338CA; --a2t:#332BA6; --a2b:#EDEBFD;
+  --a3:#C2761A; --a3t:#96590F; --a3b:#FBF1E1;
+  --risk:#D4453B; --riskT:#B5322A; --riskB:#FDECEA;
+  --heroA:#0A1E38; --heroB:#123C68; --heroC:#17586E;
+  --heroInk:#FFFFFF; --heroSub:#A8BFD8; --heroDot:#3FD9A4;
+  --sh:0 1px 3px rgba(10,22,40,.06); --sh-sm:0 1px 2px rgba(10,22,40,.04);
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{
+  font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',-apple-system,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',sans-serif;
+  background:var(--page); color:var(--body);
+  -webkit-font-smoothing:antialiased; font-variant-numeric:tabular-nums;
+  word-break:keep-all; overflow-wrap:break-word;
+}
+.wrap{max-width:1220px; margin:0 auto; padding:26px 26px 60px; display:flex; flex-direction:column; gap:16px}
+@media (max-width:640px){.wrap{padding:14px 13px 40px; gap:12px}}
+
+/* hero. 높이를 200px 아래로 유지한다 */
+.hero{position:relative; overflow:hidden; border-radius:16px; padding:26px 30px;
+  background:linear-gradient(104deg,var(--heroA) 0%,var(--heroB) 58%,var(--heroC) 100%);
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:18px}
+.hero::after{content:""; position:absolute; right:-90px; top:-120px; width:340px; height:340px;
+  border-radius:50%; background:rgba(255,255,255,.05)}
+.hero>*{position:relative; z-index:1}
+.hero .hk{display:flex; align-items:center; gap:8px; font-size:11.5px; font-weight:800;
+  letter-spacing:.18em; color:var(--heroSub)}
+.hero .hk i{width:7px; height:7px; border-radius:50%; background:var(--heroDot); flex:0 0 auto}
+.hero h1{font-size:31px; font-weight:800; letter-spacing:-.026em; color:var(--heroInk); margin-top:9px; line-height:1.2}
+.hero .hs{font-size:14.5px; color:var(--heroSub); margin-top:8px; line-height:1.55}
+.hchip{border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.07);
+  border-radius:12px; padding:13px 20px; text-align:right; min-width:196px}
+.hchip dt{font-size:11px; font-weight:800; letter-spacing:.14em; color:var(--heroSub)}
+.hchip dd{font-size:17px; font-weight:800; color:var(--heroInk); margin-top:5px}
+.hchip .hm{font-size:11.5px; color:var(--heroSub); margin-top:6px; font-weight:600}
+@media (max-width:640px){.hero{padding:20px 18px}.hero h1{font-size:23px}
+  .hchip{text-align:left; min-width:0; width:100%}}
+
+/* grid */
+.row{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+@media (max-width:900px){.row{grid-template-columns:1fr}}
+.kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.kpis{grid-template-columns:1fr}}
+
+.card{background:var(--card); border:1px solid var(--line); border-radius:14px;
+  padding:20px 22px 18px; box-shadow:var(--sh-sm); min-width:0}
+@media (max-width:640px){.card{padding:15px 14px 13px}}
+.chd{display:flex; align-items:flex-start; justify-content:space-between; gap:14px}
+.chd .ck{font-size:11px; font-weight:800; letter-spacing:.14em; color:var(--ct,var(--a1t))}
+.chd h2{font-size:19px; font-weight:800; letter-spacing:-.02em; color:var(--ink); margin-top:7px; line-height:1.25}
+.chd .cs{font-size:13px; color:var(--muted); margin-top:6px; line-height:1.5}
+.badge{flex:0 0 auto; font-size:11px; font-weight:800; letter-spacing:.06em; padding:4px 10px;
+  border-radius:20px; background:var(--bgc,var(--a1b)); color:var(--ct,var(--a1t))}
+
+/* KPI. 관점 라벨 / 지표명 / 값 / 비교 네 줄을 지킨다 */
+.kpi{background:var(--card); border:1px solid var(--line); border-radius:14px;
+  padding:17px 18px 16px; box-shadow:var(--sh-sm); position:relative; overflow:hidden}
+.kpi::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--ct,var(--a1))}
+.kpi .ax{font-size:11px; font-weight:800; letter-spacing:.14em}
+.kpi .kl{font-size:13.5px; font-weight:700; color:var(--ink); margin-top:7px}
+.kpi .kv{font-size:30px; font-weight:800; letter-spacing:-.032em; color:var(--ink); margin-top:9px; line-height:1.05}
+.kpi .kv small{font-size:15px; font-weight:750; color:var(--muted); margin-left:2px; letter-spacing:0}
+.kpi .kd{font-size:12.5px; color:var(--muted); margin-top:9px; line-height:1.5}
+.kpi .kd b{font-weight:800}
+
+/* chart */
+.fig{margin-top:16px; position:relative}
+.fig svg{width:100%; height:auto; display:block}
+svg text{font-family:inherit}
+svg .l{font-size:12px; fill:var(--body)}
+svg .ls{font-size:11px; fill:var(--faint)}
+svg .f{font-size:12px; fill:var(--ink); font-weight:700}
+svg .hit{cursor:pointer}
+.lgd{display:flex; flex-wrap:wrap; gap:14px; margin-top:12px; list-style:none;
+  font-size:12px; font-weight:600; color:var(--muted)}
+.lgd li{display:flex; align-items:center; gap:7px}
+.lgd i{width:11px; height:11px; border-radius:3px; background:var(--c); flex:0 0 auto}
+.lgd i.ln{height:3px; width:17px; border-radius:2px}
+.lgd i.hz{background:var(--tint); border:1px solid var(--faint);
+  background-image:repeating-linear-gradient(45deg,transparent 0 3px,var(--faint) 3px 4px)}
+
+.seg{display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden;
+  background:var(--tint); flex:0 0 auto}
+.seg button{appearance:none; border:0; background:transparent; font:inherit; font-size:12.5px;
+  font-weight:700; color:var(--muted); padding:6px 13px; cursor:pointer; border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--a1); color:var(--card)}
+.seg button:focus-visible{outline:2px solid var(--a1); outline-offset:-2px}
+
+/* 클릭 상세 */
+.dtl{margin-top:14px; border-radius:10px; background:var(--tint); border:1px solid var(--line2);
+  border-left:3px solid var(--ct,var(--a1)); padding:13px 16px}
+.dtl .dk{font-size:11px; font-weight:800; letter-spacing:.14em; color:var(--ct,var(--a1t))}
+.dtl .dt{font-size:15.5px; font-weight:800; color:var(--ink); margin-top:6px}
+.dtl .dg{display:grid; grid-template-columns:repeat(auto-fit,minmax(126px,1fr)); gap:10px 18px; margin-top:11px}
+.dtl .dg div{display:flex; flex-direction:column; gap:2px}
+.dtl .dg dt{font-size:11px; font-weight:700; color:var(--muted)}
+.dtl .dg dd{font-size:15.5px; font-weight:800; color:var(--ink)}
+.dtl .dn{margin-top:10px; font-size:12.5px; line-height:1.55; color:var(--muted)}
+.dtl .ph{font-size:13px; color:var(--muted); margin-top:6px}
+
+/* table */
+.tw{margin-top:16px; overflow-x:auto; border-top:2px solid var(--c,var(--rule)); border-bottom:1px solid var(--line)}
+table{width:100%; border-collapse:collapse}
+thead th{text-align:left; font-size:11px; font-weight:800; letter-spacing:.09em; color:var(--faint);
+  padding:10px 12px; white-space:nowrap; border-bottom:1px solid var(--line)}
+tbody td{font-size:14px; line-height:1.5; color:var(--body); padding:10px 12px;
+  border-top:1px solid var(--line2); white-space:nowrap}
+tbody tr:first-child td{border-top:1px solid var(--line)}
+tbody td:first-child{font-weight:700; color:var(--ink)}
+tfoot td{font-size:14px; font-weight:800; color:var(--ink); padding:11px 12px;
+  border-top:2px solid var(--rule); white-space:nowrap}
+.num{text-align:right}
+.neg{color:var(--riskT)} .pos{color:var(--a1t)}
+tr.sub td{background:var(--tint); font-size:12.5px; color:var(--muted); white-space:normal; padding:9px 12px}
+.cap{margin-top:9px; font-size:12px; color:var(--faint); line-height:1.5}
+
+.callout{margin-top:16px; border-radius:0 10px 10px 0; padding:14px 18px 13px;
+  background:var(--bgc,var(--riskB)); border-left:3px solid var(--c,var(--risk))}
+.callout .ck{font-size:11px; font-weight:800; letter-spacing:.14em; color:var(--ct,var(--riskT))}
+.callout .hd{font-size:15.5px; font-weight:800; color:var(--ink); margin-top:6px}
+.callout p{margin-top:7px; font-size:13.5px; line-height:1.62; color:var(--body)}
+
+.foot{margin-top:6px; padding:16px 22px; border-radius:14px; background:var(--card);
+  border:1px solid var(--line); font-size:12px; color:var(--faint); line-height:1.7;
+  display:flex; gap:24px; flex-wrap:wrap; justify-content:space-between}
+.foot b{color:var(--muted); font-weight:700}
+.foot div{max-width:640px}
+
+.tip{position:absolute; pointer-events:none; opacity:0; transition:opacity .12s; z-index:25;
+  background:var(--rule); color:var(--card); border-radius:9px; padding:9px 12px;
+  font-size:12px; line-height:1.55; min-width:158px; box-shadow:var(--sh)}
+.tip .th{display:block; font-weight:800; font-size:12.5px; margin-bottom:5px}
+.tip .tr{display:flex; justify-content:space-between; gap:16px}
+.tip .tr b{font-weight:800}
+
+@media print{
+  *{-webkit-print-color-adjust:exact!important; print-color-adjust:exact!important}
+  body{background:#fff}
+  .tip,.seg{display:none!important}
+  .wrap{max-width:none; padding:0}
+  .card,.kpi,.foot{break-inside:avoid; box-shadow:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+
+.dbar{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.dpick{position:relative}
+.dbtn,.dstep button{appearance:none; font:inherit; cursor:pointer; color:var(--ink); background:var(--card);
+  border:1px solid var(--line); border-radius:10px; box-shadow:var(--sh-sm)}
+.dbtn{display:flex; align-items:center; gap:10px; padding:9px 14px}
+.dbtn .dlab{font-size:11px; font-weight:800; letter-spacing:.12em; color:var(--a1t)}
+.dbtn b{font-size:15px; font-weight:800}
+.dbtn svg{color:var(--muted)}
+.dbtn:hover,.dbtn[aria-expanded="true"]{border-color:var(--a1)}
+.dstep{display:flex; gap:6px}
+.dstep button{padding:9px 12px; font-size:13px; font-weight:700; color:var(--body)}
+.dstep button:hover:not(:disabled){border-color:var(--a1); color:var(--a1t)}
+.dstep button:disabled{color:var(--faint); cursor:not-allowed; box-shadow:none}
+.dmeta{margin-left:auto; font-size:12.5px; color:var(--muted)}
+.dpop{position:absolute; top:calc(100% + 8px); left:0; z-index:30; width:336px; max-width:calc(100vw - 32px); background:var(--card);
+  border:1px solid var(--line); border-radius:14px; padding:14px 14px 12px; box-shadow:var(--sh), 0 18px 40px -14px var(--faint)}
+.dpop[hidden]{display:none}
+.dhd{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px}
+.dhd b{font-size:15px; font-weight:800}
+.mnav{appearance:none; width:32px; height:32px; border-radius:8px; border:1px solid var(--line2); background:var(--tint);
+  font:inherit; font-size:18px; line-height:1; color:var(--ink); cursor:pointer}
+.mnav:hover{border-color:var(--a1)}
+.cal{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
+.cal .dw{font-size:11px; font-weight:800; color:var(--faint); text-align:center; padding:2px 0 4px}
+.cal button{appearance:none; border:1px solid var(--line2); background:var(--tint); border-radius:8px; height:38px;
+  font:inherit; font-size:13.5px; font-weight:750; color:var(--ink); cursor:pointer; position:relative}
+.cal button i{position:absolute; left:50%; bottom:4px; width:5px; height:5px; margin-left:-2.5px; border-radius:50%; background:var(--c)}
+.cal button:hover:not(:disabled){border-color:var(--a1)}
+.cal button[aria-pressed="true"]{background:var(--a1); color:var(--card); border-color:var(--a1)}
+.cal button[aria-pressed="true"] i{background:var(--card)}
+.cal button:disabled{background:transparent; border-color:transparent; color:var(--line); cursor:not-allowed}
+.dpop .lgd{margin-top:10px}
+.txw{max-height:300px; overflow:auto; margin-top:2px; border:1px solid var(--line2); border-radius:8px; background:var(--card)}
+.txt{width:100%; border-collapse:collapse; font-size:12.5px; color:var(--body)}
+.txt th{position:sticky; top:0; background:var(--tint); font-size:11px; font-weight:800; color:var(--muted); text-align:left; padding:6px 8px; border-bottom:1px solid var(--line2); white-space:nowrap}
+.txt td{padding:6px 8px; border-top:0; border-bottom:1px solid var(--line2); vertical-align:top; white-space:normal; word-break:keep-all; overflow-wrap:anywhere}
+.txt tr:last-child td{border-bottom:0}
+.txt .tm{color:var(--faint); white-space:nowrap; font-variant-numeric:tabular-nums}
+.txt .ds{color:var(--ink); font-weight:650}
+.txt .cp{color:var(--muted); font-size:11.5px}
+.txt .cd{display:inline-block; margin-top:2px; font-size:11px; color:var(--a1t)}
+.txt .am{text-align:right; white-space:nowrap; font-weight:750; font-variant-numeric:tabular-nums}
+.txt .am.pos{color:var(--a1t)} .txt .am.neg{color:var(--riskT)}
+.txt .acm{display:none}
+.txt .kd.kdm{display:none}
+@media (max-width:640px){.txt .ac,.txt .kc{display:none} .txt .kd.kdm{display:inline-block; margin-right:5px; vertical-align:1px} .txt .acm{display:block} .txw{max-height:340px}}
+.txt .kd{display:inline-block; font-size:10.5px; font-weight:800; padding:1px 6px; border-radius:6px; white-space:nowrap}
+.txt .kd.plan{background:var(--a1); color:var(--card)} .txt .kd.est{border:1px solid var(--line); color:var(--muted)}
+.dpdf{appearance:none; display:flex; align-items:center; gap:7px; font:inherit; font-size:13px; font-weight:800; cursor:pointer;
+  color:var(--card); background:var(--a1); border:1px solid var(--a1); border-radius:10px; padding:9px 14px; box-shadow:var(--sh-sm)}
+.dpdf:hover{background:var(--a1t); border-color:var(--a1t)}
+@page{size:A4 landscape; margin:9mm}
+@media print{.dstep,.dpdf,.dpop,.dbtn svg{display:none !important} .dbtn{border:0; box-shadow:none; padding:0}
+  .kpis,.calrow .kpis{grid-template-columns:repeat(4,1fr) !important}
+  .row{grid-template-columns:1fr 1fr !important}
+  .dmeta{margin-left:16px} .dtl .ph{display:none}}
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div>
+    <div class="hk"><i></i>(주)새봄푸드 (가상) · 가상 은행 거래내역(연습용) 3개 계좌</div>
+    <h1>(주)새봄푸드 (가상) 자금일보</h1>
+  </div>
+  <dl class="hchip">
+    <dt>3개 계좌 마감 잔액</dt>
+    <dd><span id="chipv">-</span></dd>
+    <div class="hm"><span id="chipm">-</span></div>
+  </dl>
+</header>
+
+
+<div class="dbar">
+  <div class="dpick" id="dpick">
+    <button type="button" class="dbtn" id="dbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="dpop">
+      <span class="dlab">기준일</span><b id="dval">-</b><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <div class="dpop" id="dpop" role="dialog" aria-label="기준일 고르기" hidden>
+      <div class="dhd"><button type="button" class="mnav" id="mprev" aria-label="이전 달">&lsaquo;</button><b id="mlab"></b><button type="button" class="mnav" id="mnext" aria-label="다음 달">&rsaquo;</button></div>
+      <div class="cal" id="cal"></div>
+      <ul class="lgd"><li><i style="--c:var(--a1)"></i>순유입</li><li><i style="--c:var(--risk)"></i>순유출</li><li><i style="--c:var(--line)"></i>자료 없음</li></ul>
+    </div>
+  </div>
+  <div class="dstep"><button type="button" id="dprev">&lsaquo; 이전 영업일</button><button type="button" id="dnext">다음 영업일 &rsaquo;</button></div>
+  <span class="dmeta" id="dmeta"></span>
+  <button type="button" class="dpdf" id="dpdf" title="인쇄 창에서 대상: PDF로 저장"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>PDF 다운로드</button>
+</div>
+<section class="kpis" id="kpis"></section>
+
+
+<div class="row">
+  <section class="card">
+    <div class="chd">
+      <div><div class="ck" style="--ct:var(--a1t)">BALANCE</div>
+        <h2><span id="c1t">마감 잔액 추이</span></h2><p class="cs">3개 계좌 합계. 점을 누르면 그날의 입금·출금이 나옵니다</p></div>
+      <span class="badge" style="--bgc:var(--a1b);--ct:var(--a1t)"><span id="b1">-</span></span>
+    </div>
+    <div class="fig" id="p1"><ul class="lgd" id="g1"></ul><div class="tip" id="t1"></div></div>
+    <div class="dtl" id="d1" style="--ct:var(--a1t)"></div>
+  </section>
+
+  <section class="card">
+    <div class="chd">
+      <div><div class="ck" style="--ct:var(--a2t)">TODAY</div>
+        <h2>오늘 자금코드별 유입·유출</h2><p class="cs">계좌 간 이체는 뺐습니다. 행을 누르면 그 코드의 거래가 한 건씩 나옵니다</p></div>
+      <span class="badge" style="--bgc:var(--a2b);--ct:var(--a2t)"><span id="b2">-</span></span>
+    </div>
+    <div class="fig" id="p2"><ul class="lgd" id="g2"></ul><div class="tip" id="t2"></div></div>
+    <div class="dtl" id="d2" style="--ct:var(--a2t)"></div>
+  </section>
+</div>
+
+<!-- 관점이 넷이므로 차트 카드도 넷이 기본이다. 아래 .row 를 그대로 복제해
+     p5/p6 을 더 붙여도 된다. 눈썹 색은 a1t → a2t 를 번갈아 쓴다. -->
+<div class="row">
+  <section class="card">
+    <div class="chd">
+      <div><div class="ck" style="--ct:var(--a1t)">FORECAST · NEXT 14 DAYS</div>
+        <h2>앞으로 14일 일자별 입출금 예측</h2><p class="cs">10/30 마감 기준. 예정표 항목은 그대로, 매출대금 회수·원재료 매입·운영비 은 최근 20영업일 평균으로 잡았습니다. 휴일에 잡힌 예정은 다음 영업일로 옮깁니다. 막대를 누르면 그날 항목과 근거가 나옵니다</p></div>
+      <span class="badge" style="--bgc:var(--a1b);--ct:var(--a1t)"><span id="b3">-</span></span>
+    </div>
+    <div class="fig" id="p3"><ul class="lgd" id="g3"></ul><div class="tip" id="t3"></div></div>
+    <div class="dtl" id="d3" style="--ct:var(--a1t)"></div>
+  </section>
+
+  <section class="card">
+    <div class="chd">
+      <div><div class="ck" style="--ct:var(--a2t)">LAST 10 DAYS</div>
+        <h2>최근 10영업일 입금·출금</h2><p class="cs">막대를 누르면 그날 거래가 금액 순으로 한 건씩 나옵니다</p></div>
+      <span class="badge" style="--bgc:var(--a2b);--ct:var(--a2t)"><span id="b4">-</span></span>
+    </div>
+    <div class="fig" id="p4"><ul class="lgd" id="g4"></ul><div class="tip" id="t4"></div></div>
+    <div class="dtl" id="d4" style="--ct:var(--a2t)"></div>
+  </section>
+</div>
+
+
+<section class="card">
+  <div class="chd"><div><div class="ck" style="--ct:var(--a1t)">ACCOUNTS</div>
+    <h2>계좌별 마감 잔액</h2><p class="cs">계좌마다 그날 마지막 거래의 잔액. 증감은 전일 대비</p></div></div>
+  <div class="tw"><table><thead><tr><th>은행</th><th>용도</th><th>계좌번호</th><th class="num">입금</th><th class="num">출금</th><th class="num">마감 잔액</th><th class="num">전일 대비</th></tr></thead>
+  <tbody id="acct"></tbody></table></div>
+</section>
+<section class="card">
+  <div class="chd"><div><div class="ck" style="--ct:var(--a2t)">TOP 6</div>
+    <h2>오늘 큰 거래</h2><p class="cs">금액이 큰 순서. 확인이 필요한 거래는 아래에 따로 모읍니다</p></div></div>
+  <div class="tw"><table><thead><tr><th>적요</th><th>자금코드</th><th class="num">입금</th><th class="num">출금</th></tr></thead>
+  <tbody id="bigt"></tbody></table></div>
+  <div class="tw"><table><thead><tr><th>확인 필요 거래</th><th>자금코드</th><th class="num">입금</th><th class="num">출금</th></tr></thead>
+  <tbody id="flagt"></tbody></table></div>
+</section>
+
+<footer class="foot">
+  <div><b>산출 근거</b> 가상 은행 거래내역(연습용) 153건(2026-10-01~2026-10-30, 우리은행 · NH농협은행 · IBK기업은행 3개 계좌). 시작 잔액은 3개 계좌 기초 합계 1,890,700,000원. 계좌마다 거래 한 줄씩 직전 잔액 + 입금 - 출금 = 잔액이 맞고, 날마다 전일 잔액 + 입금 - 출금 = 계좌 잔액 합계가 21영업일 전부 1원까지 맞는다. 계좌 간 이체는 양쪽에서 같이 빠지므로 등식이 그대로 선다. 자금코드는 분류규칙_새봄푸드.md 표(11줄)로 붙였다.</div>
+  <div><b>한계</b> 분류규칙 어느 줄에도 안 맞은 거래 2건은 기타 입금·출금(확인 필요)으로 따로 모았다. 검산은 금액이 맞는지만 본다. 자금코드가 이 회사 거래 성격에 맞는지는 사람이 판단한다. 예측의 예정 항목은 입력한 예정표 그대로이고, 추정 항목은 최근 평균이라 정산 주기와 계절성을 반영하지 않는다.</div>
+</footer>
+
+</div>
+
+<script>
+/* ============================================================
+   차트 라이브러리. 다섯 종 전부 hover 툴팁 + 클릭 상세를 진다.
+   viewBox 는 컨테이너 실제 픽셀 폭으로 잡는다. 고정폭을 쓰면
+   좁은 카드에서 글자만 축소되어 못 읽는다.
+   ============================================================ */
+function C(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function won(v){return Math.round(v).toLocaleString("ko-KR");}
+function man(v){var m=v/1e4;return Math.abs(m)>=10000?(m/10000).toFixed(2)+"억":Math.round(m).toLocaleString("ko-KR")+"만";}
+function pct(v,d){return (v*100).toFixed(d===undefined?1:d)+"%";}
+function pp(v){return (v>=0?"+":"")+(v*100).toFixed(1)+"%p";}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function niceStep(r,t){var raw=r/t,p=Math.pow(10,Math.floor(Math.log10(raw))),n=raw/p;
+  return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p;}
+/* 퍼센트 눈금의 소수 자릿수. 간격 자체가 정수로 떨어지는지로 정한다.
+   크기로 판정하면(예: 1 이상이면 0자리) 간격 2.5%가 "3%"로 반올림돼 0/3/5/8 처럼 틀리게 찍힌다. */
+function pctDec(step){
+  var s=Math.abs(step*100);
+  if(Math.abs(s-Math.round(s))<1e-9) return 0;
+  if(Math.abs(s*10-Math.round(s*10))<1e-9) return 1;
+  return 2;}
+function W_(host){return Math.max(Math.round(host.clientWidth||520),360);}
+
+function panel(id,title,pairs,note){
+  var el=document.getElementById(id); if(!el) return;
+  el.innerHTML='<div class="dk">상세</div><div class="dt">'+esc(title)+'</div>'+
+    '<div class="dg">'+pairs.map(function(p){
+      return '<div><dt>'+esc(p[0])+'</dt><dd'+(p[2]?' class="'+p[2]+'"':'')+'>'+p[1]+'</dd></div>';}).join("")+'</div>'+
+    (note?'<div class="dn">'+note+'</div>':'');
+}
+function placeholder(id,txt){
+  var el=document.getElementById(id); if(!el) return;
+  el.innerHTML='<div class="dk">상세</div><div class="ph">'+txt+'</div>';
+}
+function legend(id,items){
+  var el=document.getElementById(id); if(!el) return;
+  el.innerHTML=items.map(function(o){
+    return '<li><i class="'+(o.type||"")+'" style="--c:'+C(o.color)+'"></i>'+esc(o.name)+'</li>';}).join("");
+}
+function mkTip(host,tipEl){return{
+  show:function(html,x,y){tipEl.innerHTML=html;tipEl.style.opacity="1";
+    var r=host.getBoundingClientRect(),tw=tipEl.offsetWidth,th=tipEl.offsetHeight;
+    var L=x+16;if(L+tw>r.width)L=x-tw-16;if(L<0)L=2;
+    var T=y-th-12;if(T<0)T=y+18;
+    tipEl.style.left=L+"px";tipEl.style.top=T+"px";},
+  hide:function(){tipEl.style.opacity="0";}};}
+function bind(host,tip,fnTip,fnClick){
+  host.querySelectorAll(".hit").forEach(function(h){
+    h.addEventListener("mousemove",function(e){var hr=host.getBoundingClientRect();
+      tip.show(fnTip(h),e.clientX-hr.left,e.clientY-hr.top);});
+    h.addEventListener("mouseleave",function(){tip.hide();});
+    h.addEventListener("click",function(){
+      host.querySelectorAll(".hit").forEach(function(o){o.setAttribute("fill","transparent");});
+      h.setAttribute("fill","rgba(30,80,216,.07)");
+      if(fnClick) fnClick(h);});});
+}
+function svgWrap(host,W,H,inner,label){
+  var old=host.querySelector("svg"); if(old) old.remove();
+  host.insertAdjacentHTML("afterbegin",'<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(label)+'">'+inner+'</svg>');
+}
+var HATCH='<defs><pattern id="hx" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">'+
+  '<line x1="0" y1="0" x2="0" y2="7" stroke="'+"CARDCOLOR"+'" stroke-width="2.6"/></pattern></defs>';
+function hatchDef(){return HATCH.replace("CARDCOLOR",C("--card"));}
+
+var CHART={};
+
+/* 세로 묶은 막대. cfg:{host,tip,dtl,cats,series:[{name,color,data}],fmt,note,detail} */
+CHART.bars=function(cfg){
+  var host=document.getElementById(cfg.host),tip=mkTip(host,document.getElementById(cfg.tip));
+  var S=cfg.series,n=cfg.cats.length,fmt=cfg.fmt||man;
+  var W=W_(host),H=cfg.height||250,mL=cfg.mL||64,mR=10,mT=12,mB=cfg.note?48:32;
+  var pw=W-mL-mR,ph=H-mT-mB;
+  var hi=Math.max.apply(null,S.map(function(s){return Math.max.apply(null,s.data);}));
+  var step=niceStep(hi*1.06,4),yMax=Math.ceil(hi*1.06/step)*step;
+  var Y=function(v){return mT+ph-v/yMax*ph;};
+  var bw=pw/n,bar=Math.min(26,(bw-14)/S.length),g="",tk="";
+  for(var v=0;v<=yMax+step*.001;v+=step){var y=Y(v);
+    g+='<line x1="'+mL+'" x2="'+(W-mR)+'" y1="'+y+'" y2="'+y+'" stroke="'+(v===0?C("--line"):C("--line2"))+'" stroke-width="'+(v===0?1.5:1)+'"/>';
+    tk+='<text class="ls" x="'+(mL-9)+'" y="'+(y+4)+'" text-anchor="end">'+(v===0?"0":fmt(v))+'</text>';}
+  var bars="",hits="";
+  for(var i=0;i<n;i++){
+    var cx=mL+bw*i+bw/2,off=-(S.length*bar)/2;
+    S.forEach(function(s,si){
+      var x=cx+off+si*bar+(si?1.5:0);
+      bars+='<rect x="'+x+'" y="'+Y(s.data[i])+'" width="'+(bar-1.5)+'" height="'+Math.max(ph-(Y(s.data[i])-mT),1)+'" rx="3" fill="'+C(s.color)+'"/>';});
+    bars+='<text class="l" x="'+cx+'" y="'+(mT+ph+19)+'" text-anchor="middle">'+esc(cfg.cats[i])+'</text>';
+    if(cfg.note) bars+='<text class="f" x="'+cx+'" y="'+(mT+ph+36)+'" text-anchor="middle" fill="'+C(cfg.note(i).color||"--a1t")+'">'+cfg.note(i).text+'</text>';
+    hits+='<rect class="hit" data-i="'+i+'" x="'+(mL+bw*i)+'" y="'+mT+'" width="'+bw+'" height="'+ph+'" fill="transparent"/>';}
+  svgWrap(host,W,H,g+bars+tk+hits,cfg.label||"막대그래프");
+  bind(host,tip,function(h){var i=+h.dataset.i;
+    return '<span class="th">'+esc(cfg.cats[i])+'</span>'+S.map(function(s){
+      return '<span class="tr"><span>'+esc(s.name)+'</span><b>'+won(s.data[i])+'</b></span>';}).join("");},
+    cfg.detail?function(h){var o=cfg.detail(+h.dataset.i);panel(cfg.dtl,o.title,o.pairs,o.note);}:null);
+};
+
+/* 꺾은선. cfg:{host,tip,dtl,cats,series,percent:true,detail} */
+CHART.line=function(cfg){
+  var host=document.getElementById(cfg.host),tip=mkTip(host,document.getElementById(cfg.tip));
+  var S=cfg.series,n=cfg.cats.length,P=cfg.percent;
+  var W=W_(host),H=cfg.height||250,mL=cfg.mL||52,mR=10,mT=12,mB=34,pw=W-mL-mR,ph=H-mT-mB;
+  var all=[];S.forEach(function(s){all=all.concat(s.data);});
+  var lo=Math.min.apply(null,all),hi=Math.max.apply(null,all);
+  /* 퍼센트 축도 간격을 자료에서 뽑는다. .1 로 고정하면 폭이 좁은 자료에서 눈금이 두 줄만 남는다. */
+  var st=niceStep(hi-Math.min(lo,P?lo:0),4);
+  var yMin=Math.floor(Math.min(lo,P?lo:0)/st)*st,yMax=Math.ceil(hi/st)*st;
+  var X=function(i){return mL+(pw/(n-1))*i;},Y=function(v){return mT+ph-(v-yMin)/(yMax-yMin)*ph;};
+  var g="",tk="",dc=pctDec(st);
+  for(var v=yMin;v<=yMax+st*.001;v+=st){var y=Y(v),z=Math.abs(v)<1e-9;
+    g+='<line x1="'+mL+'" x2="'+(W-mR)+'" y1="'+y+'" y2="'+y+'" stroke="'+(z?C("--line"):C("--line2"))+'" stroke-width="'+(z?1.5:1)+'"/>';
+    tk+='<text class="ls" x="'+(mL-9)+'" y="'+(y+4)+'" text-anchor="end">'+(P?(v*100).toFixed(dc)+"%":man(v))+'</text>';}
+  var xl="";
+  for(var i=0;i<n;i++) xl+='<text class="l" x="'+X(i)+'" y="'+(mT+ph+20)+'" text-anchor="middle">'+esc(cfg.cats[i])+'</text>';
+  var paths="",dots="";
+  S.forEach(function(s){
+    paths+='<path d="'+s.data.map(function(v,i){return (i?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1);}).join(" ")+
+      '" fill="none" stroke="'+C(s.color)+'" stroke-width="2.6" stroke-linejoin="round"/>';
+    s.data.forEach(function(v,i){dots+='<circle cx="'+X(i)+'" cy="'+Y(v)+'" r="4.5" fill="'+C(s.color)+'" stroke="'+C("--card")+'" stroke-width="2"/>';});});
+  var hits="";
+  for(var j=0;j<n;j++) hits+='<rect class="hit" data-i="'+j+'" x="'+(X(j)-pw/(n-1)/2)+'" y="'+mT+'" width="'+(pw/(n-1))+'" height="'+ph+'" fill="transparent"/>';
+  svgWrap(host,W,H,g+paths+dots+tk+xl+hits,cfg.label||"꺾은선그래프");
+  bind(host,tip,function(h){var i=+h.dataset.i;
+    return '<span class="th">'+esc(cfg.cats[i])+'</span>'+S.map(function(s){
+      return '<span class="tr"><span>'+esc(s.name)+'</span><b>'+(P?pct(s.data[i]):won(s.data[i]))+'</b></span>';}).join("");},
+    cfg.detail?function(h){var o=cfg.detail(+h.dataset.i);panel(cfg.dtl,o.title,o.pairs,o.note);}:null);
+};
+
+/* 폭포. cfg:{host,tip,dtl,start:{k,v},steps:[{k,v,hatch}],end:{k,v},labels,detail}
+   항목이 5개를 넘으면 못 읽는다. 묶어서 줄여라. */
+CHART.bridge=function(cfg){
+  var host=document.getElementById(cfg.host),tip=mkTip(host,document.getElementById(cfg.tip));
+  var steps=[{k:cfg.start.k,v:cfg.start.v,base:1}].concat(cfg.steps).concat([{k:cfg.end.k,v:cfg.end.v,base:1}]);
+  var W=W_(host),H=cfg.height||300,mL=48,mR=12,mT=24,mB=56,pw=W-mL-mR,ph=H-mT-mB;
+  var cum=cfg.start.v,tops=[],lo=0,hi=0;
+  steps.forEach(function(s){
+    if(s.base){tops.push([0,s.v]);}else{var a=cum;cum+=s.v;tops.push([Math.min(a,cum),Math.max(a,cum)]);}});
+  tops.forEach(function(t){lo=Math.min(lo,t[0]);hi=Math.max(hi,t[1]);});
+  var st=niceStep(hi-lo,5),yMin=Math.floor(lo/st)*st,yMax=Math.ceil(hi/st)*st;
+  var Y=function(v){return mT+ph-(v-yMin)/(yMax-yMin)*ph;};
+  var bw=pw/steps.length,bar=Math.min(72,bw*.58),g="",tk="";
+  /* 눈금 소수 자릿수는 간격에서 뽑는다. toFixed(0) 으로 고정하면 간격 2.5%가 "3%"로 찍혀
+     0/3/5/8/10 처럼 틀린 눈금이 나온다. */
+  var dc=pctDec(st);
+  for(var v=yMin;v<=yMax+st*.001;v+=st){var y=Y(v),z=Math.abs(v)<1e-9;
+    g+='<line x1="'+mL+'" x2="'+(W-mR)+'" y1="'+y+'" y2="'+y+'" stroke="'+(z?C("--line"):C("--line2"))+'" stroke-width="'+(z?1.5:1)+'"/>';
+    tk+='<text class="ls" x="'+(mL-9)+'" y="'+(y+4)+'" text-anchor="end">'+(v*100).toFixed(dc)+'%</text>';}
+  var bars="",hits="";
+  steps.forEach(function(s,i){
+    var cx=mL+bw*i+bw/2,x=cx-bar/2,t=tops[i],y0=Y(t[1]),h2=Math.max(Y(t[0])-Y(t[1]),3);
+    var col=s.base?C("--ink"):(s.v>0?C("--a1"):C("--risk"));
+    bars+='<rect x="'+x+'" y="'+y0+'" width="'+bar+'" height="'+h2+'" rx="3" fill="'+col+'"/>';
+    if(s.hatch) bars+='<rect x="'+x+'" y="'+y0+'" width="'+bar+'" height="'+h2+'" rx="3" fill="url(#hx)"/>';
+    bars+='<text class="f" x="'+cx+'" y="'+(y0-8)+'" text-anchor="middle" fill="'+col+'">'+(s.base?pct(s.v):pp(s.v))+'</text>';
+    ((cfg.labels&&cfg.labels[s.k])||[s.k]).forEach(function(p,j){
+      bars+='<text class="l" x="'+cx+'" y="'+(mT+ph+20+j*15)+'" text-anchor="middle">'+esc(p)+'</text>';});
+    hits+='<rect class="hit" data-i="'+i+'" x="'+(mL+bw*i)+'" y="'+mT+'" width="'+bw+'" height="'+ph+'" fill="transparent"/>';});
+  svgWrap(host,W,H,hatchDef()+g+bars+tk+hits,cfg.label||"폭포그래프");
+  bind(host,tip,function(h){var s=steps[+h.dataset.i];
+    return '<span class="th">'+esc(s.k)+'</span><span class="tr"><span>'+(s.base?"값":"영향")+'</span><b>'+(s.base?pct(s.v):pp(s.v))+'</b></span>';},
+    cfg.detail?function(h){var o=cfg.detail(+h.dataset.i,steps[+h.dataset.i]);panel(cfg.dtl,o.title,o.pairs,o.note);}:null);
+};
+
+/* 가로 묶은 막대. rows:[{name,a,b,segs:[[라벨,값],...]}] segs 있으면 b 막대를 쌓고 둘째에 빗금 */
+CHART.hbar=function(cfg){
+  var host=document.getElementById(cfg.host),tip=mkTip(host,document.getElementById(cfg.tip));
+  var R=cfg.rows,W=W_(host),rowH=cfg.rowH||44,H=R.length*rowH+10;
+  var mL=cfg.mL||96,mR=cfg.mR||76,mT=4,pw=W-mL-mR;
+  var xMax=Math.max.apply(null,R.map(function(r){return Math.max(r.a||0,r.b||0);}))*1.05;
+  var out="",hits="";
+  R.forEach(function(r,i){
+    var y=mT+i*rowH,bh=13;
+    out+='<text class="l" x="'+(mL-10)+'" y="'+(y+rowH/2+1)+'" text-anchor="end" font-weight="700" fill="'+C("--ink")+'">'+esc(r.name)+'</text>';
+    [[r.a,C(cfg.colorA||"--a3"),0,null],[r.b,C(cfg.colorB||"--a1"),bh+4,r.segs]].forEach(function(t){
+      var yy=y+7+t[2],x0=mL,segs=t[3]||[[r.name,t[0]||0]];
+      segs.forEach(function(sg,si){
+        var w=Math.max(pw*sg[1]/xMax,sg[1]>0?2:0); if(w<=0) return;
+        out+='<rect x="'+x0+'" y="'+yy+'" width="'+w+'" height="'+bh+'" rx="'+(segs.length>1?2:3)+'" fill="'+t[1]+'"/>';
+        if(si===1) out+='<rect x="'+x0+'" y="'+yy+'" width="'+w+'" height="'+bh+'" rx="2" fill="url(#hx)"/>';
+        x0+=w+(segs.length>1&&si===0?1.5:0);});});
+    if(r.right) out+='<text class="f" x="'+(W-8)+'" y="'+(y+rowH/2-2)+'" text-anchor="end" fill="'+C(r.rightColor||"--a1t")+'">'+esc(r.right)+'</text>';
+    if(r.right2) out+='<text class="ls" x="'+(W-8)+'" y="'+(y+rowH/2+13)+'" text-anchor="end">'+esc(r.right2)+'</text>';
+    hits+='<rect class="hit" data-i="'+i+'" x="0" y="'+y+'" width="'+W+'" height="'+rowH+'" fill="transparent"/>';});
+  svgWrap(host,W,H,hatchDef()+out+hits,cfg.label||"가로막대그래프");
+  bind(host,tip,function(h){var r=R[+h.dataset.i];
+    return '<span class="th">'+esc(r.name)+'</span>'+
+      '<span class="tr"><span>'+esc(cfg.nameA||"전기")+'</span><b>'+won(r.a||0)+'</b></span>'+
+      '<span class="tr"><span>'+esc(cfg.nameB||"당기")+'</span><b>'+won(r.b||0)+'</b></span>';},
+    cfg.detail?function(h){var o=cfg.detail(+h.dataset.i,R[+h.dataset.i]);panel(cfg.dtl,o.title,o.pairs,o.note);}:null);
+};
+
+/* 0선 기준 발산 가로막대. rows:[{name,v}] v 는 비율 */
+CHART.diverge=function(cfg){
+  var host=document.getElementById(cfg.host),tip=mkTip(host,document.getElementById(cfg.tip));
+  var R=cfg.rows.slice().sort(function(x,y){return y.v-x.v;});
+  var W=W_(host),rowH=cfg.rowH||38,H=R.length*rowH+26,mL=cfg.mL||96,mR=58,mT=6,pw=W-mL-mR;
+  var lo=Math.min(0,Math.min.apply(null,R.map(function(r){return r.v;})));
+  var hi=Math.max.apply(null,R.map(function(r){return r.v;})),pad=(hi-lo)*.14;
+  var X=function(v){return mL+(v-(lo-pad*.5))/((hi+pad)-(lo-pad*.5))*pw;},zero=X(0);
+  var out='<line x1="'+zero+'" x2="'+zero+'" y1="'+mT+'" y2="'+(mT+R.length*rowH)+'" stroke="'+C("--line")+'" stroke-width="1.5"/>',hits="";
+  R.forEach(function(r,i){
+    var y=mT+i*rowH,bh=15,x1=Math.min(zero,X(r.v)),w=Math.max(Math.abs(X(r.v)-zero),3);
+    out+='<text class="l" x="'+(mL-10)+'" y="'+(y+rowH/2+4)+'" text-anchor="end" font-weight="700" fill="'+C("--ink")+'">'+esc(r.name)+'</text>';
+    out+='<rect x="'+x1+'" y="'+(y+rowH/2-bh/2)+'" width="'+w+'" height="'+bh+'" rx="3" fill="'+(r.v>=0?C("--a1"):C("--risk"))+'"/>';
+    /* 음수 값 라벨은 항상 막대 오른쪽 끝(0선 옆)에 붙인다. 왼쪽에 두면 항목명과 겹친다. */
+    out+='<text class="f" x="'+(x1+w+8)+'" y="'+(y+rowH/2+4)+'" text-anchor="start" fill="'+(r.v>=0?C("--ink"):C("--riskT"))+'">'+pct(r.v)+'</text>';
+    hits+='<rect class="hit" data-i="'+i+'" x="0" y="'+y+'" width="'+W+'" height="'+rowH+'" fill="transparent"/>';});
+  out+='<text class="ls" x="'+zero+'" y="'+(mT+R.length*rowH+18)+'" text-anchor="middle">0%</text>';
+  svgWrap(host,W,H,out+hits,cfg.label||"발산 가로막대그래프");
+  bind(host,tip,function(h){var r=R[+h.dataset.i];
+    return '<span class="th">'+esc(r.name)+'</span><span class="tr"><span>'+esc(cfg.unit||"비율")+'</span><b>'+pct(r.v)+'</b></span>';},
+    cfg.detail?function(h){var o=cfg.detail(+h.dataset.i,R[+h.dataset.i]);panel(cfg.dtl,o.title,o.pairs,o.note);}:null);
+};
+
+/* KPI. items:[{ax,label,value,unit,color,colorT,desc}] */
+function renderKPI(id,items){
+  document.getElementById(id).innerHTML=items.map(function(o){
+    return '<div class="kpi" style="--ct:'+o.color+'"><div class="ax" style="color:'+o.colorT+'">'+esc(o.ax)+'</div>'+
+      '<div class="kl">'+esc(o.label)+'</div>'+
+      '<div class="kv">'+o.value+(o.unit?'<small>'+esc(o.unit)+'</small>':'')+'</div>'+
+      '<div class="kd">'+o.desc+'</div></div>';}).join("");
+}
+
+/* ============================================================
+   여기부터 자료를 넣는다. drawAll 안에서 CHART.* 를 부르고
+   그리기가 끝나면 placeholder 로 상세 안내를 채운다.
+   ============================================================ */
+
+var DATA = {"days": ["2026-10-01", "2026-10-02", "2026-10-05", "2026-10-06", "2026-10-07", "2026-10-08", "2026-10-12", "2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16", "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23", "2026-10-26", "2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30"], "by": {"2026-10-01": {"tx": [["11:40", "주거래", "(주)대지농산", "원재료 매입대금", 0, 49680000, "원재료 매입"], ["15:04", "주거래", "(주)푸른유통", "매출대금 입금", 39280000, 0, "매출대금 회수"], ["12:30", "주거래", "(주)한결마트", "매출대금 입금", 16540000, 0, "매출대금 회수"], ["09:17", "주거래", "(주)푸른유통", "매출대금 입금", 12410000, 0, "매출대금 회수"], ["12:36", "주거래", "나이스정보통신", "카드매출 정산", 2518300, 0, "카드매출 정산"], ["14:51", "주거래", "운영", "차량 주유비", 0, 699900, "운영비"]], "prev": 1890700000, "in": 70748300, "out": 50379900, "end": 1911068400, "n": 6, "codes": [{"name": "매출대금 회수", "i": 68230000, "o": 0, "n": 3, "top": [["매출대금 입금", 39280000], ["매출대금 입금", 16540000], ["매출대금 입금", 12410000]]}, {"name": "카드매출 정산", "i": 2518300, "o": 0, "n": 1, "top": [["카드매출 정산", 2518300]]}, {"name": "원재료 매입", "i": 0, "o": 49680000, "n": 1, "top": [["원재료 매입대금", 49680000]]}, {"name": "운영비", "i": 0, "o": 699900, "n": 1, "top": [["차량 주유비", 699900]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1304868400, 70748300, 50379900, 20368400], ["NH농협은행", "급여·세금", "301-****-5528-21", 186200000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 420000000, 0, 0, 0]], "big": [["원재료 매입대금", 0, 49680000, "원재료 매입"], ["매출대금 입금", 39280000, 0, "매출대금 회수"], ["매출대금 입금", 16540000, 0, "매출대금 회수"], ["매출대금 입금", 12410000, 0, "매출대금 회수"], ["카드매출 정산", 2518300, 0, "카드매출 정산"], ["차량 주유비", 0, 699900, "운영비"]], "plan": [["2026-10-06", "원재료 매입", 55400000], ["2026-10-08", "원재료 매입", 61620000], ["2026-10-14", "원재료 매입", 58450000]], "flag": [], "recent": [["2026-10-01", 70748300, 50379900, [["매출대금 회수", 68230000], ["카드매출 정산", 2518300]], [["원재료 매입", 49680000], ["운영비", 699900]]]], "avg5_in": 0, "avg5_out": 0}, "2026-10-02": {"tx": [["15:23", "주거래", "농협하나로유통", "매출대금 입금", 34560000, 0, "매출대금 회수"], ["13:11", "주거래", "(주)이음식자재", "매출대금 입금", 34270000, 0, "매출대금 회수"], ["16:23", "주거래", "(주)이음식자재", "매출대금 입금", 21580000, 0, "매출대금 회수"], ["10:18", "주거래", "나이스정보통신", "카드매출 정산", 4842800, 0, "카드매출 정산"], ["12:08", "주거래", "운영", "식대 정산", 0, 691200, "운영비"]], "prev": 1911068400, "in": 95252800, "out": 691200, "end": 2005630000, "n": 5, "codes": [{"name": "매출대금 회수", "i": 90410000, "o": 0, "n": 3, "top": [["매출대금 입금", 34560000], ["매출대금 입금", 34270000], ["매출대금 입금", 21580000]]}, {"name": "카드매출 정산", "i": 4842800, "o": 0, "n": 1, "top": [["카드매출 정산", 4842800]]}, {"name": "운영비", "i": 0, "o": 691200, "n": 1, "top": [["식대 정산", 691200]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1399430000, 95252800, 691200, 94561600], ["NH농협은행", "급여·세금", "301-****-5528-21", 186200000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 420000000, 0, 0, 0]], "big": [["매출대금 입금", 34560000, 0, "매출대금 회수"], ["매출대금 입금", 34270000, 0, "매출대금 회수"], ["매출대금 입금", 21580000, 0, "매출대금 회수"], ["카드매출 정산", 4842800, 0, "카드매출 정산"], ["식대 정산", 0, 691200, "운영비"]], "plan": [["2026-10-06", "원재료 매입", 55400000], ["2026-10-08", "원재료 매입", 61620000], ["2026-10-14", "원재료 매입", 58450000]], "flag": [], "recent": [["2026-10-01", 70748300, 50379900, [["매출대금 회수", 68230000], ["카드매출 정산", 2518300]], [["원재료 매입", 49680000], ["운영비", 699900]]], ["2026-10-02", 95252800, 691200, [["매출대금 회수", 90410000], ["카드매출 정산", 4842800]], [["운영비", 691200]]]], "avg5_in": 70748300.0, "avg5_out": 50379900.0}, "2026-10-05": {"tx": [["14:25", "주거래", "(주)한결마트", "매출대금 입금", 18180000, 0, "매출대금 회수"], ["10:18", "주거래", "(주)대지농산", "원재료 매입대금", 0, 15150000, "원재료 매입"], ["12:55", "주거래", "(주)한결마트", "매출대금 입금", 14860000, 0, "매출대금 회수"], ["12:05", "주거래", "나이스정보통신", "카드매출 정산", 5625000, 0, "카드매출 정산"], ["12:29", "주거래", "운영", "식대 정산", 0, 607400, "운영비"], ["09:55", "주거래", "운영", "식대 정산", 0, 517100, "운영비"], ["13:02", "주거래", "운영", "사무용품 구입", 0, 100300, "운영비"]], "prev": 2005630000, "in": 38665000, "out": 16374800, "end": 2027920200, "n": 7, "codes": [{"name": "매출대금 회수", "i": 33040000, "o": 0, "n": 2, "top": [["매출대금 입금", 18180000], ["매출대금 입금", 14860000]]}, {"name": "카드매출 정산", "i": 5625000, "o": 0, "n": 1, "top": [["카드매출 정산", 5625000]]}, {"name": "원재료 매입", "i": 0, "o": 15150000, "n": 1, "top": [["원재료 매입대금", 15150000]]}, {"name": "운영비", "i": 0, "o": 1224800, "n": 3, "top": [["식대 정산", 607400], ["식대 정산", 517100], ["사무용품 구입", 100300]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1421720200, 38665000, 16374800, 22290200], ["NH농협은행", "급여·세금", "301-****-5528-21", 186200000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 420000000, 0, 0, 0]], "big": [["매출대금 입금", 18180000, 0, "매출대금 회수"], ["원재료 매입대금", 0, 15150000, "원재료 매입"], ["매출대금 입금", 14860000, 0, "매출대금 회수"], ["카드매출 정산", 5625000, 0, "카드매출 정산"], ["식대 정산", 0, 607400, "운영비"], ["식대 정산", 0, 517100, "운영비"]], "plan": [["2026-10-06", "원재료 매입", 55400000], ["2026-10-08", "원재료 매입", 61620000], ["2026-10-14", "원재료 매입", 58450000], ["2026-10-19", "원재료 매입", 250770000]], "flag": [], "recent": [["2026-10-01", 70748300, 50379900, [["매출대금 회수", 68230000], ["카드매출 정산", 2518300]], [["원재료 매입", 49680000], ["운영비", 699900]]], ["2026-10-02", 95252800, 691200, [["매출대금 회수", 90410000], ["카드매출 정산", 4842800]], [["운영비", 691200]]], ["2026-10-05", 38665000, 16374800, [["매출대금 회수", 33040000], ["카드매출 정산", 5625000]], [["원재료 매입", 15150000], ["운영비", 1224800]]]], "avg5_in": 83000550.0, "avg5_out": 25535550.0}, "2026-10-06": {"tx": [["13:04", "주거래", "(주)고운포장", "원재료 매입대금", 0, 55400000, "원재료 매입"], ["14:42", "주거래", "농협하나로유통", "매출대금 입금", 17780000, 0, "매출대금 회수"], ["13:14", "주거래", "농협하나로유통", "매출대금 입금", 16190000, 0, "매출대금 회수"], ["14:38", "주거래", "나이스정보통신", "카드매출 정산", 5671800, 0, "카드매출 정산"], ["09:03", "주거래", "운영", "차량 주유비", 0, 527200, "운영비"]], "prev": 2027920200, "in": 39641800, "out": 55927200, "end": 2011634800, "n": 5, "codes": [{"name": "매출대금 회수", "i": 33970000, "o": 0, "n": 2, "top": [["매출대금 입금", 17780000], ["매출대금 입금", 16190000]]}, {"name": "카드매출 정산", "i": 5671800, "o": 0, "n": 1, "top": [["카드매출 정산", 5671800]]}, {"name": "원재료 매입", "i": 0, "o": 55400000, "n": 1, "top": [["원재료 매입대금", 55400000]]}, {"name": "운영비", "i": 0, "o": 527200, "n": 1, "top": [["차량 주유비", 527200]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1405434800, 39641800, 55927200, -16285400], ["NH농협은행", "급여·세금", "301-****-5528-21", 186200000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 420000000, 0, 0, 0]], "big": [["원재료 매입대금", 0, 55400000, "원재료 매입"], ["매출대금 입금", 17780000, 0, "매출대금 회수"], ["매출대금 입금", 16190000, 0, "매출대금 회수"], ["카드매출 정산", 5671800, 0, "카드매출 정산"], ["차량 주유비", 0, 527200, "운영비"]], "plan": [["2026-10-08", "원재료 매입", 61620000], ["2026-10-14", "원재료 매입", 58450000], ["2026-10-19", "원재료 매입", 250770000]], "flag": [], "recent": [["2026-10-01", 70748300, 50379900, [["매출대금 회수", 68230000], ["카드매출 정산", 2518300]], [["원재료 매입", 49680000], ["운영비", 699900]]], ["2026-10-02", 95252800, 691200, [["매출대금 회수", 90410000], ["카드매출 정산", 4842800]], [["운영비", 691200]]], ["2026-10-05", 38665000, 16374800, [["매출대금 회수", 33040000], ["카드매출 정산", 5625000]], [["원재료 매입", 15150000], ["운영비", 1224800]]], ["2026-10-06", 39641800, 55927200, [["매출대금 회수", 33970000], ["카드매출 정산", 5671800]], [["원재료 매입", 55400000], ["운영비", 527200]]]], "avg5_in": 68222033.33333333, "avg5_out": 22481966.666666668}, "2026-10-07": {"tx": [["13:05", "주거래", "(주)푸른유통", "매출대금 입금", 30550000, 0, "매출대금 회수"], ["15:17", "주거래", "(주)이음식자재", "매출대금 입금", 18700000, 0, "매출대금 회수"], ["15:51", "주거래", "(주)이음식자재", "매출대금 입금", 16890000, 0, "매출대금 회수"], ["13:45", "주거래", "(주)푸른유통", "매출대금 입금", 10760000, 0, "매출대금 회수"], ["10:52", "주거래", "나이스정보통신", "카드매출 정산", 3070800, 0, "카드매출 정산"], ["13:05", "주거래", "운영", "통신요금", 0, 404200, "운영비"], ["14:53", "주거래", "운영", "통신요금", 0, 372100, "운영비"], ["09:02", "주거래", "운영", "통신요금", 0, 363900, "운영비"]], "prev": 2011634800, "in": 79970800, "out": 1140200, "end": 2090465400, "n": 8, "codes": [{"name": "매출대금 회수", "i": 76900000, "o": 0, "n": 4, "top": [["매출대금 입금", 30550000], ["매출대금 입금", 18700000], ["매출대금 입금", 16890000]]}, {"name": "카드매출 정산", "i": 3070800, "o": 0, "n": 1, "top": [["카드매출 정산", 3070800]]}, {"name": "운영비", "i": 0, "o": 1140200, "n": 3, "top": [["통신요금", 404200], ["통신요금", 372100], ["통신요금", 363900]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1484265400, 79970800, 1140200, 78830600], ["NH농협은행", "급여·세금", "301-****-5528-21", 186200000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 420000000, 0, 0, 0]], "big": [["매출대금 입금", 30550000, 0, "매출대금 회수"], ["매출대금 입금", 18700000, 0, "매출대금 회수"], ["매출대금 입금", 16890000, 0, "매출대금 회수"], ["매출대금 입금", 10760000, 0, "매출대금 회수"], ["카드매출 정산", 3070800, 0, "카드매출 정산"], ["통신요금", 0, 404200, "운영비"]], "plan": [["2026-10-08", "원재료 매입", 61620000], ["2026-10-14", "원재료 매입", 58450000], ["2026-10-19", "원재료 매입", 250770000]], "flag": [], "recent": [["2026-10-01", 70748300, 50379900, [["매출대금 회수", 68230000], ["카드매출 정산", 2518300]], [["원재료 매입", 49680000], ["운영비", 699900]]], ["2026-10-02", 95252800, 691200, [["매출대금 회수", 90410000], ["카드매출 정산", 4842800]], [["운영비", 691200]]], ["2026-10-05", 38665000, 16374800, [["매출대금 회수", 33040000], ["카드매출 정산", 5625000]], [["원재료 매입", 15150000], ["운영비", 1224800]]], ["2026-10-06", 39641800, 55927200, [["매출대금 회수", 33970000], ["카드매출 정산", 5671800]], [["원재료 매입", 55400000], ["운영비", 527200]]], ["2026-10-07", 79970800, 1140200, [["매출대금 회수", 76900000], ["카드매출 정산", 3070800]], [["운영비", 1140200]]]], "avg5_in": 61076975.0, "avg5_out": 30843275.0}, "2026-10-08": {"tx": [["09:41", "주거래", "(주)고운포장", "원재료 매입대금", 0, 61620000, "원재료 매입"], ["09:23", "주거래", "(주)이음식자재", "매출대금 입금", 22580000, 0, "매출대금 회수"], ["12:06", "주거래", "(주)푸른유통", "매출대금 입금", 21560000, 0, "매출대금 회수"], ["14:38", "주거래", "나이스정보통신", "카드매출 정산", 6595200, 0, "카드매출 정산"], ["11:52", "주거래", "운영", "택배비", 0, 1741300, "운영비"], ["12:43", "주거래", "운영", "택배비", 0, 1205400, "운영비"]], "prev": 2090465400, "in": 50735200, "out": 64566700, "end": 2076633900, "n": 6, "codes": [{"name": "매출대금 회수", "i": 44140000, "o": 0, "n": 2, "top": [["매출대금 입금", 22580000], ["매출대금 입금", 21560000]]}, {"name": "카드매출 정산", "i": 6595200, "o": 0, "n": 1, "top": [["카드매출 정산", 6595200]]}, {"name": "원재료 매입", "i": 0, "o": 61620000, "n": 1, "top": [["원재료 매입대금", 61620000]]}, {"name": "운영비", "i": 0, "o": 2946700, "n": 2, "top": [["택배비", 1741300], ["택배비", 1205400]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1470433900, 50735200, 64566700, -13831500], ["NH농협은행", "급여·세금", "301-****-5528-21", 186200000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 420000000, 0, 0, 0]], "big": [["원재료 매입대금", 0, 61620000, "원재료 매입"], ["매출대금 입금", 22580000, 0, "매출대금 회수"], ["매출대금 입금", 21560000, 0, "매출대금 회수"], ["카드매출 정산", 6595200, 0, "카드매출 정산"], ["택배비", 0, 1741300, "운영비"], ["택배비", 0, 1205400, "운영비"]], "plan": [["2026-10-14", "원재료 매입", 58450000], ["2026-10-19", "원재료 매입", 250770000], ["2026-10-22", "원재료 매입", 37060000]], "flag": [], "recent": [["2026-10-01", 70748300, 50379900, [["매출대금 회수", 68230000], ["카드매출 정산", 2518300]], [["원재료 매입", 49680000], ["운영비", 699900]]], ["2026-10-02", 95252800, 691200, [["매출대금 회수", 90410000], ["카드매출 정산", 4842800]], [["운영비", 691200]]], ["2026-10-05", 38665000, 16374800, [["매출대금 회수", 33040000], ["카드매출 정산", 5625000]], [["원재료 매입", 15150000], ["운영비", 1224800]]], ["2026-10-06", 39641800, 55927200, [["매출대금 회수", 33970000], ["카드매출 정산", 5671800]], [["원재료 매입", 55400000], ["운영비", 527200]]], ["2026-10-07", 79970800, 1140200, [["매출대금 회수", 76900000], ["카드매출 정산", 3070800]], [["운영비", 1140200]]], ["2026-10-08", 50735200, 64566700, [["매출대금 회수", 44140000], ["카드매출 정산", 6595200]], [["원재료 매입", 61620000], ["운영비", 2946700]]]], "avg5_in": 64855740.0, "avg5_out": 24902660.0}, "2026-10-12": {"tx": [["13:18", "주거래", "(주)한결마트", "매출대금 입금", 38540000, 0, "매출대금 회수"], ["12:13", "주거래", "(주)푸른유통", "매출대금 입금", 29820000, 0, "매출대금 회수"], ["12:17", "주거래", "(주)도담급식", "매출대금 입금", 24840000, 0, "매출대금 회수"], ["14:53", "주거래", "(주)이음식자재", "매출대금 입금", 18250000, 0, "매출대금 회수"], ["10:05", "급여·세금", "강남세무서", "원천세 납부", 0, 14620000, "세금·4대보험"], ["10:20", "급여·세금", "국민연금공단", "국민연금 납부", 0, 9880000, "세금·4대보험"], ["10:22", "급여·세금", "국민건강보험공단", "건강보험 납부", 0, 8215000, "세금·4대보험"], ["12:24", "주거래", "나이스정보통신", "카드매출 정산", 3690200, 0, "카드매출 정산"], ["10:07", "급여·세금", "강남구청", "지방소득세 납부", 0, 1462000, "세금·4대보험"], ["11:59", "주거래", "운영", "통신요금", 0, 428400, "운영비"], ["12:15", "주거래", "운영", "통신요금", 0, 392000, "운영비"], ["13:58", "주거래", "운영", "통신요금", 0, 387700, "운영비"]], "prev": 2076633900, "in": 115140200, "out": 35385100, "end": 2156389000, "n": 12, "codes": [{"name": "매출대금 회수", "i": 111450000, "o": 0, "n": 4, "top": [["매출대금 입금", 38540000], ["매출대금 입금", 29820000], ["매출대금 입금", 24840000]]}, {"name": "카드매출 정산", "i": 3690200, "o": 0, "n": 1, "top": [["카드매출 정산", 3690200]]}, {"name": "세금·4대보험", "i": 0, "o": 34177000, "n": 4, "top": [["원천세 납부", 14620000], ["국민연금 납부", 9880000], ["건강보험 납부", 8215000]]}, {"name": "운영비", "i": 0, "o": 1208100, "n": 3, "top": [["통신요금", 428400], ["통신요금", 392000], ["통신요금", 387700]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1584366000, 115140200, 1208100, 113932100], ["NH농협은행", "급여·세금", "301-****-5528-21", 152023000, 0, 34177000, -34177000], ["IBK기업은행", "운전자금", "514-******-01-013", 420000000, 0, 0, 0]], "big": [["매출대금 입금", 38540000, 0, "매출대금 회수"], ["매출대금 입금", 29820000, 0, "매출대금 회수"], ["매출대금 입금", 24840000, 0, "매출대금 회수"], ["매출대금 입금", 18250000, 0, "매출대금 회수"], ["원천세 납부", 0, 14620000, "세금·4대보험"], ["국민연금 납부", 0, 9880000, "세금·4대보험"]], "plan": [["2026-10-14", "원재료 매입", 58450000], ["2026-10-19", "원재료 매입", 250770000], ["2026-10-22", "원재료 매입", 37060000], ["2026-10-26", "급여", 128750000], ["2026-10-26", "세금·4대보험", 67340000]], "flag": [], "recent": [["2026-10-01", 70748300, 50379900, [["매출대금 회수", 68230000], ["카드매출 정산", 2518300]], [["원재료 매입", 49680000], ["운영비", 699900]]], ["2026-10-02", 95252800, 691200, [["매출대금 회수", 90410000], ["카드매출 정산", 4842800]], [["운영비", 691200]]], ["2026-10-05", 38665000, 16374800, [["매출대금 회수", 33040000], ["카드매출 정산", 5625000]], [["원재료 매입", 15150000], ["운영비", 1224800]]], ["2026-10-06", 39641800, 55927200, [["매출대금 회수", 33970000], ["카드매출 정산", 5671800]], [["원재료 매입", 55400000], ["운영비", 527200]]], ["2026-10-07", 79970800, 1140200, [["매출대금 회수", 76900000], ["카드매출 정산", 3070800]], [["운영비", 1140200]]], ["2026-10-08", 50735200, 64566700, [["매출대금 회수", 44140000], ["카드매출 정산", 6595200]], [["원재료 매입", 61620000], ["운영비", 2946700]]], ["2026-10-12", 115140200, 35385100, [["매출대금 회수", 111450000], ["카드매출 정산", 3690200]], [["세금·4대보험", 34177000], ["운영비", 1208100]]]], "avg5_in": 60853120.0, "avg5_out": 27740020.0}, "2026-10-13": {"tx": [["11:39", "주거래", "(주)한결마트", "매출대금 입금", 36670000, 0, "매출대금 회수"], ["12:27", "주거래", "(주)이음식자재", "매출대금 입금", 19930000, 0, "매출대금 회수"], ["09:09", "주거래", "농협하나로유통", "매출대금 입금", 17000000, 0, "매출대금 회수"], ["13:42", "주거래", "나이스정보통신", "카드매출 정산", 4577900, 0, "카드매출 정산"], ["10:55", "주거래", "운영", "통신요금", 0, 350500, "운영비"], ["14:40", "주거래", "운영", "통신요금", 0, 344300, "운영비"]], "prev": 2156389000, "in": 78177900, "out": 694800, "end": 2233872100, "n": 8, "codes": [{"name": "매출대금 회수", "i": 73600000, "o": 0, "n": 3, "top": [["매출대금 입금", 36670000], ["매출대금 입금", 19930000], ["매출대금 입금", 17000000]]}, {"name": "카드매출 정산", "i": 4577900, "o": 0, "n": 1, "top": [["카드매출 정산", 4577900]]}, {"name": "운영비", "i": 0, "o": 694800, "n": 2, "top": [["통신요금", 350500], ["통신요금", 344300]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1601849100, 78177900, 60694800, 17483100], ["NH농협은행", "급여·세금", "301-****-5528-21", 212023000, 60000000, 0, 60000000], ["IBK기업은행", "운전자금", "514-******-01-013", 420000000, 0, 0, 0]], "big": [["매출대금 입금", 36670000, 0, "매출대금 회수"], ["매출대금 입금", 19930000, 0, "매출대금 회수"], ["매출대금 입금", 17000000, 0, "매출대금 회수"], ["카드매출 정산", 4577900, 0, "카드매출 정산"], ["통신요금", 0, 350500, "운영비"], ["통신요금", 0, 344300, "운영비"]], "plan": [["2026-10-14", "원재료 매입", 58450000], ["2026-10-19", "원재료 매입", 250770000], ["2026-10-22", "원재료 매입", 37060000], ["2026-10-26", "급여", 128750000], ["2026-10-26", "세금·4대보험", 67340000]], "flag": [], "recent": [["2026-10-01", 70748300, 50379900, [["매출대금 회수", 68230000], ["카드매출 정산", 2518300]], [["원재료 매입", 49680000], ["운영비", 699900]]], ["2026-10-02", 95252800, 691200, [["매출대금 회수", 90410000], ["카드매출 정산", 4842800]], [["운영비", 691200]]], ["2026-10-05", 38665000, 16374800, [["매출대금 회수", 33040000], ["카드매출 정산", 5625000]], [["원재료 매입", 15150000], ["운영비", 1224800]]], ["2026-10-06", 39641800, 55927200, [["매출대금 회수", 33970000], ["카드매출 정산", 5671800]], [["원재료 매입", 55400000], ["운영비", 527200]]], ["2026-10-07", 79970800, 1140200, [["매출대금 회수", 76900000], ["카드매출 정산", 3070800]], [["운영비", 1140200]]], ["2026-10-08", 50735200, 64566700, [["매출대금 회수", 44140000], ["카드매출 정산", 6595200]], [["원재료 매입", 61620000], ["운영비", 2946700]]], ["2026-10-12", 115140200, 35385100, [["매출대금 회수", 111450000], ["카드매출 정산", 3690200]], [["세금·4대보험", 34177000], ["운영비", 1208100]]], ["2026-10-13", 78177900, 694800, [["매출대금 회수", 73600000], ["카드매출 정산", 4577900]], [["운영비", 694800]]]], "avg5_in": 64830600.0, "avg5_out": 34678800.0}, "2026-10-14": {"tx": [["10:09", "주거래", "(주)바다수산", "원재료 매입대금", 0, 58450000, "원재료 매입"], ["13:30", "주거래", "(주)한결마트", "매출대금 입금", 34860000, 0, "매출대금 회수"], ["09:46", "주거래", "(주)한결마트", "매출대금 입금", 10320000, 0, "매출대금 회수"], ["12:56", "주거래", "(주)이음식자재", "매출대금 입금", 8920000, 0, "매출대금 회수"], ["15:36", "주거래", "나이스정보통신", "카드매출 정산", 6468400, 0, "카드매출 정산"], ["09:03", "주거래", "운영", "식대 정산", 0, 864400, "운영비"], ["12:17", "주거래", "운영", "식대 정산", 0, 732200, "운영비"], ["16:21", "주거래", "운영", "사무용품 구입", 0, 100700, "운영비"]], "prev": 2233872100, "in": 60568400, "out": 60147300, "end": 2234293200, "n": 8, "codes": [{"name": "매출대금 회수", "i": 54100000, "o": 0, "n": 3, "top": [["매출대금 입금", 34860000], ["매출대금 입금", 10320000], ["매출대금 입금", 8920000]]}, {"name": "카드매출 정산", "i": 6468400, "o": 0, "n": 1, "top": [["카드매출 정산", 6468400]]}, {"name": "원재료 매입", "i": 0, "o": 58450000, "n": 1, "top": [["원재료 매입대금", 58450000]]}, {"name": "운영비", "i": 0, "o": 1697300, "n": 3, "top": [["식대 정산", 864400], ["식대 정산", 732200], ["사무용품 구입", 100700]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1602270200, 60568400, 60147300, 421100], ["NH농협은행", "급여·세금", "301-****-5528-21", 212023000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 420000000, 0, 0, 0]], "big": [["원재료 매입대금", 0, 58450000, "원재료 매입"], ["매출대금 입금", 34860000, 0, "매출대금 회수"], ["매출대금 입금", 10320000, 0, "매출대금 회수"], ["매출대금 입금", 8920000, 0, "매출대금 회수"], ["카드매출 정산", 6468400, 0, "카드매출 정산"], ["식대 정산", 0, 864400, "운영비"]], "plan": [["2026-10-19", "원재료 매입", 250770000], ["2026-10-22", "원재료 매입", 37060000], ["2026-10-26", "급여", 128750000], ["2026-10-26", "세금·4대보험", 67340000]], "flag": [], "recent": [["2026-10-01", 70748300, 50379900, [["매출대금 회수", 68230000], ["카드매출 정산", 2518300]], [["원재료 매입", 49680000], ["운영비", 699900]]], ["2026-10-02", 95252800, 691200, [["매출대금 회수", 90410000], ["카드매출 정산", 4842800]], [["운영비", 691200]]], ["2026-10-05", 38665000, 16374800, [["매출대금 회수", 33040000], ["카드매출 정산", 5625000]], [["원재료 매입", 15150000], ["운영비", 1224800]]], ["2026-10-06", 39641800, 55927200, [["매출대금 회수", 33970000], ["카드매출 정산", 5671800]], [["원재료 매입", 55400000], ["운영비", 527200]]], ["2026-10-07", 79970800, 1140200, [["매출대금 회수", 76900000], ["카드매출 정산", 3070800]], [["운영비", 1140200]]], ["2026-10-08", 50735200, 64566700, [["매출대금 회수", 44140000], ["카드매출 정산", 6595200]], [["원재료 매입", 61620000], ["운영비", 2946700]]], ["2026-10-12", 115140200, 35385100, [["매출대금 회수", 111450000], ["카드매출 정산", 3690200]], [["세금·4대보험", 34177000], ["운영비", 1208100]]], ["2026-10-13", 78177900, 694800, [["매출대금 회수", 73600000], ["카드매출 정산", 4577900]], [["운영비", 694800]]], ["2026-10-14", 60568400, 60147300, [["매출대금 회수", 54100000], ["카드매출 정산", 6468400]], [["원재료 매입", 58450000], ["운영비", 1697300]]]], "avg5_in": 72733180.0, "avg5_out": 31542800.0}, "2026-10-15": {"tx": [["14:17", "주거래", "(주)이음식자재", "매출대금 입금", 39770000, 0, "매출대금 회수"], ["09:30", "주거래", "신한카드", "법인카드 결제대금", 0, 23480500, "카드대금"], ["16:37", "주거래", "(주)이음식자재", "매출대금 입금", 18410000, 0, "매출대금 회수"], ["16:37", "주거래", "나이스정보통신", "카드매출 정산", 2597100, 0, "카드매출 정산"], ["13:14", "주거래", "운영", "택배비", 0, 1281900, "운영비"], ["11:52", "주거래", "운영", "차량 주유비", 0, 440400, "운영비"], ["13:59", "주거래", "운영", "차량 주유비", 0, 340100, "운영비"]], "prev": 2234293200, "in": 60777100, "out": 25542900, "end": 2269527400, "n": 7, "codes": [{"name": "매출대금 회수", "i": 58180000, "o": 0, "n": 2, "top": [["매출대금 입금", 39770000], ["매출대금 입금", 18410000]]}, {"name": "카드매출 정산", "i": 2597100, "o": 0, "n": 1, "top": [["카드매출 정산", 2597100]]}, {"name": "카드대금", "i": 0, "o": 23480500, "n": 1, "top": [["법인카드 결제대금", 23480500]]}, {"name": "운영비", "i": 0, "o": 2062400, "n": 3, "top": [["택배비", 1281900], ["차량 주유비", 440400], ["차량 주유비", 340100]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1637504400, 60777100, 25542900, 35234200], ["NH농협은행", "급여·세금", "301-****-5528-21", 212023000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 420000000, 0, 0, 0]], "big": [["매출대금 입금", 39770000, 0, "매출대금 회수"], ["법인카드 결제대금", 0, 23480500, "카드대금"], ["매출대금 입금", 18410000, 0, "매출대금 회수"], ["카드매출 정산", 2597100, 0, "카드매출 정산"], ["택배비", 0, 1281900, "운영비"], ["차량 주유비", 0, 440400, "운영비"]], "plan": [["2026-10-19", "원재료 매입", 250770000], ["2026-10-22", "원재료 매입", 37060000], ["2026-10-26", "급여", 128750000], ["2026-10-26", "세금·4대보험", 67340000]], "flag": [], "recent": [["2026-10-01", 70748300, 50379900, [["매출대금 회수", 68230000], ["카드매출 정산", 2518300]], [["원재료 매입", 49680000], ["운영비", 699900]]], ["2026-10-02", 95252800, 691200, [["매출대금 회수", 90410000], ["카드매출 정산", 4842800]], [["운영비", 691200]]], ["2026-10-05", 38665000, 16374800, [["매출대금 회수", 33040000], ["카드매출 정산", 5625000]], [["원재료 매입", 15150000], ["운영비", 1224800]]], ["2026-10-06", 39641800, 55927200, [["매출대금 회수", 33970000], ["카드매출 정산", 5671800]], [["원재료 매입", 55400000], ["운영비", 527200]]], ["2026-10-07", 79970800, 1140200, [["매출대금 회수", 76900000], ["카드매출 정산", 3070800]], [["운영비", 1140200]]], ["2026-10-08", 50735200, 64566700, [["매출대금 회수", 44140000], ["카드매출 정산", 6595200]], [["원재료 매입", 61620000], ["운영비", 2946700]]], ["2026-10-12", 115140200, 35385100, [["매출대금 회수", 111450000], ["카드매출 정산", 3690200]], [["세금·4대보험", 34177000], ["운영비", 1208100]]], ["2026-10-13", 78177900, 694800, [["매출대금 회수", 73600000], ["카드매출 정산", 4577900]], [["운영비", 694800]]], ["2026-10-14", 60568400, 60147300, [["매출대금 회수", 54100000], ["카드매출 정산", 6468400]], [["원재료 매입", 58450000], ["운영비", 1697300]]], ["2026-10-15", 60777100, 25542900, [["매출대금 회수", 58180000], ["카드매출 정산", 2597100]], [["카드대금", 23480500], ["운영비", 2062400]]]], "avg5_in": 76918500.0, "avg5_out": 32386820.0}, "2026-10-16": {"tx": [["10:30", "운전자금", "IBK기업은행", "운전자금 대출 실행", 300000000, 0, "차입금"], ["09:55", "주거래", "농협하나로유통", "매출대금 입금", 19650000, 0, "매출대금 회수"], ["09:42", "주거래", "(주)푸른유통", "매출대금 입금", 12020000, 0, "매출대금 회수"], ["13:50", "주거래", "나이스정보통신", "카드매출 정산", 7204200, 0, "카드매출 정산"], ["09:01", "주거래", "운영", "차량 주유비", 0, 459700, "운영비"], ["15:25", "주거래", "운영", "식대 정산", 0, 413400, "운영비"], ["11:56", "주거래", "운영", "사무용품 구입", 0, 358600, "운영비"]], "prev": 2269527400, "in": 338874200, "out": 1231700, "end": 2607169900, "n": 7, "codes": [{"name": "차입금", "i": 300000000, "o": 0, "n": 1, "top": [["운전자금 대출 실행", 300000000]]}, {"name": "매출대금 회수", "i": 31670000, "o": 0, "n": 2, "top": [["매출대금 입금", 19650000], ["매출대금 입금", 12020000]]}, {"name": "카드매출 정산", "i": 7204200, "o": 0, "n": 1, "top": [["카드매출 정산", 7204200]]}, {"name": "운영비", "i": 0, "o": 1231700, "n": 3, "top": [["차량 주유비", 459700], ["식대 정산", 413400], ["사무용품 구입", 358600]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1675146900, 38874200, 1231700, 37642500], ["NH농협은행", "급여·세금", "301-****-5528-21", 212023000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 720000000, 300000000, 0, 300000000]], "big": [["운전자금 대출 실행", 300000000, 0, "차입금"], ["매출대금 입금", 19650000, 0, "매출대금 회수"], ["매출대금 입금", 12020000, 0, "매출대금 회수"], ["카드매출 정산", 7204200, 0, "카드매출 정산"], ["차량 주유비", 0, 459700, "운영비"], ["식대 정산", 0, 413400, "운영비"]], "plan": [["2026-10-19", "원재료 매입", 250770000], ["2026-10-22", "원재료 매입", 37060000], ["2026-10-26", "급여", 128750000], ["2026-10-26", "세금·4대보험", 67340000], ["2026-10-30", "대출 이자·상환", 50000000]], "flag": [], "recent": [["2026-10-02", 95252800, 691200, [["매출대금 회수", 90410000], ["카드매출 정산", 4842800]], [["운영비", 691200]]], ["2026-10-05", 38665000, 16374800, [["매출대금 회수", 33040000], ["카드매출 정산", 5625000]], [["원재료 매입", 15150000], ["운영비", 1224800]]], ["2026-10-06", 39641800, 55927200, [["매출대금 회수", 33970000], ["카드매출 정산", 5671800]], [["원재료 매입", 55400000], ["운영비", 527200]]], ["2026-10-07", 79970800, 1140200, [["매출대금 회수", 76900000], ["카드매출 정산", 3070800]], [["운영비", 1140200]]], ["2026-10-08", 50735200, 64566700, [["매출대금 회수", 44140000], ["카드매출 정산", 6595200]], [["원재료 매입", 61620000], ["운영비", 2946700]]], ["2026-10-12", 115140200, 35385100, [["매출대금 회수", 111450000], ["카드매출 정산", 3690200]], [["세금·4대보험", 34177000], ["운영비", 1208100]]], ["2026-10-13", 78177900, 694800, [["매출대금 회수", 73600000], ["카드매출 정산", 4577900]], [["운영비", 694800]]], ["2026-10-14", 60568400, 60147300, [["매출대금 회수", 54100000], ["카드매출 정산", 6468400]], [["원재료 매입", 58450000], ["운영비", 1697300]]], ["2026-10-15", 60777100, 25542900, [["매출대금 회수", 58180000], ["카드매출 정산", 2597100]], [["카드대금", 23480500], ["운영비", 2062400]]], ["2026-10-16", 338874200, 1231700, [["차입금", 300000000], ["매출대금 회수", 31670000], ["카드매출 정산", 7204200]], [["운영비", 1231700]]]], "avg5_in": 73079760.0, "avg5_out": 37267360.0}, "2026-10-19": {"tx": [["14:20", "주거래", "(주)대지농산", "원재료 매입대금", 0, 186500000, "원재료 매입"], ["09:46", "주거래", "(주)고운포장", "원재료 매입대금", 0, 64270000, "원재료 매입"], ["11:09", "주거래", "(주)푸른유통", "매출대금 입금", 31560000, 0, "매출대금 회수"], ["14:03", "주거래", "(주)한결마트", "매출대금 입금", 22910000, 0, "매출대금 회수"], ["12:00", "주거래", "(주)푸른유통", "매출대금 입금", 8930000, 0, "매출대금 회수"], ["10:46", "주거래", "나이스정보통신", "카드매출 정산", 4832400, 0, "카드매출 정산"], ["09:34", "주거래", "운영", "택배비", 0, 1266000, "운영비"], ["13:54", "주거래", "운영", "차량 주유비", 0, 629500, "운영비"]], "prev": 2607169900, "in": 68232400, "out": 252665500, "end": 2422736800, "n": 10, "codes": [{"name": "매출대금 회수", "i": 63400000, "o": 0, "n": 3, "top": [["매출대금 입금", 31560000], ["매출대금 입금", 22910000], ["매출대금 입금", 8930000]]}, {"name": "카드매출 정산", "i": 4832400, "o": 0, "n": 1, "top": [["카드매출 정산", 4832400]]}, {"name": "원재료 매입", "i": 0, "o": 250770000, "n": 2, "top": [["원재료 매입대금", 186500000], ["원재료 매입대금", 64270000]]}, {"name": "운영비", "i": 0, "o": 1895500, "n": 2, "top": [["택배비", 1266000], ["차량 주유비", 629500]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1740713800, 318232400, 252665500, 65566900], ["NH농협은행", "급여·세금", "301-****-5528-21", 212023000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 470000000, 0, 250000000, -250000000]], "big": [["원재료 매입대금", 0, 186500000, "원재료 매입"], ["원재료 매입대금", 0, 64270000, "원재료 매입"], ["매출대금 입금", 31560000, 0, "매출대금 회수"], ["매출대금 입금", 22910000, 0, "매출대금 회수"], ["매출대금 입금", 8930000, 0, "매출대금 회수"], ["카드매출 정산", 4832400, 0, "카드매출 정산"]], "plan": [["2026-10-22", "원재료 매입", 37060000], ["2026-10-26", "급여", 128750000], ["2026-10-26", "세금·4대보험", 67340000], ["2026-10-30", "대출 이자·상환", 50000000]], "flag": [], "recent": [["2026-10-05", 38665000, 16374800, [["매출대금 회수", 33040000], ["카드매출 정산", 5625000]], [["원재료 매입", 15150000], ["운영비", 1224800]]], ["2026-10-06", 39641800, 55927200, [["매출대금 회수", 33970000], ["카드매출 정산", 5671800]], [["원재료 매입", 55400000], ["운영비", 527200]]], ["2026-10-07", 79970800, 1140200, [["매출대금 회수", 76900000], ["카드매출 정산", 3070800]], [["운영비", 1140200]]], ["2026-10-08", 50735200, 64566700, [["매출대금 회수", 44140000], ["카드매출 정산", 6595200]], [["원재료 매입", 61620000], ["운영비", 2946700]]], ["2026-10-12", 115140200, 35385100, [["매출대금 회수", 111450000], ["카드매출 정산", 3690200]], [["세금·4대보험", 34177000], ["운영비", 1208100]]], ["2026-10-13", 78177900, 694800, [["매출대금 회수", 73600000], ["카드매출 정산", 4577900]], [["운영비", 694800]]], ["2026-10-14", 60568400, 60147300, [["매출대금 회수", 54100000], ["카드매출 정산", 6468400]], [["원재료 매입", 58450000], ["운영비", 1697300]]], ["2026-10-15", 60777100, 25542900, [["매출대금 회수", 58180000], ["카드매출 정산", 2597100]], [["카드대금", 23480500], ["운영비", 2062400]]], ["2026-10-16", 338874200, 1231700, [["차입금", 300000000], ["매출대금 회수", 31670000], ["카드매출 정산", 7204200]], [["운영비", 1231700]]], ["2026-10-19", 68232400, 252665500, [["매출대금 회수", 63400000], ["카드매출 정산", 4832400]], [["원재료 매입", 250770000], ["운영비", 1895500]]]], "avg5_in": 130707560.0, "avg5_out": 24600360.0}, "2026-10-20": {"tx": [["09:38", "주거래", "(주)도담급식", "매출대금 입금", 42130000, 0, "매출대금 회수"], ["14:16", "주거래", "(주)도담급식", "매출대금 입금", 31910000, 0, "매출대금 회수"], ["16:00", "주거래", "(주)고운포장", "원재료 매입대금", 0, 19180000, "원재료 매입"], ["12:21", "주거래", "(주)푸른유통", "매출대금 입금", 14010000, 0, "매출대금 회수"], ["16:43", "주거래", "나이스정보통신", "카드매출 정산", 3003400, 0, "카드매출 정산"], ["09:00", "운전자금", "IBK기업은행", "대출이자 출금", 0, 1575000, "대출 이자·상환"], ["13:44", "주거래", "운영", "차량 주유비", 0, 400400, "운영비"], ["14:14", "주거래", "운영", "식대 정산", 0, 370700, "운영비"], ["10:18", "주거래", "운영", "사무용품 구입", 0, 249500, "운영비"]], "prev": 2422736800, "in": 91053400, "out": 21775600, "end": 2492014600, "n": 9, "codes": [{"name": "매출대금 회수", "i": 88050000, "o": 0, "n": 3, "top": [["매출대금 입금", 42130000], ["매출대금 입금", 31910000], ["매출대금 입금", 14010000]]}, {"name": "카드매출 정산", "i": 3003400, "o": 0, "n": 1, "top": [["카드매출 정산", 3003400]]}, {"name": "원재료 매입", "i": 0, "o": 19180000, "n": 1, "top": [["원재료 매입대금", 19180000]]}, {"name": "대출 이자·상환", "i": 0, "o": 1575000, "n": 1, "top": [["대출이자 출금", 1575000]]}, {"name": "운영비", "i": 0, "o": 1020600, "n": 3, "top": [["차량 주유비", 400400], ["식대 정산", 370700], ["사무용품 구입", 249500]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1811566600, 91053400, 20200600, 70852800], ["NH농협은행", "급여·세금", "301-****-5528-21", 212023000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 468425000, 0, 1575000, -1575000]], "big": [["매출대금 입금", 42130000, 0, "매출대금 회수"], ["매출대금 입금", 31910000, 0, "매출대금 회수"], ["원재료 매입대금", 0, 19180000, "원재료 매입"], ["매출대금 입금", 14010000, 0, "매출대금 회수"], ["카드매출 정산", 3003400, 0, "카드매출 정산"], ["대출이자 출금", 0, 1575000, "대출 이자·상환"]], "plan": [["2026-10-22", "원재료 매입", 37060000], ["2026-10-26", "급여", 128750000], ["2026-10-26", "세금·4대보험", 67340000], ["2026-10-30", "대출 이자·상환", 50000000], ["2026-11-03", "(주)바다수산 원재료 매입대금", 72500000]], "flag": [], "recent": [["2026-10-06", 39641800, 55927200, [["매출대금 회수", 33970000], ["카드매출 정산", 5671800]], [["원재료 매입", 55400000], ["운영비", 527200]]], ["2026-10-07", 79970800, 1140200, [["매출대금 회수", 76900000], ["카드매출 정산", 3070800]], [["운영비", 1140200]]], ["2026-10-08", 50735200, 64566700, [["매출대금 회수", 44140000], ["카드매출 정산", 6595200]], [["원재료 매입", 61620000], ["운영비", 2946700]]], ["2026-10-12", 115140200, 35385100, [["매출대금 회수", 111450000], ["카드매출 정산", 3690200]], [["세금·4대보험", 34177000], ["운영비", 1208100]]], ["2026-10-13", 78177900, 694800, [["매출대금 회수", 73600000], ["카드매출 정산", 4577900]], [["운영비", 694800]]], ["2026-10-14", 60568400, 60147300, [["매출대금 회수", 54100000], ["카드매출 정산", 6468400]], [["원재료 매입", 58450000], ["운영비", 1697300]]], ["2026-10-15", 60777100, 25542900, [["매출대금 회수", 58180000], ["카드매출 정산", 2597100]], [["카드대금", 23480500], ["운영비", 2062400]]], ["2026-10-16", 338874200, 1231700, [["차입금", 300000000], ["매출대금 회수", 31670000], ["카드매출 정산", 7204200]], [["운영비", 1231700]]], ["2026-10-19", 68232400, 252665500, [["매출대금 회수", 63400000], ["카드매출 정산", 4832400]], [["원재료 매입", 250770000], ["운영비", 1895500]]], ["2026-10-20", 91053400, 21775600, [["매출대금 회수", 88050000], ["카드매출 정산", 3003400]], [["원재료 매입", 19180000], ["대출 이자·상환", 1575000], ["운영비", 1020600]]]], "avg5_in": 121326000.0, "avg5_out": 68056440.0}, "2026-10-21": {"tx": [["11:44", "주거래", "(주)푸른유통", "매출대금 입금", 44300000, 0, "매출대금 회수"], ["11:54", "주거래", "(주)푸른유통", "매출대금 입금", 37840000, 0, "매출대금 회수"], ["14:15", "주거래", "(주)한결마트", "매출대금 입금", 10790000, 0, "매출대금 회수"], ["16:04", "주거래", "나이스정보통신", "카드매출 정산", 6117300, 0, "카드매출 정산"], ["15:23", "주거래", "운영", "차량 주유비", 0, 696100, "운영비"], ["10:36", "주거래", "운영", "통신요금", 0, 366400, "운영비"]], "prev": 2492014600, "in": 99047300, "out": 1062500, "end": 2589999400, "n": 8, "codes": [{"name": "매출대금 회수", "i": 92930000, "o": 0, "n": 3, "top": [["매출대금 입금", 44300000], ["매출대금 입금", 37840000], ["매출대금 입금", 10790000]]}, {"name": "카드매출 정산", "i": 6117300, "o": 0, "n": 1, "top": [["카드매출 정산", 6117300]]}, {"name": "운영비", "i": 0, "o": 1062500, "n": 2, "top": [["차량 주유비", 696100], ["통신요금", 366400]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1759551400, 99047300, 151062500, -52015200], ["NH농협은행", "급여·세금", "301-****-5528-21", 362023000, 150000000, 0, 150000000], ["IBK기업은행", "운전자금", "514-******-01-013", 468425000, 0, 0, 0]], "big": [["매출대금 입금", 44300000, 0, "매출대금 회수"], ["매출대금 입금", 37840000, 0, "매출대금 회수"], ["매출대금 입금", 10790000, 0, "매출대금 회수"], ["카드매출 정산", 6117300, 0, "카드매출 정산"], ["차량 주유비", 0, 696100, "운영비"], ["통신요금", 0, 366400, "운영비"]], "plan": [["2026-10-22", "원재료 매입", 37060000], ["2026-10-26", "급여", 128750000], ["2026-10-26", "세금·4대보험", 67340000], ["2026-10-30", "대출 이자·상환", 50000000], ["2026-11-03", "(주)바다수산 원재료 매입대금", 72500000]], "flag": [], "recent": [["2026-10-07", 79970800, 1140200, [["매출대금 회수", 76900000], ["카드매출 정산", 3070800]], [["운영비", 1140200]]], ["2026-10-08", 50735200, 64566700, [["매출대금 회수", 44140000], ["카드매출 정산", 6595200]], [["원재료 매입", 61620000], ["운영비", 2946700]]], ["2026-10-12", 115140200, 35385100, [["매출대금 회수", 111450000], ["카드매출 정산", 3690200]], [["세금·4대보험", 34177000], ["운영비", 1208100]]], ["2026-10-13", 78177900, 694800, [["매출대금 회수", 73600000], ["카드매출 정산", 4577900]], [["운영비", 694800]]], ["2026-10-14", 60568400, 60147300, [["매출대금 회수", 54100000], ["카드매출 정산", 6468400]], [["원재료 매입", 58450000], ["운영비", 1697300]]], ["2026-10-15", 60777100, 25542900, [["매출대금 회수", 58180000], ["카드매출 정산", 2597100]], [["카드대금", 23480500], ["운영비", 2062400]]], ["2026-10-16", 338874200, 1231700, [["차입금", 300000000], ["매출대금 회수", 31670000], ["카드매출 정산", 7204200]], [["운영비", 1231700]]], ["2026-10-19", 68232400, 252665500, [["매출대금 회수", 63400000], ["카드매출 정산", 4832400]], [["원재료 매입", 250770000], ["운영비", 1895500]]], ["2026-10-20", 91053400, 21775600, [["매출대금 회수", 88050000], ["카드매출 정산", 3003400]], [["원재료 매입", 19180000], ["대출 이자·상환", 1575000], ["운영비", 1020600]]], ["2026-10-21", 99047300, 1062500, [["매출대금 회수", 92930000], ["카드매출 정산", 6117300]], [["운영비", 1062500]]]], "avg5_in": 123901100.0, "avg5_out": 72272600.0}, "2026-10-22": {"tx": [["15:57", "주거래", "농협하나로유통", "매출대금 입금", 42030000, 0, "매출대금 회수"], ["09:28", "주거래", "(주)이음식자재", "매출대금 입금", 38450000, 0, "매출대금 회수"], ["12:20", "주거래", "(주)고운포장", "원재료 매입대금", 0, 37060000, "원재료 매입"], ["16:55", "주거래", "나이스정보통신", "카드매출 정산", 7386400, 0, "카드매출 정산"], ["13:15", "주거래", "(주)한빛물류", "보증금 반환", 5000000, 0, "기타 입금(확인 필요)"], ["15:15", "주거래", "운영", "통신요금", 0, 246400, "운영비"], ["15:30", "주거래", "운영", "사무용품 구입", 0, 228700, "운영비"]], "prev": 2589999400, "in": 92866400, "out": 37535100, "end": 2645330700, "n": 7, "codes": [{"name": "매출대금 회수", "i": 80480000, "o": 0, "n": 2, "top": [["매출대금 입금", 42030000], ["매출대금 입금", 38450000]]}, {"name": "카드매출 정산", "i": 7386400, "o": 0, "n": 1, "top": [["카드매출 정산", 7386400]]}, {"name": "기타 입금(확인 필요)", "i": 5000000, "o": 0, "n": 1, "top": [["보증금 반환", 5000000]]}, {"name": "원재료 매입", "i": 0, "o": 37060000, "n": 1, "top": [["원재료 매입대금", 37060000]]}, {"name": "운영비", "i": 0, "o": 475100, "n": 2, "top": [["통신요금", 246400], ["사무용품 구입", 228700]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1814882700, 92866400, 37535100, 55331300], ["NH농협은행", "급여·세금", "301-****-5528-21", 362023000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 468425000, 0, 0, 0]], "big": [["매출대금 입금", 42030000, 0, "매출대금 회수"], ["매출대금 입금", 38450000, 0, "매출대금 회수"], ["원재료 매입대금", 0, 37060000, "원재료 매입"], ["카드매출 정산", 7386400, 0, "카드매출 정산"], ["보증금 반환", 5000000, 0, "기타 입금(확인 필요)"], ["통신요금", 0, 246400, "운영비"]], "plan": [["2026-10-26", "급여", 128750000], ["2026-10-26", "세금·4대보험", 67340000], ["2026-10-30", "대출 이자·상환", 50000000], ["2026-11-03", "(주)바다수산 원재료 매입대금", 72500000]], "flag": [["보증금 반환", 5000000, 0, "기타 입금(확인 필요)"]], "recent": [["2026-10-08", 50735200, 64566700, [["매출대금 회수", 44140000], ["카드매출 정산", 6595200]], [["원재료 매입", 61620000], ["운영비", 2946700]]], ["2026-10-12", 115140200, 35385100, [["매출대금 회수", 111450000], ["카드매출 정산", 3690200]], [["세금·4대보험", 34177000], ["운영비", 1208100]]], ["2026-10-13", 78177900, 694800, [["매출대금 회수", 73600000], ["카드매출 정산", 4577900]], [["운영비", 694800]]], ["2026-10-14", 60568400, 60147300, [["매출대금 회수", 54100000], ["카드매출 정산", 6468400]], [["원재료 매입", 58450000], ["운영비", 1697300]]], ["2026-10-15", 60777100, 25542900, [["매출대금 회수", 58180000], ["카드매출 정산", 2597100]], [["카드대금", 23480500], ["운영비", 2062400]]], ["2026-10-16", 338874200, 1231700, [["차입금", 300000000], ["매출대금 회수", 31670000], ["카드매출 정산", 7204200]], [["운영비", 1231700]]], ["2026-10-19", 68232400, 252665500, [["매출대금 회수", 63400000], ["카드매출 정산", 4832400]], [["원재료 매입", 250770000], ["운영비", 1895500]]], ["2026-10-20", 91053400, 21775600, [["매출대금 회수", 88050000], ["카드매출 정산", 3003400]], [["원재료 매입", 19180000], ["대출 이자·상환", 1575000], ["운영비", 1020600]]], ["2026-10-21", 99047300, 1062500, [["매출대금 회수", 92930000], ["카드매출 정산", 6117300]], [["운영비", 1062500]]], ["2026-10-22", 92866400, 37535100, [["매출대금 회수", 80480000], ["카드매출 정산", 7386400], ["기타 입금(확인 필요)", 5000000]], [["원재료 매입", 37060000], ["운영비", 475100]]]], "avg5_in": 131596880.0, "avg5_out": 60455640.0}, "2026-10-23": {"tx": [["09:18", "주거래", "(주)한결마트", "매출대금 입금", 30220000, 0, "매출대금 회수"], ["16:41", "주거래", "(주)바다수산", "원재료 매입대금", 0, 20600000, "원재료 매입"], ["15:30", "주거래", "(주)한결마트", "매출대금 입금", 13270000, 0, "매출대금 회수"], ["13:36", "주거래", "나이스정보통신", "카드매출 정산", 4696800, 0, "카드매출 정산"], ["16:58", "주거래", "운영", "택배비", 0, 1429800, "운영비"], ["09:28", "주거래", "운영", "식대 정산", 0, 1133900, "운영비"], ["10:54", "주거래", "운영", "식대 정산", 0, 804500, "운영비"]], "prev": 2645330700, "in": 48186800, "out": 23968200, "end": 2669549300, "n": 7, "codes": [{"name": "매출대금 회수", "i": 43490000, "o": 0, "n": 2, "top": [["매출대금 입금", 30220000], ["매출대금 입금", 13270000]]}, {"name": "카드매출 정산", "i": 4696800, "o": 0, "n": 1, "top": [["카드매출 정산", 4696800]]}, {"name": "원재료 매입", "i": 0, "o": 20600000, "n": 1, "top": [["원재료 매입대금", 20600000]]}, {"name": "운영비", "i": 0, "o": 3368200, "n": 3, "top": [["택배비", 1429800], ["식대 정산", 1133900], ["식대 정산", 804500]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1839101300, 48186800, 23968200, 24218600], ["NH농협은행", "급여·세금", "301-****-5528-21", 362023000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 468425000, 0, 0, 0]], "big": [["매출대금 입금", 30220000, 0, "매출대금 회수"], ["원재료 매입대금", 0, 20600000, "원재료 매입"], ["매출대금 입금", 13270000, 0, "매출대금 회수"], ["카드매출 정산", 4696800, 0, "카드매출 정산"], ["택배비", 0, 1429800, "운영비"], ["식대 정산", 0, 1133900, "운영비"]], "plan": [["2026-10-26", "급여", 128750000], ["2026-10-26", "세금·4대보험", 67340000], ["2026-10-30", "대출 이자·상환", 50000000], ["2026-11-03", "(주)바다수산 원재료 매입대금", 72500000]], "flag": [], "recent": [["2026-10-12", 115140200, 35385100, [["매출대금 회수", 111450000], ["카드매출 정산", 3690200]], [["세금·4대보험", 34177000], ["운영비", 1208100]]], ["2026-10-13", 78177900, 694800, [["매출대금 회수", 73600000], ["카드매출 정산", 4577900]], [["운영비", 694800]]], ["2026-10-14", 60568400, 60147300, [["매출대금 회수", 54100000], ["카드매출 정산", 6468400]], [["원재료 매입", 58450000], ["운영비", 1697300]]], ["2026-10-15", 60777100, 25542900, [["매출대금 회수", 58180000], ["카드매출 정산", 2597100]], [["카드대금", 23480500], ["운영비", 2062400]]], ["2026-10-16", 338874200, 1231700, [["차입금", 300000000], ["매출대금 회수", 31670000], ["카드매출 정산", 7204200]], [["운영비", 1231700]]], ["2026-10-19", 68232400, 252665500, [["매출대금 회수", 63400000], ["카드매출 정산", 4832400]], [["원재료 매입", 250770000], ["운영비", 1895500]]], ["2026-10-20", 91053400, 21775600, [["매출대금 회수", 88050000], ["카드매출 정산", 3003400]], [["원재료 매입", 19180000], ["대출 이자·상환", 1575000], ["운영비", 1020600]]], ["2026-10-21", 99047300, 1062500, [["매출대금 회수", 92930000], ["카드매출 정산", 6117300]], [["운영비", 1062500]]], ["2026-10-22", 92866400, 37535100, [["매출대금 회수", 80480000], ["카드매출 정산", 7386400], ["기타 입금(확인 필요)", 5000000]], [["원재료 매입", 37060000], ["운영비", 475100]]], ["2026-10-23", 48186800, 23968200, [["매출대금 회수", 43490000], ["카드매출 정산", 4696800]], [["원재료 매입", 20600000], ["운영비", 3368200]]]], "avg5_in": 138014740.0, "avg5_out": 62854080.0}, "2026-10-26": {"tx": [["10:00", "급여·세금", "임직원 42명", "10월 급여", 0, 128750000, "급여"], ["14:00", "급여·세금", "강남세무서", "부가가치세 납부(2기 예정)", 0, 67340000, "세금·4대보험"], ["12:47", "주거래", "농협하나로유통", "매출대금 입금", 28120000, 0, "매출대금 회수"], ["12:11", "주거래", "농협하나로유통", "매출대금 입금", 17100000, 0, "매출대금 회수"], ["09:40", "주거래", "(주)선릉타워", "사무실 임차료", 0, 12100000, "임차료"], ["16:52", "주거래", "농협하나로유통", "매출대금 입금", 11010000, 0, "매출대금 회수"], ["14:43", "주거래", "나이스정보통신", "카드매출 정산", 5494300, 0, "카드매출 정산"], ["09:32", "주거래", "운영", "사무용품 구입", 0, 353100, "운영비"]], "prev": 2669549300, "in": 61724300, "out": 208543100, "end": 2522730500, "n": 8, "codes": [{"name": "매출대금 회수", "i": 56230000, "o": 0, "n": 3, "top": [["매출대금 입금", 28120000], ["매출대금 입금", 17100000], ["매출대금 입금", 11010000]]}, {"name": "카드매출 정산", "i": 5494300, "o": 0, "n": 1, "top": [["카드매출 정산", 5494300]]}, {"name": "급여", "i": 0, "o": 128750000, "n": 1, "top": [["10월 급여", 128750000]]}, {"name": "세금·4대보험", "i": 0, "o": 67340000, "n": 1, "top": [["부가가치세 납부(2기 예정)", 67340000]]}, {"name": "임차료", "i": 0, "o": 12100000, "n": 1, "top": [["사무실 임차료", 12100000]]}, {"name": "운영비", "i": 0, "o": 353100, "n": 1, "top": [["사무용품 구입", 353100]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1888372500, 61724300, 12453100, 49271200], ["NH농협은행", "급여·세금", "301-****-5528-21", 165933000, 0, 196090000, -196090000], ["IBK기업은행", "운전자금", "514-******-01-013", 468425000, 0, 0, 0]], "big": [["10월 급여", 0, 128750000, "급여"], ["부가가치세 납부(2기 예정)", 0, 67340000, "세금·4대보험"], ["매출대금 입금", 28120000, 0, "매출대금 회수"], ["매출대금 입금", 17100000, 0, "매출대금 회수"], ["사무실 임차료", 0, 12100000, "임차료"], ["매출대금 입금", 11010000, 0, "매출대금 회수"]], "plan": [["2026-10-30", "대출 이자·상환", 50000000], ["2026-11-03", "(주)바다수산 원재료 매입대금", 72500000]], "flag": [], "recent": [["2026-10-13", 78177900, 694800, [["매출대금 회수", 73600000], ["카드매출 정산", 4577900]], [["운영비", 694800]]], ["2026-10-14", 60568400, 60147300, [["매출대금 회수", 54100000], ["카드매출 정산", 6468400]], [["원재료 매입", 58450000], ["운영비", 1697300]]], ["2026-10-15", 60777100, 25542900, [["매출대금 회수", 58180000], ["카드매출 정산", 2597100]], [["카드대금", 23480500], ["운영비", 2062400]]], ["2026-10-16", 338874200, 1231700, [["차입금", 300000000], ["매출대금 회수", 31670000], ["카드매출 정산", 7204200]], [["운영비", 1231700]]], ["2026-10-19", 68232400, 252665500, [["매출대금 회수", 63400000], ["카드매출 정산", 4832400]], [["원재료 매입", 250770000], ["운영비", 1895500]]], ["2026-10-20", 91053400, 21775600, [["매출대금 회수", 88050000], ["카드매출 정산", 3003400]], [["원재료 매입", 19180000], ["대출 이자·상환", 1575000], ["운영비", 1020600]]], ["2026-10-21", 99047300, 1062500, [["매출대금 회수", 92930000], ["카드매출 정산", 6117300]], [["운영비", 1062500]]], ["2026-10-22", 92866400, 37535100, [["매출대금 회수", 80480000], ["카드매출 정산", 7386400], ["기타 입금(확인 필요)", 5000000]], [["원재료 매입", 37060000], ["운영비", 475100]]], ["2026-10-23", 48186800, 23968200, [["매출대금 회수", 43490000], ["카드매출 정산", 4696800]], [["원재료 매입", 20600000], ["운영비", 3368200]]], ["2026-10-26", 61724300, 208543100, [["매출대금 회수", 56230000], ["카드매출 정산", 5494300]], [["급여", 128750000], ["세금·4대보험", 67340000], ["임차료", 12100000]]]], "avg5_in": 79877260.0, "avg5_out": 67401380.0}, "2026-10-27": {"tx": [["10:37", "주거래", "농협하나로유통", "매출대금 입금", 43830000, 0, "매출대금 회수"], ["10:56", "주거래", "(주)도담급식", "매출대금 입금", 29870000, 0, "매출대금 회수"], ["09:16", "주거래", "농협하나로유통", "매출대금 입금", 27460000, 0, "매출대금 회수"], ["14:28", "주거래", "나이스정보통신", "카드매출 정산", 6780200, 0, "카드매출 정산"], ["15:21", "주거래", "운영", "식대 정산", 0, 809700, "운영비"], ["12:34", "주거래", "운영", "차량 주유비", 0, 416400, "운영비"]], "prev": 2522730500, "in": 107940200, "out": 1226100, "end": 2629444600, "n": 6, "codes": [{"name": "매출대금 회수", "i": 101160000, "o": 0, "n": 3, "top": [["매출대금 입금", 43830000], ["매출대금 입금", 29870000], ["매출대금 입금", 27460000]]}, {"name": "카드매출 정산", "i": 6780200, "o": 0, "n": 1, "top": [["카드매출 정산", 6780200]]}, {"name": "운영비", "i": 0, "o": 1226100, "n": 2, "top": [["식대 정산", 809700], ["차량 주유비", 416400]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 1995086600, 107940200, 1226100, 106714100], ["NH농협은행", "급여·세금", "301-****-5528-21", 165933000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 468425000, 0, 0, 0]], "big": [["매출대금 입금", 43830000, 0, "매출대금 회수"], ["매출대금 입금", 29870000, 0, "매출대금 회수"], ["매출대금 입금", 27460000, 0, "매출대금 회수"], ["카드매출 정산", 6780200, 0, "카드매출 정산"], ["식대 정산", 0, 809700, "운영비"], ["차량 주유비", 0, 416400, "운영비"]], "plan": [["2026-10-30", "대출 이자·상환", 50000000], ["2026-11-03", "(주)바다수산 원재료 매입대금", 72500000], ["2026-11-10", "국민연금·건강보험 납부", 18300000], ["2026-11-10", "원천세 납부", 14900000]], "flag": [], "recent": [["2026-10-14", 60568400, 60147300, [["매출대금 회수", 54100000], ["카드매출 정산", 6468400]], [["원재료 매입", 58450000], ["운영비", 1697300]]], ["2026-10-15", 60777100, 25542900, [["매출대금 회수", 58180000], ["카드매출 정산", 2597100]], [["카드대금", 23480500], ["운영비", 2062400]]], ["2026-10-16", 338874200, 1231700, [["차입금", 300000000], ["매출대금 회수", 31670000], ["카드매출 정산", 7204200]], [["운영비", 1231700]]], ["2026-10-19", 68232400, 252665500, [["매출대금 회수", 63400000], ["카드매출 정산", 4832400]], [["원재료 매입", 250770000], ["운영비", 1895500]]], ["2026-10-20", 91053400, 21775600, [["매출대금 회수", 88050000], ["카드매출 정산", 3003400]], [["원재료 매입", 19180000], ["대출 이자·상환", 1575000], ["운영비", 1020600]]], ["2026-10-21", 99047300, 1062500, [["매출대금 회수", 92930000], ["카드매출 정산", 6117300]], [["운영비", 1062500]]], ["2026-10-22", 92866400, 37535100, [["매출대금 회수", 80480000], ["카드매출 정산", 7386400], ["기타 입금(확인 필요)", 5000000]], [["원재료 매입", 37060000], ["운영비", 475100]]], ["2026-10-23", 48186800, 23968200, [["매출대금 회수", 43490000], ["카드매출 정산", 4696800]], [["원재료 매입", 20600000], ["운영비", 3368200]]], ["2026-10-26", 61724300, 208543100, [["매출대금 회수", 56230000], ["카드매출 정산", 5494300]], [["급여", 128750000], ["세금·4대보험", 67340000], ["임차료", 12100000]]], ["2026-10-27", 107940200, 1226100, [["매출대금 회수", 101160000], ["카드매출 정산", 6780200]], [["운영비", 1226100]]]], "avg5_in": 78575640.0, "avg5_out": 58576900.0}, "2026-10-28": {"tx": [["12:44", "주거래", "농협하나로유통", "매출대금 입금", 40730000, 0, "매출대금 회수"], ["16:37", "주거래", "농협하나로유통", "매출대금 입금", 39030000, 0, "매출대금 회수"], ["14:57", "주거래", "(주)푸른유통", "매출대금 입금", 38390000, 0, "매출대금 회수"], ["13:14", "주거래", "(주)푸른유통", "매출대금 입금", 18800000, 0, "매출대금 회수"], ["16:57", "주거래", "나이스정보통신", "카드매출 정산", 2591500, 0, "카드매출 정산"], ["09:48", "주거래", "운영", "식대 정산", 0, 892200, "운영비"]], "prev": 2629444600, "in": 139541500, "out": 892200, "end": 2768093900, "n": 6, "codes": [{"name": "매출대금 회수", "i": 136950000, "o": 0, "n": 4, "top": [["매출대금 입금", 40730000], ["매출대금 입금", 39030000], ["매출대금 입금", 38390000]]}, {"name": "카드매출 정산", "i": 2591500, "o": 0, "n": 1, "top": [["카드매출 정산", 2591500]]}, {"name": "운영비", "i": 0, "o": 892200, "n": 1, "top": [["식대 정산", 892200]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 2133735900, 139541500, 892200, 138649300], ["NH농협은행", "급여·세금", "301-****-5528-21", 165933000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 468425000, 0, 0, 0]], "big": [["매출대금 입금", 40730000, 0, "매출대금 회수"], ["매출대금 입금", 39030000, 0, "매출대금 회수"], ["매출대금 입금", 38390000, 0, "매출대금 회수"], ["매출대금 입금", 18800000, 0, "매출대금 회수"], ["카드매출 정산", 2591500, 0, "카드매출 정산"], ["식대 정산", 0, 892200, "운영비"]], "plan": [["2026-10-30", "대출 이자·상환", 50000000], ["2026-11-03", "(주)바다수산 원재료 매입대금", 72500000], ["2026-11-10", "국민연금·건강보험 납부", 18300000], ["2026-11-10", "원천세 납부", 14900000]], "flag": [], "recent": [["2026-10-15", 60777100, 25542900, [["매출대금 회수", 58180000], ["카드매출 정산", 2597100]], [["카드대금", 23480500], ["운영비", 2062400]]], ["2026-10-16", 338874200, 1231700, [["차입금", 300000000], ["매출대금 회수", 31670000], ["카드매출 정산", 7204200]], [["운영비", 1231700]]], ["2026-10-19", 68232400, 252665500, [["매출대금 회수", 63400000], ["카드매출 정산", 4832400]], [["원재료 매입", 250770000], ["운영비", 1895500]]], ["2026-10-20", 91053400, 21775600, [["매출대금 회수", 88050000], ["카드매출 정산", 3003400]], [["원재료 매입", 19180000], ["대출 이자·상환", 1575000], ["운영비", 1020600]]], ["2026-10-21", 99047300, 1062500, [["매출대금 회수", 92930000], ["카드매출 정산", 6117300]], [["운영비", 1062500]]], ["2026-10-22", 92866400, 37535100, [["매출대금 회수", 80480000], ["카드매출 정산", 7386400], ["기타 입금(확인 필요)", 5000000]], [["원재료 매입", 37060000], ["운영비", 475100]]], ["2026-10-23", 48186800, 23968200, [["매출대금 회수", 43490000], ["카드매출 정산", 4696800]], [["원재료 매입", 20600000], ["운영비", 3368200]]], ["2026-10-26", 61724300, 208543100, [["매출대금 회수", 56230000], ["카드매출 정산", 5494300]], [["급여", 128750000], ["세금·4대보험", 67340000], ["임차료", 12100000]]], ["2026-10-27", 107940200, 1226100, [["매출대금 회수", 101160000], ["카드매출 정산", 6780200]], [["운영비", 1226100]]], ["2026-10-28", 139541500, 892200, [["매출대금 회수", 136950000], ["카드매출 정산", 2591500]], [["운영비", 892200]]]], "avg5_in": 81953000.0, "avg5_out": 54467000.0}, "2026-10-29": {"tx": [["10:29", "주거래", "농협하나로유통", "매출대금 입금", 44140000, 0, "매출대금 회수"], ["13:54", "주거래", "(주)푸른유통", "매출대금 입금", 36400000, 0, "매출대금 회수"], ["12:55", "주거래", "(주)푸른유통", "매출대금 입금", 32130000, 0, "매출대금 회수"], ["13:17", "주거래", "나이스정보통신", "카드매출 정산", 4885400, 0, "카드매출 정산"], ["16:40", "주거래", "김*영", "타행송금", 0, 2350000, "기타 출금(확인 필요)"], ["14:28", "주거래", "운영", "택배비", 0, 844300, "운영비"]], "prev": 2768093900, "in": 117555400, "out": 3194300, "end": 2882455000, "n": 6, "codes": [{"name": "매출대금 회수", "i": 112670000, "o": 0, "n": 3, "top": [["매출대금 입금", 44140000], ["매출대금 입금", 36400000], ["매출대금 입금", 32130000]]}, {"name": "카드매출 정산", "i": 4885400, "o": 0, "n": 1, "top": [["카드매출 정산", 4885400]]}, {"name": "운영비", "i": 0, "o": 844300, "n": 1, "top": [["택배비", 844300]]}, {"name": "기타 출금(확인 필요)", "i": 0, "o": 2350000, "n": 1, "top": [["타행송금", 2350000]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 2248097000, 117555400, 3194300, 114361100], ["NH농협은행", "급여·세금", "301-****-5528-21", 165933000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 468425000, 0, 0, 0]], "big": [["매출대금 입금", 44140000, 0, "매출대금 회수"], ["매출대금 입금", 36400000, 0, "매출대금 회수"], ["매출대금 입금", 32130000, 0, "매출대금 회수"], ["카드매출 정산", 4885400, 0, "카드매출 정산"], ["타행송금", 0, 2350000, "기타 출금(확인 필요)"], ["택배비", 0, 844300, "운영비"]], "plan": [["2026-10-30", "대출 이자·상환", 50000000], ["2026-11-03", "(주)바다수산 원재료 매입대금", 72500000], ["2026-11-10", "국민연금·건강보험 납부", 18300000], ["2026-11-10", "원천세 납부", 14900000]], "flag": [["타행송금", 0, 2350000, "기타 출금(확인 필요)"]], "recent": [["2026-10-16", 338874200, 1231700, [["차입금", 300000000], ["매출대금 회수", 31670000], ["카드매출 정산", 7204200]], [["운영비", 1231700]]], ["2026-10-19", 68232400, 252665500, [["매출대금 회수", 63400000], ["카드매출 정산", 4832400]], [["원재료 매입", 250770000], ["운영비", 1895500]]], ["2026-10-20", 91053400, 21775600, [["매출대금 회수", 88050000], ["카드매출 정산", 3003400]], [["원재료 매입", 19180000], ["대출 이자·상환", 1575000], ["운영비", 1020600]]], ["2026-10-21", 99047300, 1062500, [["매출대금 회수", 92930000], ["카드매출 정산", 6117300]], [["운영비", 1062500]]], ["2026-10-22", 92866400, 37535100, [["매출대금 회수", 80480000], ["카드매출 정산", 7386400], ["기타 입금(확인 필요)", 5000000]], [["원재료 매입", 37060000], ["운영비", 475100]]], ["2026-10-23", 48186800, 23968200, [["매출대금 회수", 43490000], ["카드매출 정산", 4696800]], [["원재료 매입", 20600000], ["운영비", 3368200]]], ["2026-10-26", 61724300, 208543100, [["매출대금 회수", 56230000], ["카드매출 정산", 5494300]], [["급여", 128750000], ["세금·4대보험", 67340000], ["임차료", 12100000]]], ["2026-10-27", 107940200, 1226100, [["매출대금 회수", 101160000], ["카드매출 정산", 6780200]], [["운영비", 1226100]]], ["2026-10-28", 139541500, 892200, [["매출대금 회수", 136950000], ["카드매출 정산", 2591500]], [["운영비", 892200]]], ["2026-10-29", 117555400, 3194300, [["매출대금 회수", 112670000], ["카드매출 정산", 4885400]], [["기타 출금(확인 필요)", 2350000], ["운영비", 844300]]]], "avg5_in": 90051840.0, "avg5_out": 54432940.0}, "2026-10-30": {"tx": [["09:10", "운전자금", "IBK기업은행", "대출원금 분할상환", 0, 50000000, "대출 이자·상환"], ["14:46", "주거래", "(주)도담급식", "매출대금 입금", 43530000, 0, "매출대금 회수"], ["15:56", "주거래", "(주)이음식자재", "매출대금 입금", 25080000, 0, "매출대금 회수"], ["15:22", "주거래", "(주)대지농산", "원재료 매입대금", 0, 25050000, "원재료 매입"], ["15:54", "주거래", "농협하나로유통", "매출대금 입금", 13190000, 0, "매출대금 회수"], ["16:21", "주거래", "나이스정보통신", "카드매출 정산", 6555800, 0, "카드매출 정산"], ["10:33", "주거래", "운영", "택배비", 0, 480300, "운영비"]], "prev": 2882455000, "in": 88355800, "out": 75530300, "end": 2895280500, "n": 7, "codes": [{"name": "매출대금 회수", "i": 81800000, "o": 0, "n": 3, "top": [["매출대금 입금", 43530000], ["매출대금 입금", 25080000], ["매출대금 입금", 13190000]]}, {"name": "카드매출 정산", "i": 6555800, "o": 0, "n": 1, "top": [["카드매출 정산", 6555800]]}, {"name": "원재료 매입", "i": 0, "o": 25050000, "n": 1, "top": [["원재료 매입대금", 25050000]]}, {"name": "대출 이자·상환", "i": 0, "o": 50000000, "n": 1, "top": [["대출원금 분할상환", 50000000]]}, {"name": "운영비", "i": 0, "o": 480300, "n": 1, "top": [["택배비", 480300]]}], "accs": [["우리은행", "주거래", "1005-***-381274", 2310922500, 88355800, 25530300, 62825500], ["NH농협은행", "급여·세금", "301-****-5528-21", 165933000, 0, 0, 0], ["IBK기업은행", "운전자금", "514-******-01-013", 418425000, 0, 50000000, -50000000]], "big": [["대출원금 분할상환", 0, 50000000, "대출 이자·상환"], ["매출대금 입금", 43530000, 0, "매출대금 회수"], ["매출대금 입금", 25080000, 0, "매출대금 회수"], ["원재료 매입대금", 0, 25050000, "원재료 매입"], ["매출대금 입금", 13190000, 0, "매출대금 회수"], ["카드매출 정산", 6555800, 0, "카드매출 정산"]], "plan": [["2026-11-03", "(주)바다수산 원재료 매입대금", 72500000], ["2026-11-10", "국민연금·건강보험 납부", 18300000], ["2026-11-10", "원천세 납부", 14900000], ["2026-11-13", "법인카드 결제대금", 24000000]], "flag": [], "recent": [["2026-10-19", 68232400, 252665500, [["매출대금 회수", 63400000], ["카드매출 정산", 4832400]], [["원재료 매입", 250770000], ["운영비", 1895500]]], ["2026-10-20", 91053400, 21775600, [["매출대금 회수", 88050000], ["카드매출 정산", 3003400]], [["원재료 매입", 19180000], ["대출 이자·상환", 1575000], ["운영비", 1020600]]], ["2026-10-21", 99047300, 1062500, [["매출대금 회수", 92930000], ["카드매출 정산", 6117300]], [["운영비", 1062500]]], ["2026-10-22", 92866400, 37535100, [["매출대금 회수", 80480000], ["카드매출 정산", 7386400], ["기타 입금(확인 필요)", 5000000]], [["원재료 매입", 37060000], ["운영비", 475100]]], ["2026-10-23", 48186800, 23968200, [["매출대금 회수", 43490000], ["카드매출 정산", 4696800]], [["원재료 매입", 20600000], ["운영비", 3368200]]], ["2026-10-26", 61724300, 208543100, [["매출대금 회수", 56230000], ["카드매출 정산", 5494300]], [["급여", 128750000], ["세금·4대보험", 67340000], ["임차료", 12100000]]], ["2026-10-27", 107940200, 1226100, [["매출대금 회수", 101160000], ["카드매출 정산", 6780200]], [["운영비", 1226100]]], ["2026-10-28", 139541500, 892200, [["매출대금 회수", 136950000], ["카드매출 정산", 2591500]], [["운영비", 892200]]], ["2026-10-29", 117555400, 3194300, [["매출대금 회수", 112670000], ["카드매출 정산", 4885400]], [["기타 출금(확인 필요)", 2350000], ["운영비", 844300]]], ["2026-10-30", 88355800, 75530300, [["매출대금 회수", 81800000], ["카드매출 정산", 6555800]], [["대출 이자·상환", 50000000], ["원재료 매입", 25050000], ["운영비", 480300]]]], "avg5_in": 94989640.0, "avg5_out": 47564780.0}}, "fc": [["2026-11-02", 84000000, 28500000, 2950780500, [["(주)한결마트 10월분 매출대금", "입금", 84000000, "예정", "주거래", "PLN-001 입출금 예정표", "(주)한결마트"], ["원재료 매입", "출금", 27200000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 543,280,000원(10건) ÷ 20, 10만원 단위 반올림", "거래처 비중 (주)고운포장 44% · (주)대지농산 42% · (주)바다수산 15%"], ["운영비", "출금", 1300000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 25,042,300원(42건) ÷ 20, 10만원 단위 반올림", "거래처 비중 운영 100%"]]], ["2026-11-03", 78400000, 73800000, 2955380500, [["매출대금 회수", "입금", 78400000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 1,567,306,900원(76건) ÷ 20, 10만원 단위 반올림", "구성 매출대금 회수 93% · 카드매출 정산 7%"], ["(주)바다수산 원재료 매입대금", "출금", 72500000, "예정", "주거래", "PLN-002 입출금 예정표", "(주)바다수산"], ["운영비", "출금", 1300000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 25,042,300원(42건) ÷ 20, 10만원 단위 반올림", "거래처 비중 운영 100%"]]], ["2026-11-04", 78400000, 28500000, 3005280500, [["매출대금 회수", "입금", 78400000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 1,567,306,900원(76건) ÷ 20, 10만원 단위 반올림", "구성 매출대금 회수 93% · 카드매출 정산 7%"], ["원재료 매입", "출금", 27200000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 543,280,000원(10건) ÷ 20, 10만원 단위 반올림", "거래처 비중 (주)고운포장 44% · (주)대지농산 42% · (주)바다수산 15%"], ["운영비", "출금", 1300000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 25,042,300원(42건) ÷ 20, 10만원 단위 반올림", "거래처 비중 운영 100%"]]], ["2026-11-05", 61200000, 28500000, 3037980500, [["(주)도담급식 10월분 매출대금", "입금", 61200000, "예정", "주거래", "PLN-003 입출금 예정표", "(주)도담급식"], ["원재료 매입", "출금", 27200000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 543,280,000원(10건) ÷ 20, 10만원 단위 반올림", "거래처 비중 (주)고운포장 44% · (주)대지농산 42% · (주)바다수산 15%"], ["운영비", "출금", 1300000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 25,042,300원(42건) ÷ 20, 10만원 단위 반올림", "거래처 비중 운영 100%"]]], ["2026-11-06", 78400000, 28500000, 3087880500, [["매출대금 회수", "입금", 78400000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 1,567,306,900원(76건) ÷ 20, 10만원 단위 반올림", "구성 매출대금 회수 93% · 카드매출 정산 7%"], ["원재료 매입", "출금", 27200000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 543,280,000원(10건) ÷ 20, 10만원 단위 반올림", "거래처 비중 (주)고운포장 44% · (주)대지농산 42% · (주)바다수산 15%"], ["운영비", "출금", 1300000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 25,042,300원(42건) ÷ 20, 10만원 단위 반올림", "거래처 비중 운영 100%"]]], ["2026-11-09", 78400000, 28500000, 3137780500, [["매출대금 회수", "입금", 78400000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 1,567,306,900원(76건) ÷ 20, 10만원 단위 반올림", "구성 매출대금 회수 93% · 카드매출 정산 7%"], ["원재료 매입", "출금", 27200000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 543,280,000원(10건) ÷ 20, 10만원 단위 반올림", "거래처 비중 (주)고운포장 44% · (주)대지농산 42% · (주)바다수산 15%"], ["운영비", "출금", 1300000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 25,042,300원(42건) ÷ 20, 10만원 단위 반올림", "거래처 비중 운영 100%"]]], ["2026-11-10", 78400000, 61700000, 3154480500, [["매출대금 회수", "입금", 78400000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 1,567,306,900원(76건) ÷ 20, 10만원 단위 반올림", "구성 매출대금 회수 93% · 카드매출 정산 7%"], ["원재료 매입", "출금", 27200000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 543,280,000원(10건) ÷ 20, 10만원 단위 반올림", "거래처 비중 (주)고운포장 44% · (주)대지농산 42% · (주)바다수산 15%"], ["국민연금·건강보험 납부", "출금", 18300000, "예정", "급여·세금", "PLN-005 입출금 예정표", "국민연금공단 외"], ["원천세 납부", "출금", 14900000, "예정", "급여·세금", "PLN-004 입출금 예정표", "강남세무서"], ["운영비", "출금", 1300000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 25,042,300원(42건) ÷ 20, 10만원 단위 반올림", "거래처 비중 운영 100%"]]], ["2026-11-11", 78400000, 28500000, 3204380500, [["매출대금 회수", "입금", 78400000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 1,567,306,900원(76건) ÷ 20, 10만원 단위 반올림", "구성 매출대금 회수 93% · 카드매출 정산 7%"], ["원재료 매입", "출금", 27200000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 543,280,000원(10건) ÷ 20, 10만원 단위 반올림", "거래처 비중 (주)고운포장 44% · (주)대지농산 42% · (주)바다수산 15%"], ["운영비", "출금", 1300000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 25,042,300원(42건) ÷ 20, 10만원 단위 반올림", "거래처 비중 운영 100%"]]], ["2026-11-12", 78400000, 28500000, 3254280500, [["매출대금 회수", "입금", 78400000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 1,567,306,900원(76건) ÷ 20, 10만원 단위 반올림", "구성 매출대금 회수 93% · 카드매출 정산 7%"], ["원재료 매입", "출금", 27200000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 543,280,000원(10건) ÷ 20, 10만원 단위 반올림", "거래처 비중 (주)고운포장 44% · (주)대지농산 42% · (주)바다수산 15%"], ["운영비", "출금", 1300000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 25,042,300원(42건) ÷ 20, 10만원 단위 반올림", "거래처 비중 운영 100%"]]], ["2026-11-13", 78400000, 52500000, 3280180500, [["매출대금 회수", "입금", 78400000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 1,567,306,900원(76건) ÷ 20, 10만원 단위 반올림", "구성 매출대금 회수 93% · 카드매출 정산 7%"], ["원재료 매입", "출금", 27200000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 543,280,000원(10건) ÷ 20, 10만원 단위 반올림", "거래처 비중 (주)고운포장 44% · (주)대지농산 42% · (주)바다수산 15%"], ["법인카드 결제대금", "출금", 24000000, "예정", "주거래", "PLN-008 입출금 예정표", "신한카드"], ["운영비", "출금", 1300000, "추정", "주거래", "최근 20영업일(10/2~10/30) 실적 25,042,300원(42건) ÷ 20, 10만원 단위 반올림", "거래처 비중 운영 100%"]]]], "fc_base": 2895280500};
+var CFG = {"def": "2026-10-30", "src": "가상 은행 거래내역(연습용)", "file": "주새봄푸드가상", "nacc": 3};
+function eok(v){return (v/1e8).toFixed(1)+"억";}
+function md(d){return (+d.slice(5,7))+"/"+(+d.slice(8,10));}
+function current(){var h=decodeURIComponent(location.hash.slice(1));return DATA.by[h]?h:(DATA.by[CFG.def]?CFG.def:DATA.days[DATA.days.length-1]);}
+var SEL=current(), VM=SEL.slice(0,7), WD="일월화수목금토";
+function ymd(y,m,d){return y+"-"+(m<10?"0":"")+m+"-"+(d<10?"0":"")+d;}
+function longd(d){return d.slice(0,4)+"년 "+(+d.slice(5,7))+"월 "+(+d.slice(8,10))+"일 ("+WD[new Date(d).getDay()]+")";}
+function drawCal(){
+  var y=+VM.slice(0,4), m=+VM.slice(5,7), el=document.getElementById("cal"), out="";
+  document.getElementById("mlab").textContent=y+"년 "+m+"월";
+  for(var k=0;k<7;k++) out+='<div class="dw">'+WD[k]+'</div>';
+  var first=new Date(y,m-1,1).getDay(), last=new Date(y,m,0).getDate();
+  for(var b=0;b<first;b++) out+='<span></span>';
+  for(var day=1;day<=last;day++){
+    var d=ymd(y,m,day), o=DATA.by[d];
+    if(o){var net=o.end-o.prev;
+      out+='<button type="button" data-d="'+d+'" aria-pressed="'+(d===SEL)+'" aria-label="'+longd(d)+'">'+day+'<i style="--c:var('+(net>=0?"--a1":"--risk")+')"></i></button>';}
+    else out+='<button type="button" disabled aria-label="'+longd(d)+' 자료 없음">'+day+'</button>';}
+  el.innerHTML=out;
+  el.querySelectorAll("button[data-d]").forEach(function(bt){bt.addEventListener("click",function(){go(bt.dataset.d);closePop();});});
+}
+function openPop(){VM=SEL.slice(0,7);drawCal();document.getElementById("dpop").hidden=false;document.getElementById("dbtn").setAttribute("aria-expanded","true");}
+function closePop(){document.getElementById("dpop").hidden=true;document.getElementById("dbtn").setAttribute("aria-expanded","false");}
+function shiftMonth(n){var y=+VM.slice(0,4), m=+VM.slice(5,7)+n; if(m<1){m=12;y--;} if(m>12){m=1;y++;} VM=y+"-"+(m<10?"0":"")+m; drawCal();}
+function go(d){if(!DATA.by[d])return; history.replaceState(null,"","#"+d); render(d);}
+document.getElementById("dbtn").addEventListener("click",function(e){e.stopPropagation();document.getElementById("dpop").hidden?openPop():closePop();});
+document.getElementById("mprev").addEventListener("click",function(e){e.stopPropagation();shiftMonth(-1);});
+document.getElementById("mnext").addEventListener("click",function(e){e.stopPropagation();shiftMonth(1);});
+document.getElementById("dpop").addEventListener("click",function(e){e.stopPropagation();});
+document.addEventListener("click",closePop);
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closePop();});
+document.getElementById("dprev").addEventListener("click",function(){var i=DATA.days.indexOf(SEL);if(i>0)go(DATA.days[i-1]);});
+document.getElementById("dnext").addEventListener("click",function(){var i=DATA.days.indexOf(SEL);if(i<DATA.days.length-1)go(DATA.days[i+1]);});
+document.getElementById("dmeta").textContent="자료 "+DATA.days[0]+" ~ "+DATA.days[DATA.days.length-1]+" · 영업일 "+DATA.days.length+"일 · "+CFG.src;
+addEventListener("hashchange",function(){SEL=current();render(SEL);});
+/* PDF: 브라우저 인쇄 창에서 「PDF로 저장」. 파일 이름이 기준일로 잡히게 제목을 잠시 바꾼다 */
+document.getElementById("dpdf").addEventListener("click",function(e){e.stopPropagation();closePop();
+  var t0=document.title; document.title=CFG.file+"_자금일보_"+SEL;
+  var back=function(){document.title=t0;removeEventListener("afterprint",back);}; addEventListener("afterprint",back);
+  window.print();});
+function sign(v){return (v>=0?"+":"")+eok(v);}
+function fcTable(list){
+  return '<div class="txw"><table class="txt"><thead><tr><th class="kc">구분</th><th class="ac">계좌</th><th>항목 · 근거</th><th style="text-align:right">금액</th></tr></thead><tbody>'
+    +list.map(function(it){var inn=it[1]==="입금";
+      var kd='<span class="kd '+(it[3]==="예정"?"plan":"est")+'">'+it[3]+'</span>';
+      return '<tr><td class="kc">'+kd+'</td><td class="ac">'+esc(it[4])+'</td><td><div class="ds">'+kd.replace('class="kd ','class="kd kdm ')+esc(it[0])+'</div><div class="cp acm">'+esc(it[4])+'</div>'
+        +'<div class="cp">'+esc(it[6])+'</div><div class="cp">'+esc(it[5])+'</div></td>'
+        +'<td class="am '+(inn?"pos":"neg")+'">'+(inn?"+":"-")+won(it[2])+'</td></tr>';}).join("")
+    +'</tbody></table></div>';}
+function txTable(list,showCode){
+  return '<div class="txw"><table class="txt"><thead><tr><th>시각</th><th class="ac">계좌</th><th>적요 · 거래처</th><th style="text-align:right">금액</th></tr></thead><tbody>'
+    +list.map(function(x){var inn=x[4]>0;
+      return '<tr><td class="tm">'+x[0]+'</td><td class="ac">'+esc(x[1])+'</td><td><div class="ds">'+esc(x[3])+'</div><div class="cp">'+esc(x[2])+'</div><div class="cp acm">'+esc(x[1])+'</div>'
+        +(showCode?'<span class="cd">'+esc(x[6])+'</span>':'')+'</td><td class="am '+(inn?"pos":"neg")+'">'+(inn?"+":"-")+won(inn?x[4]:x[5])+'</td></tr>';}).join("")
+    +'</tbody></table></div>';}
+function render(d){
+  SEL=d; var o=DATA.by[d];
+  var di=DATA.days.indexOf(d), mon=d.slice(0,7), MD=DATA.days.filter(function(x){return x.slice(0,7)===mon;});
+  document.getElementById("dval").textContent=longd(d);
+  document.getElementById("dprev").disabled=di<=0; document.getElementById("dnext").disabled=di>=DATA.days.length-1;
+  document.getElementById("c1t").textContent=(+d.slice(5,7))+"월 마감 잔액 추이";
+  document.getElementById("chipv").textContent=won(o.end)+"원";
+  document.getElementById("chipm").textContent=md(d)+" 마감 · 거래 "+o.n+"건";
+  var net=o.end-o.prev, fromOpen=o.prev-DATA.by[MD[0]].prev;
+  function vs(v,a){if(!a) return "직전 영업일 없음"; var r=v/a-1; return "최근 5영업일 평균 대비 <b>"+(r>=0?"+":"")+(r*100).toFixed(0)+"%</b>";}
+  renderKPI("kpis",[
+    {ax:"시작",label:"전일 마감 잔액",value:eok(o.prev),unit:"",color:"var(--a2)",colorT:"var(--a2t)",desc:"월초 대비 <b>"+sign(fromOpen)+"</b>"},
+    {ax:"들어온 돈",label:"당일 입금",value:eok(o.in),unit:"",color:"var(--a1)",colorT:"var(--a1t)",desc:vs(o.in,o.avg5_in)},
+    {ax:"나간 돈",label:"당일 출금",value:eok(o.out),unit:"",color:"var(--risk)",colorT:"var(--riskT)",desc:vs(o.out,o.avg5_out)},
+    {ax:"마감",label:"당일 마감 잔액",value:eok(o.end),unit:"",color:net>=0?"var(--a1)":"var(--risk)",colorT:net>=0?"var(--a1t)":"var(--riskT)",
+     desc:'전일 대비 <b style="color:'+(net>=0?"var(--a1t)":"var(--riskT)")+'">'+sign(net)+'</b>'}]);
+  var J=MD, ends=J.map(function(x){return DATA.by[x].end;});
+  CHART.line({host:"p1",tip:"t1",dtl:"d1",cats:J.map(function(x){return x.slice(8,10);}),series:[{name:"마감 잔액",color:"--a1",data:ends}],
+    label:(+d.slice(5,7))+"월 마감 잔액 추이",detail:function(i){var q=DATA.by[J[i]];
+      return {title:md(J[i])+" 자금",pairs:[["시작",won(q.prev)],["입금",won(q.in)],["출금",won(q.out)],["마감",won(q.end)]]};}});
+  legend("g1",[{name:CFG.nacc+"개 계좌 마감 잔액",color:"--a1",type:"ln"}]);
+  document.getElementById("b1").textContent=md(d);
+  var rows=o.codes.map(function(c){return {name:c.name,a:c.o,b:c.i,right:(c.i-c.o>=0?"+":"-")+man(Math.abs(c.i-c.o)),
+    rightColor:c.i-c.o>=0?"--a1t":"--riskT",right2:c.n+"건"};});
+  CHART.hbar({host:"p2",tip:"t2",dtl:"d2",rows:rows,colorA:"--risk",colorB:"--a1",nameA:"나간 돈",nameB:"들어온 돈",mL:132,
+    label:"오늘 자금코드별 유입·유출",detail:function(i){var c=o.codes[i];
+      return {title:md(d)+" "+c.name,pairs:[["들어온 돈",won(c.i)],["나간 돈",won(c.o)],["건수",c.n+"건"]],
+        note:txTable(o.tx.filter(function(x){return x[6]===c.name;}),false)};}});
+  legend("g2",[{name:"들어온 돈",color:"--a1"},{name:"나간 돈",color:"--risk"}]);
+  document.getElementById("b2").textContent=o.codes.length+"개 코드";
+  var F=DATA.fc, wd="일월화수목금토";
+  if(F.length){
+  CHART.bars({host:"p3",tip:"t3",dtl:"d3",cats:F.map(function(f){return md(f[0])+"("+wd[new Date(f[0]).getDay()]+")";}),
+    series:[{name:"입금 예측",color:"--a1",data:F.map(function(f){return f[1];})},{name:"출금 예측",color:"--risk",data:F.map(function(f){return f[2];})}],
+    label:"앞으로 일자별 입출금 예측",
+    detail:function(i){var f=F[i];
+      return {title:md(f[0])+" 예상 입출금 "+f[4].length+"건",pairs:[["입금 예측",won(f[1]),"pos"],["출금 예측",won(f[2]),"neg"],["예상 마감 잔액",won(f[3])]],
+        note:fcTable(f[4])};}});
+  legend("g3",[{name:"입금 예측",color:"--a1"},{name:"출금 예측",color:"--risk"}]);
+  var fnet=F[F.length-1][3]-DATA.fc_base;
+  document.getElementById("b3").textContent="예측 기간 순액 "+sign(fnet);}
+  else document.getElementById("b3").textContent="예측 없음";
+  var R=o.recent;
+  CHART.bars({host:"p4",tip:"t4",dtl:"d4",cats:R.map(function(r){return md(r[0]);}),
+    series:[{name:"입금",color:"--a1",data:R.map(function(r){return r[1];})},{name:"출금",color:"--risk",data:R.map(function(r){return r[2];})}],
+    label:"최근 10영업일 입금·출금",detail:function(i){var r=R[i], q=DATA.by[r[0]];
+      return {title:md(r[0])+" 거래 "+q.tx.length+"건",pairs:[["입금",won(r[1]),"pos"],["출금",won(r[2]),"neg"],["순액",(r[1]-r[2]>=0?"+":"")+won(r[1]-r[2])]],
+        note:txTable(q.tx,true)};}});
+  legend("g4",[{name:"입금",color:"--a1"},{name:"출금",color:"--risk"}]);
+  document.getElementById("b4").textContent="~"+md(d);
+  document.getElementById("acct").innerHTML=o.accs.map(function(a){
+    return '<tr><td>'+esc(a[0])+'</td><td>'+esc(a[1])+'</td><td>'+esc(a[2])+'</td><td class="num pos">'+(a[4]?won(a[4]):"")+'</td><td class="num neg">'+(a[5]?won(a[5]):"")+'</td><td class="num">'+won(a[3])+'</td><td class="num '+(a[6]>=0?"pos":"neg")+'">'+(a[6]>=0?"+":"")+won(a[6])+'</td></tr>';}).join("")
+    +'<tr><td><b>합계</b></td><td></td><td></td><td></td><td></td><td class="num"><b>'+won(o.end)+'</b></td><td class="num"><b>'+(net>=0?"+":"")+won(net)+'</b></td></tr>';
+  document.getElementById("bigt").innerHTML=o.big.map(function(r){
+    return '<tr><td>'+esc(r[0])+'</td><td>'+esc(r[3])+'</td><td class="num pos">'+(r[1]?won(r[1]):"")+'</td><td class="num neg">'+(r[2]?won(r[2]):"")+'</td></tr>';}).join("");
+  document.getElementById("flagt").innerHTML=o.flag.length?o.flag.map(function(r){
+    return '<tr><td>'+esc(r[0])+'</td><td>'+esc(r[3])+'</td><td class="num pos">'+(r[1]?won(r[1]):"")+'</td><td class="num neg">'+(r[2]?won(r[2]):"")+'</td></tr>';}).join(""):'<tr><td colspan="4">없음</td></tr>';
+  ["d1","d2"].forEach(function(id){placeholder(id,"그래프를 누르면 금액이 나옵니다");});
+  ["d3","d4"].forEach(function(id){placeholder(id,"막대를 누르면 그날의 항목이 나옵니다");});
+}
+
+function drawAll(){
+  /* */ render(current()); /* */
+}
+drawAll();
+var rt;addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(drawAll,180);});
+</script>
