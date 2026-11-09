@@ -311,6 +311,68 @@ h1 em{font-style:normal;color:var(--gold)}
 .likebox b{font-size:22px;font-variant-numeric:tabular-nums;min-width:44px}
 .spark{position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;border-radius:50%}
 @media (max-width:480px){.modes{grid-template-columns:1fr}.hrow i{width:100px;height:80px}}
+/* ---------- 추가 데모 공용 조각 ---------- */
+.nx-scr,.nx-ph{position:relative;background:#f6f7ff;color:#23264a;overflow:hidden;box-shadow:0 12px 30px #0007;font-size:13px;line-height:1.35}
+.nx-scr{width:min(320px,86%);height:min(214px,86%);border-radius:16px}
+.nx-ph{width:150px;height:min(226px,92%);border-radius:22px;border:4px solid #05061a}
+.nx-pad{padding:12px}
+.nx-l{display:block;height:8px;border-radius:4px;background:#d5d8ee;margin:7px 0}
+.nx-l.d{background:#2a2f5a}
+.nx-row{display:flex;align-items:center;gap:9px;padding:7px 12px}
+.nx-row>.nx-b{flex:1;min-width:0}
+.nx-dot{flex:none;width:22px;height:22px;border-radius:7px;background:#b3a8ff}
+.nx-cl{position:absolute;inset:0;background:#f6f7ff}
+.nx-f{position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:#7c6cff55;border:2px solid #7c6cff;z-index:6;pointer-events:none}
+.nx-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#5b4bf0;color:#fff;font-weight:700;border-radius:10px;padding:9px 16px;white-space:nowrap;font-size:13px}
+.nx-btn.g{background:#e3e5f6;color:#4a4f7c}
+.nx-big{font-size:clamp(22px,5vw,30px);font-weight:800;color:#fff;white-space:nowrap}
+.nx-field{height:34px;border-radius:9px;border:2px solid #cfd2ea;background:#fff;padding:0 10px;display:flex;align-items:center;font-size:13px;color:#23264a}
+.nx-lab{font-size:11px;font-weight:700;color:#6a6f9a;margin-bottom:4px}
+.nx-cen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;padding:12px}
+.nx-sub{font-size:12px;color:#7a7fa6}
+.nx-h{font-size:15px;font-weight:800}
+.nx-ico{color:#fff}
+.nx-ico svg{display:block;width:84px;height:84px}
+.nx-tile{width:130px;height:130px;border-radius:30px;background:#232a62;display:grid;place-items:center;color:#fff}
+.nx-tile svg{width:76px;height:76px}
+.nx-spin{display:inline-block;width:18px;height:18px;border-radius:50%;border:3px solid #ffffff55;border-top-color:currentColor;animation:nxs .8s linear infinite}
+@keyframes nxs{to{transform:rotate(360deg)}}
+.nx-chip{display:inline-block;border:1.5px solid #cfd2ea;background:#fff;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:600;white-space:nowrap}
+.nx-chip.on{background:#5b4bf0;border-color:#5b4bf0;color:#fff}
+.nx-bub{max-width:82%;padding:8px 11px;border-radius:13px;font-size:12.5px;background:#fff;box-shadow:0 2px 8px #0001;margin:6px 10px}
+.nx-bub.me{margin-left:auto;background:#5b4bf0;color:#fff}
+.nx-sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:16px 16px 0 0;box-shadow:0 -6px 20px #0003;padding:12px}
+.nx-grab{width:34px;height:4px;border-radius:2px;background:#cfd2ea;margin:0 auto 10px}
+.nx-dim{position:absolute;inset:0;background:#0009}
+.nx-hero{height:64px;background:linear-gradient(135deg,#7c6cff,#5fe3ff)}
+.nx-tb{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-around;padding:8px 0;background:#fff;box-shadow:0 -2px 8px #0001}
+.nx-tb i{width:16px;height:16px;border-radius:5px;background:#d5d8ee;transition:background .2s}
+.nx-tb i.on{background:#5b4bf0}
+/* 스타일 시트 */
+.st{position:relative;width:min(290px,84%);height:min(188px,78%);padding:18px;display:flex;flex-direction:column;gap:9px;overflow:hidden}
+.st .tt{font-size:17px;font-weight:800}
+.st .bb{margin-top:auto;align-self:flex-start;padding:9px 18px;font-weight:700;font-size:13px}
+.st-skeu{background:repeating-linear-gradient(#fdf6c6 0 22px,#d9cf8c 23px);border-radius:14px;box-shadow:inset 0 0 0 1px #fff8,0 10px 22px #0009;color:#5a3d15;border-top:26px solid #7a4e24}
+.st-skeu .bb{background:linear-gradient(#f2f2f2,#bdbdbd);border:1px solid #777;border-radius:8px;box-shadow:inset 0 1px #fff,0 2px 4px #0006;color:#333}
+.st-flat{background:#ffb33e;color:#fff}.st-flat .bb{background:#fff;color:#ff9500}
+.st-mat{background:#fff;border-radius:6px;color:#222;box-shadow:0 12px 26px #000a}.st-mat .tt{color:#3f51b5}
+.st-mat .bb{background:#3f51b5;color:#fff;border-radius:4px;box-shadow:0 5px 10px #0007;text-transform:uppercase}
+.st-mat .fb{position:absolute;right:16px;bottom:16px;width:44px;height:44px;border-radius:50%;background:#ff5722;color:#fff;display:grid;place-items:center;font-size:24px;box-shadow:0 6px 12px #0007}
+.st-neu{background:#e4e8f1;border-radius:24px;color:#6b7390;box-shadow:12px 12px 24px #a8aebd,-12px -12px 24px #fff}
+.st-neu .bb{background:#e4e8f1;border-radius:14px;box-shadow:5px 5px 10px #a8aebd,-5px -5px 10px #fff}
+.st-clay{background:#ffd9c7;border-radius:30px;color:#a14d3a;box-shadow:inset -8px -8px 16px #eba78e,inset 8px 8px 16px #fff3e9,0 14px 24px #0005}
+.st-clay .bb{background:#c7b1ff;color:#40307e;border-radius:18px;box-shadow:inset -4px -4px 8px #9d83e6,inset 4px 4px 8px #eae1ff}
+.st-brut{background:#ffe14d;color:#000;border:3px solid #000;box-shadow:8px 8px 0 #000}
+.st-brut .bb{background:#ff6b6b;border:3px solid #000;box-shadow:4px 4px 0 #000}
+.st-liq{background:linear-gradient(135deg,#ffb3d0,#a2d4ff 55%,#c4f3cd);border-radius:26px}
+.st-liq .gl{position:absolute;inset:26px 34px;border-radius:30px;background:linear-gradient(135deg,#ffffff88,#ffffff22);box-shadow:inset 2px 2px 3px #fffc,inset -3px -3px 6px #ffffff66,0 10px 24px #4055;backdrop-filter:blur(6px) saturate(1.6);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;color:#23305f}
+.st-y2k{background:linear-gradient(180deg,#d4d8e8,#8c95b8 45%,#e9ecf7 55%,#7884ad);border-radius:18px;border:2px solid #fff;color:#1b1d6b}
+.st-y2k .tt{font-family:'Courier New',monospace;font-style:italic;color:#ff2fc0;text-shadow:0 0 8px #fff,0 0 2px #ff2fc0}
+.st-y2k .bb{background:linear-gradient(#b4f7ff,#2bbde0);border:2px solid #fff;border-radius:999px;color:#04386b;box-shadow:0 0 14px #5ff}
+.st-min{background:#fff;color:#111;border-radius:2px;padding:26px}.st-min .tt{font-weight:400;font-size:20px;letter-spacing:.02em}.st-min .bb{background:none;padding:0;font-weight:400;border-bottom:1px solid #111;border-radius:0}
+/* 메뉴 아이콘 */
+.nx-gl{display:grid;gap:7px;grid-template-columns:repeat(3,14px)}
+.nx-gl i{width:14px;height:14px;background:#fff}
 </style>
 </head>
 <body>
@@ -384,12 +446,14 @@ h1 em{font-style:normal;color:var(--gold)}
 /* ================= 데이터 ================= */
 // 시트를 추가하려면 SHEETS에 같은 형식으로 넣고 DEMOS에 데모를 등록하면 된다.
 function T(id, display, en, ko, nick, desc, opt){ return Object.assign({id, display, en, ko, nick, desc}, opt||{}); }
+const X = {extra: true}; // 영상 치트시트 밖에서 추가한 문항 표시
+const DERIVED = '스타일·다크패턴·심리·리서치 및 “시트 외 추가” 용어: <a href="https://www.instagram.com/uxwoodytips/" target="_blank" rel="noopener">인스타그램 @uxwoodytips</a>에서 고른 이름 (설명과 데모는 직접 작성)';
 const SHEETS = [{
   id: 'motion',
   short: '모션 용어',
   title: '애니메이션 필수 용어',
   nickLabel: '별명',
-  credit: '모션 용어: 「<a href="https://youtu.be/r7iS0Gw3Jq4?t=735" target="_blank" rel="noopener">바이브코더가 반드시 알아야 할 필수 용어 24가지 2탄</a>」 12:15 치트시트 · Ease-in / Ease-out은 시트 외 추가 문항',
+  credit: '모션 용어: 「<a href="https://youtu.be/r7iS0Gw3Jq4?t=735" target="_blank" rel="noopener">바이브코더가 반드시 알아야 할 필수 용어 24가지 2탄</a>」 12:15 치트시트',
   categories: [
     { id: 'basics', name: '기본', terms: [
       T('fade', 'Fade', ['Fade'], ['페이드'], '스르륵', '투명도(opacity)가 서서히 바뀌며 나타나거나 사라지는 효과'),
@@ -412,6 +476,11 @@ const SHEETS = [{
       T('morphing', 'Morphing', ['Morphing'], ['모핑'], '스르르', '한 모양이 다른 모양으로 자연스럽게 변형되는 효과 (☰ → ✕)'),
       T('marquee', 'Marquee', ['Marquee'], ['마퀴', '마키', '마르퀴'], '줄줄', '글자나 로고가 띠처럼 끝없이 흘러가는 효과'),
       T('motion-path', 'Motion Path', ['Motion Path'], ['모션패스'], '슝', '요소가 정해진 곡선 경로를 따라 이동하는 효과'),
+      T('fade-up', 'Fade Up', ['Fade Up', 'Fade In Up'], ['페이드 업', '페이드 인 업'], '스윽 떠오름', '글자가 흐릿한 상태에서 살짝 아래에서 올라오며 또렷해지는 등장 효과', X),
+      T('mask-reveal', 'Mask Reveal', ['Mask Reveal', 'Text Reveal'], ['마스크 리빌', '텍스트 리빌'], '가림막 뒤에서 쏙', '보이지 않는 가림막 뒤에 숨어 있던 글자가 경계선 위로 드러나는 효과', X),
+      T('text-highlight', 'Highlight', ['Highlight', 'Text Highlight'], ['하이라이트', '텍스트 하이라이트'], '형광펜 쓱', '형광펜으로 칠하듯 글자 뒤에 색이 차오르며 핵심 단어를 강조하는 효과', X),
+      T('word-rotate', 'Word Rotate', ['Word Rotate', 'Text Rotate'], ['워드 로테이트', '단어 교체', '텍스트 로테이트'], '단어만 휙휙', '문장은 그대로 두고 일부 단어만 위아래로 돌아가며 바뀌는 효과', X),
+      T('blur-in', 'Blur In', ['Blur In'], ['블러 인'], '흐릿 → 또렷', '심하게 흐린 상태에서 점점 초점이 맞듯 선명해지며 나타나는 효과', X),
     ]},
     { id: 'screen', name: '화면과 마우스', terms: [
       T('page-transition', 'Page Transition', ['Page Transition'], ['페이지 트랜지션'], '휘릭', '페이지가 바뀔 때 화면 전체에 주는 전환 효과'),
@@ -422,6 +491,27 @@ const SHEETS = [{
       T('custom-cursor', 'Custom Cursor', ['Custom Cursor'], ['커스텀 커서'], '졸졸', '기본 화살표 대신 직접 디자인한 커서가 마우스를 따라다니는 효과'),
       T('3d-tilt', '3D Tilt', ['3D Tilt'], ['3d 틸트', '쓰리디 틸트'], '갸우뚱', '커서 위치에 따라 카드가 입체적으로 기울어지는 효과', {koDisplay: '3D 틸트'}),
       T('confetti', 'Confetti', ['Confetti'], ['컨페티', '콘페티', '콘페티이'], '빵', '성공·완료 순간에 색종이가 터지는 축하 효과', {koDisplay: '컨페티'}),
+      T('rubber-band', 'Rubber Band', ['Rubber Band', 'Overscroll Bounce', 'Rubber Banding'], ['러버 밴드', '러버밴드', '고무줄 효과', '오버스크롤'], '고무줄처럼 튕김', '스크롤 끝에서 화면이 조금 더 밀렸다가 고무줄처럼 되돌아와 끝임을 알려주는 효과', X),
+      T('momentum-scroll', 'Momentum Scroll', ['Momentum Scroll', 'Inertial Scroll', 'Momentum Scrolling'], ['모멘텀 스크롤', '관성 스크롤', '모멘텀 스크롤링'], '손 떼도 데구루루', '손을 뗀 뒤에도 움직이던 힘이 남아 스크롤이 굴러가다 서서히 멈추는 효과', X),
+    ]},
+    { id: 'nav-motion', name: '화면 전환', terms: [
+      T('push', 'Push', ['Push', 'Push Transition'], ['푸시', '푸시 전환'], '옆에서 밀고 들어옴', '다음 화면이 옆에서 들어오며 이전 화면을 밀어내는 기본 전환', X),
+      T('modal-present', 'Modal Present', ['Modal Present', 'Modal Presentation'], ['모달 등장', '모달 프레젠트'], '아래에서 올라와 덮음', '새 화면이 아래에서 올라와 지금 화면을 덮는 전환. 잠깐 하고 돌아오는 작업에 쓴다', X),
+      T('fade-through', 'Fade Through', ['Fade Through'], ['페이드 스루', '페이드 쓰루'], '사라졌다 새로 나타남', '이전 화면이 완전히 사라진 뒤 다음 화면이 살짝 커지며 나타나는 전환. 서로 관계없는 화면 사이에 쓴다', X),
+      T('card-expand', 'Card Expand', ['Card Expand', 'Card Expansion'], ['카드 확장'], '카드가 그대로 화면으로', '목록의 카드가 그 자리에서 커져 상세 화면이 되는 전환', X),
+      T('zoom-transition', 'Zoom Transition', ['Zoom Transition', 'Zoom'], ['줌 전환', '확대 전환', '줌'], '화면 안으로 쑥', '누른 곳을 중심으로 화면이 확대되며 안으로 들어가는 듯한 전환', X),
+      T('tab-switch', 'Tab Switch', ['Tab Switch', 'Tab Transition'], ['탭 전환'], '탭 따라 옆으로 착', '하단 탭을 누르면 내용이 옆으로 넘어가며 바뀌는 전환', X),
+      T('sheet-expand', 'Sheet Expand', ['Sheet Expand', 'Sheet Expansion'], ['시트 확장'], '반쯤 올라왔다 끝까지', '아래에서 반만 올라온 시트를 끌어 올리면 전체 화면까지 커지는 전환', X),
+    ]},
+    { id: 'done', name: '완료 표시', terms: [
+      T('check-animation', 'Check Animation', ['Check Animation', 'Checkmark Animation'], ['체크 그리기', '체크 애니메이션', '체크 모션'], '체크가 슥', '동그라미와 체크 표시가 선으로 그려지며 완료를 알리는 효과', X),
+      T('strikethrough', 'Strikethrough', ['Strikethrough', 'Strike Through'], ['할 일 줄긋기', '스트라이크스루', '취소선'], '끝낸 일에 쭉', '끝낸 할 일 위로 줄이 그어지며 흐려지는 효과', X),
+      T('button-morph', 'Button Morph', ['Button Morph', 'Button Morphing'], ['버튼 모핑'], '버튼이 동글 → 체크', '누른 버튼이 작은 원으로 줄어들어 처리 후 체크로 바뀌는 효과', X),
+      T('progress-complete', 'Progress Complete', ['Progress Complete'], ['진행률 완료', '프로그레스 완료'], '막대 끝에 체크', '진행 막대가 끝까지 차고 나서 완료 표시로 바뀌는 효과', X),
+      T('send-animation', 'Send Animation', ['Send Animation'], ['보냄 애니메이션', '전송 애니메이션', '센드 애니메이션'], '슝 날아감', '보낸 내용이 종이비행기처럼 날아가며 전송을 알려주는 효과', X),
+      T('stamp', 'Stamp', ['Stamp', 'Stamp Animation'], ['스탬프', '도장'], '쾅 찍힘', '도장이 위에서 쾅 찍히며 승인·완료를 보여주는 효과', X),
+      T('badge-unlock', 'Badge Unlock', ['Badge Unlock'], ['배지 획득', '뱃지 획득', '배지 언락'], '반짝 얻었다', '업적을 달성한 순간 배지가 돌며 반짝이고 내 것이 되는 효과', X),
+      T('success-screen', 'Success Screen', ['Success Screen', 'Completion Screen'], ['완료 화면', '성공 화면'], '다 됐어요 한 화면', '큰 작업을 마쳤을 때 화면 전체로 결과와 다음 행동을 보여주는 화면', X),
     ]},
   ],
 }, {
@@ -461,6 +551,209 @@ const SHEETS = [{
       T('scroll-snap', 'Scroll Snap', ['Scroll Snap'], ['스크롤 스냅'], '섹션 단위로 착 정렬', '스크롤을 멈추면 섹션 단위로 딱 맞춰 정렬되는 효과'),
       T('micro-interaction', 'Micro-interaction', ['Micro-interaction'], ['마이크로 인터랙션', '마이크로 인터렉션'], '작은 반응 애니메이션', '좋아요 하트가 톡 터지는 것처럼 작은 행동에 돌려주는 작은 반응 애니메이션'),
     ]},
+    { id: 'form', name: '입력 폼', terms: [
+      T('text-field', 'Text Field', ['Text Field', 'Input Field', 'Text Input', 'Text Field States'], ['텍스트 필드', '입력 칸', '인풋', '텍스트 인풋', '텍스트 필드 상태'], '글자 치는 칸', '글자를 입력하는 칸. 기본·선택됨·오류·확인됨처럼 상태에 따라 모양이 바뀐다', X),
+      T('select', 'Select', ['Select', 'Select Box'], ['셀렉트', '셀렉트 박스'], '고르면 값이 남음', '펼쳐서 하나를 고르면 그 값이 칸에 그대로 남는 입력 컴포넌트', X),
+      T('segmented-control', 'Segmented Control', ['Segmented Control', 'Segmented'], ['세그먼트', '세그먼티드 컨트롤', '세그먼트 컨트롤'], '붙어 있는 선택 버튼', '하나로 붙은 버튼들 중 하나를 골라 보기 방식이나 옵션을 바꾸는 컴포넌트', X),
+      T('switch', 'Toggle Switch', ['Toggle', 'Switch', 'Toggle Switch'], ['토글', '스위치', '토글 스위치'], '누르자마자 켜짐', '켜고 끄는 스위치. 저장 버튼 없이 누르는 즉시 반영하는 설정에 쓴다', {extra: true, koDisplay: '토글 · 스위치'}),
+      T('checkbox', 'Checkbox', ['Checkbox', 'Check Box'], ['체크박스', '체크 박스'], '여러 개 고르기', '여러 항목을 동시에 고를 수 있는 네모 칸', X),
+      T('radio-button', 'Radio Button', ['Radio Button', 'Radio'], ['라디오 버튼', '라디오'], '하나만 고르기', '여러 선택지 중 딱 하나만 고를 수 있는 동그라미 버튼', X),
+      T('slider', 'Slider', ['Slider'], ['슬라이더'], '막대를 밀어 값 조절', '손잡이를 좌우로 끌어 범위 안의 값을 정하는 컴포넌트', X),
+      T('stepper', 'Stepper', ['Stepper', 'Quantity Stepper'], ['스테퍼', '수량 스테퍼'], '- 2 +', '빼기·더하기 버튼으로 수량을 한 단계씩 바꾸는 컴포넌트', X),
+      T('date-picker', 'Date Picker', ['Date Picker'], ['데이트 피커', '날짜 선택'], '달력에서 콕', '달력을 띄워 날짜를 고르는 입력 컴포넌트', X),
+      T('placeholder', 'Placeholder', ['Placeholder'], ['플레이스홀더'], '입력하면 사라지는 글자', '입력 칸 안에 흐리게 보이다가 글자를 치면 사라지는 안내 문구', X),
+      T('input-label', 'Label', ['Label', 'Input Label', 'Form Label'], ['라벨', '레이블', '입력 라벨'], '입력해도 남는 이름표', '입력 칸이 무엇인지 알려주며 입력해도 사라지지 않는 이름', X),
+    ]},
+    { id: 'control', name: '버튼과 표시', terms: [
+      T('ui-button', 'Button', ['Button'], ['버튼'], '누르면 실행', '저장·결제처럼 무언가를 실행하는 컴포넌트', X),
+      T('text-link', 'Link', ['Link', 'Text Link'], ['링크', '텍스트 링크'], '누르면 이동', '다른 페이지나 위치로 이동시키는 글자', X),
+      T('icon-button', 'Icon Button', ['Icon Button'], ['아이콘 버튼'], '글자 없는 작은 버튼', '글자 없이 아이콘만 있는 작은 보조 버튼', X),
+      T('fab', 'FAB', ['FAB', 'Floating Action Button', 'Floating Button'], ['팹', '플로팅 버튼', '플로팅 액션 버튼'], '떠 있는 주요 버튼', '화면 위에 둥둥 떠서 스크롤해도 남아 있는 가장 중요한 행동 버튼', {extra: true, koDisplay: '플로팅 액션 버튼'}),
+      T('chip', 'Chip', ['Chip'], ['칩'], '알약 모양 태그', '조건이나 속성을 보여주는 작은 알약 모양 요소. 눌러서 필터로도 쓴다', X),
+      T('ui-badge', 'Badge', ['Badge'], ['배지', '뱃지'], '아이콘 위 빨간 숫자', '아이콘 모서리에 붙어 새 소식 수나 상태를 알려주는 작은 표시', X),
+      T('avatar', 'Avatar', ['Avatar'], ['아바타', '프로필 사진'], '동그란 사람 사진', '사람이나 계정을 나타내는 동그란 작은 이미지', X),
+      T('thumbnail', 'Thumbnail', ['Thumbnail'], ['썸네일', '섬네일'], '콘텐츠 미리보기 그림', '영상이나 글 같은 콘텐츠를 미리 보여주는 작은 이미지', X),
+      T('list-view', 'List', ['List', 'List View'], ['리스트', '리스트 뷰', '목록'], '줄로 나열', '항목을 한 줄씩 위아래로 나열해 빠르게 훑어보게 하는 배치', X),
+    ]},
+    { id: 'notice', name: '창과 안내', terms: [
+      T('bottom-sheet', 'Bottom Sheet', ['Bottom Sheet'], ['바텀시트', '바텀 시트'], '아래에서 올라온 패널', '화면 아래에서 올라와 엄지 닿는 곳에 선택지를 펼치는 패널', X),
+      T('popover', 'Popover', ['Popover'], ['팝오버'], '누른 자리에 뜨는 작은 창', '누른 요소 바로 옆에 뜨는 작은 창. 툴팁과 달리 버튼 같은 내용도 담는다', X),
+      T('banner', 'Banner', ['Banner'], ['배너'], '화면 위쪽 안내 띠', '화면 위에 띠처럼 계속 붙어서 공지를 알려주는 영역', X),
+      T('popup', 'Popup', ['Popup', 'Pop-up'], ['팝업'], '화면을 가리는 창', '이벤트 안내처럼 갑자기 떠서 화면을 가리는 창', X),
+      T('inline-error', 'Inline Error', ['Inline Error', 'Inline Validation'], ['인라인 오류', '인라인 에러'], '입력 칸 바로 아래 빨간 글씨', '입력 칸 바로 아래에서 무엇이 틀렸는지 바로 알려주는 오류 문구', X),
+      T('coach-mark', 'Coach Mark', ['Coach Mark', 'Coachmark'], ['코치마크', '코치 마크'], '새 기능 짚어주기', '화면을 어둡게 하고 새 기능 위치를 처음 한 번만 짚어주는 안내', X),
+    ]},
+    { id: 'navigation', name: '내비게이션', terms: [
+      T('app-bar', 'App Bar', ['App Bar', 'Top App Bar', 'Navigation Bar'], ['앱 바', '앱바', '상단 바', '내비게이션 바'], '위쪽 제목 줄', '앱 맨 위에서 화면 제목과 주요 버튼을 보여주는 줄', X),
+      T('tab-bar', 'Tab Bar', ['Tab Bar', 'Bottom Navigation', 'Bottom Tab Bar'], ['탭 바', '탭바', '하단 탭바', '하단 탭 바', '하단 내비게이션'], '아래쪽 메뉴 줄', '화면 맨 아래 홈·검색 같은 주요 메뉴를 모아둔 줄', X),
+      T('breadcrumb', 'Breadcrumb', ['Breadcrumb', 'Breadcrumbs'], ['브레드크럼', '빵부스러기', '브레드 크럼'], '홈 > 의류 > 상의', '지금 위치까지 지나온 경로를 차례로 보여주는 내비게이션', X),
+      T('pagination', 'Pagination', ['Pagination'], ['페이지네이션'], '1 2 3 번호로 넘기기', '내용을 여러 쪽으로 나눠 번호를 눌러 넘겨 보게 하는 방식', X),
+      T('infinite-scroll', 'Infinite Scroll', ['Infinite Scroll'], ['무한 스크롤', '인피니트 스크롤'], '내려도 내려도 계속', '끝에 닿을 때마다 다음 내용을 불러와 끝없이 이어지는 스크롤', X),
+      T('back-navigation', 'Back Navigation', ['Back Navigation', 'Back Button'], ['뒤로 가기', '백 내비게이션', '뒤로가기 버튼'], '이전 화면으로 ‹', '화살표나 제스처로 바로 이전 화면으로 돌아가는 동작', X),
+    ]},
+    { id: 'indicator', name: '인디케이터', terms: [
+      T('progress-bar', 'Progress Bar', ['Progress Bar'], ['프로그레스 바', '진행 바', '진행 막대'], '채워지는 막대', '작업이 얼마나 끝났는지 막대가 차오르며 보여주는 표시', X),
+      T('step-indicator', 'Step Indicator', ['Step Indicator', 'Step Progress'], ['스텝 인디케이터', '단계 표시'], '1-2-3-4 단계', '가입·결제처럼 여러 단계 중 지금 어디인지 보여주는 표시', X),
+      T('page-indicator', 'Page Indicator', ['Page Indicator', 'Pagination Dots'], ['페이지 인디케이터', '페이지 점'], '캐러셀 아래 점들', '캐러셀 아래 점으로 지금 몇 번째 장인지 보여주는 표시', X),
+      T('story-progress', 'Story Progress', ['Story Progress', 'Story Bar', 'Story Progress Bar'], ['스토리 바', '스토리 진행 바'], '위쪽 조각 막대', '스토리 맨 위 여러 조각 막대가 차례로 차오르며 진행을 보여주는 표시', X),
+      T('scroll-progress', 'Scroll Progress', ['Scroll Progress', 'Scroll Progress Bar', 'Reading Progress'], ['스크롤 진행 바', '스크롤 프로그레스', '읽기 진행 바'], '읽을수록 차는 선', '글을 내려 읽을수록 화면 위쪽 선이 차오르는 표시', X),
+      T('progress-ring', 'Progress Ring', ['Progress Ring', 'Circular Progress'], ['프로그레스 링', '진행 링', '원형 진행률'], '동그라미 퍼센트', '좁은 자리에서 원 둘레가 차오르며 퍼센트를 보여주는 표시', X),
+      T('strength-meter', 'Strength Meter', ['Strength Meter', 'Password Strength Meter'], ['강도 표시기', '비밀번호 강도', '스트렝스 미터'], '비밀번호 칸이 참', '비밀번호를 칠수록 칸이 차며 얼마나 안전한지 보여주는 표시', X),
+      T('tab-indicator', 'Tab Indicator', ['Tab Indicator'], ['탭 인디케이터'], '탭 아래 움직이는 선', '지금 고른 탭 아래를 따라다니는 선', X),
+      T('home-indicator', 'Home Indicator', ['Home Indicator'], ['홈 인디케이터'], '아이폰 맨 아래 가로 막대', '아이폰 맨 아래 가로 막대. 위로 쓸어 올려 홈으로 나갈 수 있다는 표시', X),
+    ]},
+    { id: 'loading', name: '로딩', terms: [
+      T('spinner', 'Spinner', ['Spinner'], ['스피너'], '뱅글뱅글', '끝을 알 수 없는 짧은 대기 동안 빙글빙글 도는 표시', X),
+      T('blur-up', 'Blur-up', ['Blur-up', 'Blur Up', 'Blur-up Image'], ['블러 업', '블러업'], '흐린 사진이 선명하게', '큰 이미지가 늦게 뜰 때 흐린 작은 사진을 먼저 보여주고 선명하게 바꾸는 로딩', X),
+      T('optimistic-ui', 'Optimistic UI', ['Optimistic UI', 'Optimistic Update'], ['낙관적 UI', '옵티미스틱 UI', '낙관적 업데이트'], '성공한 셈 치고 먼저', '서버 응답을 기다리지 않고 성공한 것처럼 화면부터 바꾸는 방식', X),
+      T('loading-button', 'Loading Button', ['Loading Button'], ['로딩 버튼'], '버튼 안에서 뱅글', '누른 버튼 안에 처리 중 표시를 넣어 두 번 누르지 않게 하는 방식', X),
+    ]},
+    { id: 'gesture', name: '제스처', terms: [
+      T('tap', 'Tap', ['Tap'], ['탭하기', '터치', '톡'], '한 번 톡', '손가락으로 한 번 짧게 누르는 가장 기본 동작', X),
+      T('long-press', 'Long Press', ['Long Press'], ['롱 프레스', '길게 누르기', '꾹 누르기'], '꾸욱 누르기', '손가락을 떼지 않고 오래 눌러 숨은 메뉴를 여는 동작', X),
+      T('swipe', 'Swipe', ['Swipe'], ['스와이프'], '휙 넘기기', '손가락을 화면 위에서 빠르게 밀어 다음으로 넘기는 동작', X),
+      T('swipe-to-delete', 'Swipe to Delete', ['Swipe to Delete'], ['밀어서 삭제', '스와이프 삭제', '스와이프 투 딜리트'], '밀면 빨간 삭제', '목록 한 줄을 옆으로 밀어 숨어 있던 삭제 버튼을 꺼내는 동작', X),
+      T('drag-and-drop', 'Drag and Drop', ['Drag and Drop', 'Drag', 'Drag & Drop'], ['드래그 앤 드롭', '드래그', '드래그앤드롭'], '잡아서 옮기기', '요소를 꾹 잡고 끌어 다른 자리에 놓는 동작', X),
+      T('pinch-to-zoom', 'Pinch to Zoom', ['Pinch to Zoom', 'Pinch'], ['핀치', '핀치 줌', '핀치 투 줌'], '두 손가락 벌리기', '두 손가락을 벌리거나 모아 화면을 확대·축소하는 동작', X),
+      T('double-tap', 'Double Tap', ['Double Tap'], ['더블 탭', '두 번 탭', '따닥'], '따닥 두 번', '빠르게 두 번 눌러 좋아요를 누르거나 확대하는 동작', X),
+      T('pull-to-refresh', 'Pull to Refresh', ['Pull to Refresh'], ['당겨서 새로고침', '풀 투 리프레시'], '당겼다 놓기', '목록 맨 위에서 아래로 당겼다 놓아 새 내용을 불러오는 동작', X),
+      T('edge-swipe', 'Edge Swipe', ['Edge Swipe'], ['가장자리 스와이프', '엣지 스와이프'], '화면 끝에서 안으로', '화면 맨 가장자리에서 안쪽으로 밀어 뒤로 가는 동작', X),
+    ]},
+    { id: 'ai', name: 'AI 화면', terms: [
+      T('thinking-indicator', 'Thinking Indicator', ['Thinking Indicator', 'Typing Indicator'], ['생각 중 표시', '씽킹 인디케이터', '타이핑 인디케이터'], '점 세 개 통통', 'AI가 답을 만드는 동안 작동 중임을 알려주는 표시', X),
+      T('streaming-response', 'Streaming Response', ['Streaming Response', 'Streaming Text'], ['스트리밍 답변', '스트리밍 텍스트', '스트리밍 응답'], '글자가 줄줄 나옴', '답변이 완성되기를 기다리지 않고 만들어지는 대로 글자를 보여주는 방식', X),
+      T('suggested-prompts', 'Suggested Prompts', ['Suggested Prompts', 'Suggested Questions', 'Suggestion Chips'], ['추천 질문 칩', '추천 질문', '추천 프롬프트'], '다음 질문 미리 띄우기', '다음에 물어볼 만한 질문을 눌러서 바로 보낼 수 있게 띄워주는 칩', X),
+      T('regenerate', 'Regenerate', ['Regenerate', 'Regenerate Response'], ['다시 생성', '재생성', '리제너레이트'], '↻ 2/2', '같은 질문으로 답을 다시 만들고 이전 답과 넘겨 볼 수 있게 하는 기능', X),
+      T('citations', 'Citations', ['Citations', 'Citation', 'Source Citation'], ['출처 표시', '인용 표시', '사이테이션'], '문장 옆 작은 번호', '답변의 근거가 된 문서를 번호와 링크로 보여주는 표시', X),
+      T('feedback-buttons', 'Feedback Buttons', ['Feedback Buttons', 'Response Feedback'], ['답변 피드백', '피드백 버튼'], '답변 아래 엄지', '답변 아래에서 좋음·나쁨을 눌러 평가를 남기는 버튼', X),
+      T('edit-and-resend', 'Edit and Resend', ['Edit and Resend', 'Edit Prompt', 'Edit Message'], ['고쳐 묻기', '질문 수정', '수정 후 재전송'], '내 말 고쳐 다시', '이미 보낸 내 질문을 고쳐서 다시 보내는 기능', X),
+      T('file-attachment', 'File Attachment', ['File Attachment', 'File Upload'], ['파일 첨부', '파일 업로드'], '클립 눌러 PDF', '입력창에 문서를 붙여 그 내용을 바탕으로 묻게 하는 기능', X),
+      T('agent-steps', 'Agent Steps', ['Agent Steps', 'Agent Progress', 'Task Steps'], ['에이전트 단계', '작업 단계', '에이전트 진행'], '할 일 체크가 하나씩', 'AI가 스스로 작업하며 지금 어느 단계인지 체크 목록으로 보여주는 표시', X),
+    ]},
+    { id: 'rating', name: '평점', terms: [
+      T('star-rating', 'Star Rating', ['Star Rating', 'Stars'], ['별점', '스타 레이팅'], '별 다섯 개', '별 다섯 개 중 몇 개인지로 평가하는 방식', X),
+      T('half-star-rating', 'Half-star Rating', ['Half-star Rating', 'Half Star Rating', 'Half Star'], ['반 별점', '하프 스타', '반별점'], '별 반 개까지', '별을 반 개 단위까지 나눠 더 세밀하게 평가하는 방식', X),
+      T('nps', 'NPS', ['NPS', 'Net Promoter Score', 'NPS Score'], ['NPS 점수', '순추천지수', '넷 프로모터 스코어'], '0부터 10 중 고르기', '“주변에 추천하시겠어요?”를 0~10점으로 묻는 평가', {extra: true, koDisplay: 'NPS 점수'}),
+      T('emoji-rating', 'Emoji Rating', ['Emoji Rating'], ['이모지 평가', '이모지 평점'], '표정으로 평가', '표정 이모지 중 하나를 골라 기분으로 평가하는 방식', X),
+      T('thumbs-rating', 'Thumbs Up / Down', ['Thumbs Up Down', 'Thumbs Up', 'Thumbs Rating'], ['좋아요 싫어요', '따봉', '엄지 평가'], '엄지 위아래 둘 중 하나', '좋음·싫음 둘 중 하나만 고르는 가장 단순한 평가', {extra: true, koDisplay: '좋아요 · 싫어요'}),
+      T('rating-slider', 'Rating Slider', ['Rating Slider'], ['평점 슬라이더'], '막대 밀어 점수 주기', '막대를 좌우로 밀어 점수를 정하는 평가', X),
+      T('rating-summary', 'Rating Summary', ['Rating Summary', 'Rating Breakdown'], ['평점 요약', '평점 분포'], '평균 숫자와 분포 막대', '평균 점수와 점수별 분포 막대를 모아 보여주는 영역', X),
+      T('rating-tags', 'Rating Tags', ['Rating Tags', 'Review Tags'], ['평가 태그', '리뷰 태그'], '빠른 배송, 친절해요', '“빠른 배송”처럼 미리 준비된 문구를 골라 누르는 평가', X),
+      T('rating-badge', 'Rating Badge', ['Rating Badge'], ['평점 배지', '평점 뱃지'], '★ 4.8 (1,204)', '목록에서 상품 옆에 작게 붙는 평균 평점과 후기 수', X),
+    ]},
+    { id: 'share', name: '공유 아이콘', terms: [
+      T('share-ios', 'iOS Share', ['iOS Share', 'Share on iOS', 'Share iOS'], ['iOS 공유', '아이폰 공유', '아이오에스 공유'], '네모에서 위로 화살표', '네모 상자에서 화살표가 위로 나가는 아이폰식 공유 아이콘', X),
+      T('share-android', 'Android Share', ['Android Share', 'Share on Android', 'Share Android'], ['안드로이드 공유'], '점 세 개를 선으로 연결', '점 세 개가 선으로 이어진 안드로이드식 공유 아이콘', X),
+      T('forward', 'Forward', ['Forward'], ['전달', '포워드'], '오른쪽으로 꺾인 화살표', '받은 메시지를 다른 사람에게 그대로 넘기는 아이콘', X),
+      T('send-icon', 'Send', ['Send'], ['보내기', '센드'], '종이비행기', '새 메시지로 콘텐츠를 보내는 종이비행기 아이콘', X),
+      T('copy-link', 'Copy Link', ['Copy Link'], ['링크 복사', '카피 링크'], '체인 모양', '콘텐츠 주소를 복사하는 체인 아이콘', X),
+      T('repost', 'Repost', ['Repost', 'Retweet'], ['리포스트', '리트윗'], '화살표 두 개가 빙글', '다른 사람 글을 내 피드에 다시 올리는 아이콘', X),
+      T('qr-code', 'QR Code', ['QR Code', 'QR', 'QR Share'], ['QR 공유', 'QR 코드', '큐알 코드', '큐알'], '찍으면 열리는 네모', '카메라로 찍으면 바로 열리는 코드로 콘텐츠를 나누는 방식', X),
+      T('nearby-share', 'Nearby Share', ['Nearby Share', 'AirDrop'], ['근처 공유', '니어바이 쉐어', '에어드롭'], '주변 기기로 슝', '주변 기기로 바로 파일을 보내는 방식', X),
+      T('share-sheet', 'Share Sheet', ['Share Sheet'], ['공유 시트', '셰어 시트', '쉐어 시트'], '보낼 곳 고르는 패널', '공유를 누르면 올라와 보낼 앱과 사람을 고르게 하는 패널', X),
+    ]},
+    { id: 'empty', name: '빈 화면', terms: [
+      T('first-use', 'First Use', ['First Use', 'First Use Empty State'], ['첫 사용', '첫 사용 화면'], '처음이라 아직 없음', '처음 들어와 아무것도 없을 때 무엇부터 할지 알려주는 빈 화면', X),
+      T('no-search-results', 'No Search Results', ['No Search Results', 'No Results'], ['검색 결과 없음'], '찾는 게 없음', '검색어에 맞는 결과가 없을 때 다른 검색어를 권하는 화면', X),
+      T('no-filter-results', 'No Filter Results', ['No Filter Results'], ['필터 결과 없음'], '조건이 너무 좁음', '걸어 둔 조건에 맞는 항목이 없을 때 조건을 풀도록 돕는 화면', X),
+      T('offline', 'Offline', ['Offline', 'Offline State'], ['오프라인', '오프라인 화면'], '인터넷 끊김', '인터넷이 끊겨 내용을 못 불러올 때 보여주는 화면', X),
+      T('permission-needed', 'Permission Needed', ['Permission Needed', 'Permission Denied'], ['권한 필요', '권한 요청'], '허용해야 보임', '알림·위치 같은 권한을 켜야 쓸 수 있을 때 보여주는 화면', X),
+      T('all-caught-up', 'All Caught Up', ['All Caught Up'], ['모두 완료', '올 코트 업', '전부 확인'], '다 끝내서 비어 있음', '확인할 것을 다 끝내서 비어 있을 때 칭찬해 주는 화면', X),
+      T('emptied', 'Emptied', ['Emptied', 'User Cleared', 'Empty Cart'], ['삭제 직후', '비운 직후', '빈 장바구니'], '방금 내가 비움', '사용자가 항목을 방금 다 지워서 비어 있는 화면', X),
+      T('error-state', 'Error State', ['Error State', 'Error Screen'], ['오류 화면', '에러 화면', '에러 상태'], '문제가 생겨 비어 있음', '문제가 생겨 내용을 못 보여줄 때 다시 시도를 권하는 화면', X),
+      T('locked-content', 'Locked Content', ['Locked Content', 'Locked', 'Paywall'], ['잠김', '잠금 콘텐츠', '페이월', '잠긴 콘텐츠'], '자물쇠와 흐린 내용', '구독해야 볼 수 있는 내용을 흐리게 가리고 자물쇠를 띄운 화면', X),
+    ]},
+    { id: 'menu-icon', name: '메뉴 아이콘', terms: [
+      T('hamburger', 'Hamburger', ['Hamburger', 'Hamburger Menu'], ['햄버거', '햄버거 메뉴'], '줄 세 개', '가로줄 세 개 모양의 메뉴 아이콘', X),
+      T('kebab', 'Kebab', ['Kebab', 'Kebab Menu'], ['케밥', '케밥 메뉴'], '세로로 점 세 개', '점 세 개를 세로로 꿴 더보기 아이콘', X),
+      T('meatballs', 'Meatballs', ['Meatballs', 'Meatball', 'Meatballs Menu'], ['미트볼', '미트볼 메뉴'], '가로로 점 세 개', '점 세 개를 가로로 놓은 더보기 아이콘', X),
+      T('waffle', 'Waffle', ['Waffle', 'Waffle Menu'], ['와플', '와플 메뉴'], '동그란 점 아홉 개', '동그란 점 아홉 개를 3×3으로 놓은 앱 전환 아이콘', X),
+      T('bento-menu', 'Bento', ['Bento', 'Bento Menu'], ['벤토', '벤토 메뉴'], '네모 아홉 개', '네모 아홉 개를 3×3으로 놓은 메뉴 아이콘', X),
+      T('doner', 'Döner', ['Doner', 'Döner', 'Doner Menu'], ['도너', '도너 메뉴', '되네르'], '아래로 갈수록 짧은 줄', '아래로 갈수록 짧아지는 세 줄 아이콘. 주로 필터에 쓴다', X),
+      T('veggie-burger', 'Veggie Burger', ['Veggie Burger', 'Veggie'], ['베지 버거', '베지버거'], '줄 두 개', '가로줄 두 개로 줄인 메뉴 아이콘', X),
+      T('stairs', 'Stairs', ['Stairs', 'Stairs Menu'], ['계단', '스테어스', '계단 메뉴'], '옆으로 밀린 세 줄', '계단처럼 옆으로 조금씩 밀린 세 줄 아이콘', X),
+      T('sliders-icon', 'Sliders', ['Sliders', 'Sliders Icon'], ['슬라이더스', '슬라이더 아이콘', '슬라이더스 아이콘'], '손잡이 달린 두 줄', '손잡이가 달린 줄 모양의 설정·필터 아이콘', X),
+    ]},
+  ],
+}, {
+  id: 'style',
+  short: '디자인 스타일',
+  title: 'AI에게 말하는 디자인 스타일',
+  nickLabel: '한 줄 뜻',
+  credit: DERIVED,
+  categories: [
+    { id: 'styles', name: '스타일', terms: [
+      T('skeuomorphism', 'Skeuomorphism', ['Skeuomorphism'], ['스큐어모피즘', '스큐모피즘'], '진짜 물건처럼', '종이·가죽 같은 실제 물건의 질감을 그대로 흉내 낸 스타일'),
+      T('flat-design', 'Flat Design', ['Flat Design', 'Flat'], ['플랫 디자인', '플랫'], '그림자 없이 납작', '그림자와 질감을 빼고 단색과 단순한 모양으로 납작하게 그리는 스타일'),
+      T('material-design', 'Material Design', ['Material Design', 'Material'], ['머티리얼 디자인', '머티리얼', '메테리얼'], '종이 겹과 그림자', '종이가 겹친 듯 층을 그림자로 나누는 구글의 디자인 언어'),
+      T('neumorphism', 'Neumorphism', ['Neumorphism'], ['뉴모피즘'], '배경에서 볼록', '배경과 같은 색에 빛과 그림자만 줘서 말랑하게 튀어나와 보이는 스타일'),
+      T('claymorphism', 'Claymorphism', ['Claymorphism'], ['클레이모피즘'], '말랑한 점토', '파스텔 색과 둥근 모서리, 안쪽 그림자로 점토처럼 부풀어 보이는 스타일'),
+      T('neo-brutalism', 'Neo Brutalism', ['Neo Brutalism', 'Neobrutalism', 'Brutalism'], ['네오 브루탈리즘', '브루탈리즘', '네오브루탈리즘'], '굵은 테두리와 원색', '굵은 검은 테두리, 튀는 원색, 어긋난 딱딱한 그림자로 거칠게 표현한 스타일'),
+      T('3d-icon', '3D Icon', ['3D Icon', '3D'], ['3D 아이콘', '쓰리디 아이콘'], '입체로 돌아가는 아이콘', '아이콘을 입체 물체처럼 빛과 깊이를 줘서 표현하는 스타일'),
+      T('liquid-glass', 'Liquid Glass', ['Liquid Glass'], ['리퀴드 글래스', '리퀴드 글라스'], '물방울 같은 유리', '빛을 휘게 하는 물방울 같은 유리 재질로 표현한 애플의 새 디자인 언어'),
+      T('y2k', 'Y2K', ['Y2K', 'Y2K Style'], ['와이투케이', 'Y2K 스타일'], '2000년대 초반 감성', '금속 광택, 네온, 픽셀 글씨 같은 2000년대 초반 감성의 스타일', {koDisplay: '와이투케이'}),
+      T('minimal', 'Minimal', ['Minimal', 'Minimalism', 'Minimal Design'], ['미니멀', '미니멀리즘', '미니멀 디자인'], '덜어내고 여백', '장식을 최대한 덜어내고 여백과 글자로만 표현하는 스타일'),
+      T('dark-mode', 'Dark Mode', ['Dark Mode'], ['다크 모드', '다크모드', '어두운 모드'], '어두운 배경으로 전환', '어두운 배경에 밝은 글자로 화면을 바꿔 보여주는 테마'),
+    ]},
+  ],
+}, {
+  id: 'dark',
+  short: '다크패턴',
+  title: '사용자를 속이는 다크패턴',
+  nickLabel: '한 줄 뜻',
+  credit: DERIVED,
+  categories: [
+    { id: 'patterns', name: '다크패턴', terms: [
+      T('roach-motel', 'Roach Motel', ['Roach Motel'], ['숨은 해지', '로치 모텔', '바퀴벌레 모텔'], '가입은 쉽고 해지는 미로', '가입은 한 번에 되지만 해지 버튼은 찾기 어렵게 숨겨 둔 패턴', {koDisplay: '숨은 해지'}),
+      T('pre-checked', 'Pre-checked Consent', ['Pre-checked Consent', 'Pre-checked', 'Prechecked'], ['미리 체크된 동의', '사전 체크', '자동 체크'], '이미 켜진 마케팅 동의', '선택 동의 항목을 미리 체크해 두어 모르고 넘어가게 하는 패턴', {koDisplay: '미리 체크된 동의'}),
+      T('fake-countdown', 'Fake Countdown', ['Fake Countdown', 'Fake Timer'], ['가짜 마감 시계', '가짜 카운트다운', '가짜 타이머'], '끝나면 다시 도는 시계', '끝나도 다시 시작되는 가짜 시계로 지금 사야 할 것처럼 재촉하는 패턴', {koDisplay: '가짜 마감 시계'}),
+      T('confirmshaming', 'Confirmshaming', ['Confirmshaming', 'Confirm Shaming'], ['죄책감 버튼', '컨펌셰이밍', '컨펌쉐이밍'], '“전 손해 볼래요”', '거절 버튼의 말을 부끄럽게 지어 죄책감으로 수락하게 하는 패턴', {koDisplay: '죄책감 버튼'}),
+      T('sneak-into-basket', 'Sneak into Basket', ['Sneak into Basket', 'Basket Sneaking'], ['끼워 팔기', '몰래 담기', '스니크 인투 바스켓'], '담은 적 없는 상품이 슬쩍', '고른 적 없는 상품이나 보험을 장바구니에 슬쩍 넣어 두는 패턴', {koDisplay: '끼워 팔기'}),
+      T('fake-scarcity', 'Fake Scarcity', ['Fake Scarcity'], ['가짜 희소성'], '늘 남은 자리 2석', '실제와 상관없이 “남은 자리 2석”처럼 곧 없어질 듯 꾸미는 패턴', {koDisplay: '가짜 희소성'}),
+      T('hidden-costs', 'Hidden Costs', ['Hidden Costs', 'Hidden Cost', 'Drip Pricing'], ['숨은 비용', '드립 프라이싱', '히든 코스트'], '결제 직전 붙는 수수료', '결제 마지막 단계에야 수수료를 더해 보여주는 패턴', {koDisplay: '숨은 비용'}),
+      T('forced-continuity', 'Forced Continuity', ['Forced Continuity'], ['몰래 자동 결제', '강제 연장', '포스드 컨티뉴이티'], '무료 끝나면 말없이 결제', '무료 체험이 끝나면 알리지 않고 자동으로 돈을 빼 가는 패턴', {koDisplay: '몰래 자동 결제'}),
+      T('nagging', 'Nagging', ['Nagging'], ['끝없는 권유', '내깅', '잔소리 패턴'], '닫아도 또 뜸', '거절해도 같은 요청을 계속 띄워 지쳐서 수락하게 하는 패턴', {koDisplay: '끝없는 권유'}),
+    ]},
+  ],
+}, {
+  id: 'psych',
+  short: '심리·편향',
+  title: 'UX에 숨은 심리와 편향',
+  nickLabel: '한 줄 뜻',
+  credit: DERIVED,
+  categories: [
+    { id: 'bias', name: '심리와 편향', terms: [
+      T('anchoring', 'Anchoring', ['Anchoring', 'Anchoring Effect'], ['앵커링', '앵커링 효과', '닻 내리기 효과'], '먼저 본 값이 기준', '처음 본 가격이 기준이 되어 다음 가격을 싸거나 비싸게 느끼는 심리'),
+      T('loss-aversion', 'Loss Aversion', ['Loss Aversion'], ['손실 회피', '손실 회피 편향'], '얻기보다 잃기가 더 아픔', '같은 크기라면 얻는 기쁨보다 잃는 아픔을 더 크게 느끼는 심리'),
+      T('default-effect', 'Default Effect', ['Default Effect'], ['기본값 효과', '디폴트 효과'], '안 바꾸고 그대로', '미리 골라 둔 선택지를 그대로 따르는 심리'),
+      T('social-proof', 'Social Proof', ['Social Proof'], ['사회적 증거'], '남들도 쓰니까', '다른 사람들이 고른 것을 보면 믿고 따르게 되는 심리'),
+      T('scarcity', 'Scarcity', ['Scarcity', 'Scarcity Effect'], ['희소성', '희소성 효과'], '적을수록 갖고 싶음', '수량이 적을수록 더 가치 있게 느끼는 심리'),
+      T('framing', 'Framing', ['Framing', 'Framing Effect'], ['프레이밍', '프레이밍 효과'], '말 바꾸면 느낌도 바뀜', '같은 사실도 어떻게 표현하느냐에 따라 다르게 받아들이는 심리'),
+      T('choice-overload', 'Choice Overload', ['Choice Overload'], ['선택 과부하', '선택의 역설', '초이스 오버로드'], '많으면 못 고름', '선택지가 너무 많으면 오히려 고르지 못하고 포기하는 심리'),
+      T('peak-end', 'Peak-end Rule', ['Peak-end Rule', 'Peak End Rule', 'Peak-end'], ['피크엔드 법칙', '피크 엔드 법칙', '절정 대미 법칙'], '절정과 끝만 기억', '경험 전체가 아니라 가장 강렬한 순간과 마지막 순간으로 기억하는 심리'),
+      T('zeigarnik', 'Zeigarnik Effect', ['Zeigarnik Effect', 'Zeigarnik'], ['자이가르닉 효과', '자이가르닉'], '안 끝낸 일이 계속 생각남', '끝내지 못한 일을 더 잘 기억하고 마저 끝내고 싶어지는 심리'),
+      T('compromise-effect', 'Compromise Effect', ['Compromise Effect'], ['타협 효과'], '양 끝 말고 가운데', '양 끝을 피하고 가운데 선택지를 고르려는 심리'),
+      T('variable-reward', 'Variable Reward', ['Variable Reward', 'Variable Rewards'], ['가변 보상', '변동 보상'], '뭐가 나올지 몰라서 또', '보상이 언제 무엇일지 모를 때 행동을 더 자주 반복하는 심리'),
+    ]},
+  ],
+}, {
+  id: 'research',
+  short: '리서치 방법',
+  title: '알고 싶은 것별 UX 리서치 방법',
+  nickLabel: '한 줄 뜻',
+  credit: DERIVED,
+  categories: [
+    { id: 'methods', name: '리서치', terms: [
+      T('user-interview', 'User Interview', ['User Interview', 'Interview'], ['사용자 인터뷰', '유저 인터뷰', '인터뷰'], '왜 그랬는지 직접 묻기', '사용자와 일대일로 대화하며 행동의 이유를 깊이 알아내는 방법'),
+      T('usability-test', 'Usability Test', ['Usability Test', 'Usability Testing'], ['사용성 테스트', '유저빌리티 테스트'], '직접 써 보게 하고 관찰', '실제로 과제를 시켜 보고 어디서 막히는지 관찰하는 방법'),
+      T('ab-test', 'A/B Test', ['A/B Test', 'AB Test', 'A B Test', 'A/B Testing'], ['A/B 테스트', '에이비 테스트', 'AB 테스트'], '둘 중 뭐가 나은지 비교', '두 안을 사용자에게 나눠 보여주고 숫자로 비교하는 방법'),
+      T('card-sorting', 'Card Sorting', ['Card Sorting', 'Card Sort'], ['카드 소팅', '카드 분류'], '직접 묶어 보게 하기', '메뉴 항목 카드를 사용자가 직접 묶어 보게 해 머릿속 분류를 알아내는 방법'),
+      T('tree-testing', 'Tree Testing', ['Tree Testing', 'Tree Test'], ['트리 테스트', '트리 테스팅'], '메뉴에서 찾아보게 하기', '화면 없이 메뉴 구조만 주고 원하는 항목을 찾게 해 구조를 검증하는 방법'),
+      T('survey', 'Survey', ['Survey'], ['설문', '설문조사', '서베이'], '많은 사람에게 묻기', '많은 사람에게 같은 질문을 던져 경향을 숫자로 파악하는 방법'),
+      T('diary-study', 'Diary Study', ['Diary Study'], ['다이어리 스터디', '일지 연구'], '며칠간 일기처럼 기록', '며칠 이상 사용 경험을 직접 기록하게 해 일상 속 변화를 보는 방법'),
+      T('heatmap', 'Heatmap', ['Heatmap', 'Heat Map'], ['히트맵', '열지도'], '많이 누른 곳이 빨갛게', '사람들이 많이 누르거나 본 곳을 색으로 겹쳐 보여주는 방법'),
+      T('funnel-analysis', 'Funnel Analysis', ['Funnel Analysis', 'Funnel'], ['퍼널 분석', '깔때기 분석', '퍼널'], '어디서 빠져나가나', '단계별로 사람이 얼마나 줄어드는지 보고 이탈 지점을 찾는 방법'),
+    ]},
   ],
 }];
 
@@ -469,6 +762,21 @@ const FORCED = {
   'easing': ['ease-in', 'ease-out'], 'ease-in': ['ease-out', 'easing'], 'ease-out': ['ease-in', 'easing'],
   'accordion': ['dropdown'], 'dropdown': ['accordion'], 'modal-dialog': ['drawer'], 'drawer': ['modal-dialog'],
   'scroll-reveal': ['stagger-animation'], 'stagger-animation': ['scroll-reveal'],
+  'switch': ['checkbox'], 'checkbox': ['radio-button', 'switch'], 'radio-button': ['checkbox'],
+  'select': ['dropdown'], 'tabs': ['segmented-control'], 'segmented-control': ['tabs'],
+  'tooltip': ['popover'], 'popover': ['tooltip'], 'bottom-sheet': ['drawer'], 'banner': ['popup'], 'popup': ['modal-dialog', 'banner'],
+  'chip': ['ui-badge'], 'ui-badge': ['chip'], 'stepper': ['slider'], 'slider': ['stepper'],
+  'placeholder': ['input-label'], 'input-label': ['placeholder'], 'ui-button': ['text-link'], 'text-link': ['ui-button'],
+  'avatar': ['thumbnail'], 'thumbnail': ['avatar'], 'app-bar': ['tab-bar'], 'tab-bar': ['app-bar'],
+  'spinner': ['skeleton-loading', 'loading-button'], 'skeleton-loading': ['spinner'], 'loading-button': ['spinner'],
+  'progress-bar': ['progress-ring'], 'progress-ring': ['progress-bar'], 'page-indicator': ['tab-indicator'], 'tab-indicator': ['page-indicator'],
+  'kebab': ['meatballs', 'hamburger'], 'meatballs': ['kebab', 'waffle'], 'hamburger': ['veggie-burger', 'kebab'], 'veggie-burger': ['hamburger'], 'waffle': ['bento-menu'], 'bento-menu': ['waffle'],
+  'share-ios': ['share-android'], 'share-android': ['share-ios'], 'forward': ['send-icon'], 'send-icon': ['forward'],
+  'swipe': ['drag-and-drop'], 'drag-and-drop': ['swipe'], 'star-rating': ['half-star-rating'], 'half-star-rating': ['star-rating'],
+  'push': ['fade-through'], 'modal-present': ['sheet-expand'], 'card-expand': ['shared-element'], 'shared-element': ['card-expand'],
+  'neumorphism': ['claymorphism'], 'claymorphism': ['neumorphism'], 'flat-design': ['material-design'], 'material-design': ['flat-design'],
+  'scarcity': ['social-proof'], 'anchoring': ['framing'], 'framing': ['anchoring'], 'fake-countdown': ['fake-scarcity'], 'fake-scarcity': ['fake-countdown'],
+  'card-sorting': ['tree-testing'], 'tree-testing': ['card-sorting'], 'user-interview': ['usability-test'], 'usability-test': ['user-interview'],
 };
 
 /* ================= 채점 ================= */
@@ -576,7 +884,7 @@ const createPlayer = () => ({
 });
 const Player = createPlayer();
 
-/* ================= 데모 26개 ================= */
+/* ================= 데모 ================= */
 const EASE = { lin: t => t, in: t => t * t * t, out: t => 1 - Math.pow(1 - t, 3), inout: t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2 };
 const CURSOR = '<svg width="22" height="24" viewBox="0 0 22 24"><path d="M3 2l15 9-6.5 1.6L8.5 20z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 const CART = '<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h3l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.1L21 7H6"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>';
@@ -1130,6 +1438,1181 @@ D('micro-interaction', (r, c) => {
   return 2400;
 });
 
+/* ----- 추가 데모 공용 도구 ----- */
+const SCR = (r, html) => h('div', 'nx-scr', r, html);
+const PH = (r, html) => h('div', 'nx-ph', r, html);
+const LN = (w, d) => `<i class="nx-l${d ? ' d' : ''}" style="width:${w}%"></i>`;
+const ROWS = (n, col) => Array.from({length: n}, (_, i) => `<div class="nx-row"><span class="nx-dot" style="background:${col || ['#b3a8ff', '#f6b93f', '#7be3bd', '#ff9fb1'][i % 4]}"></span><div class="nx-b">${LN(70 - i * 6, 1)}${LN(90)}</div></div>`).join('');
+const A = (c, el, fr, dur, delay, ease) => c.anim(el, fr, {duration: dur, delay: delay || 0, fill: 'both', easing: ease || 'ease-out'});
+const SEQ = (c, list) => list.forEach(([ms, fn]) => c.timeout(fn, ms));
+const IN = [{opacity: 0, transform: 'translateY(10px)'}, {opacity: 1, transform: 'none'}];
+const OUT = [{opacity: 1}, {opacity: 0}];
+const POP = [{transform: 'scale(.4)', opacity: 0}, {transform: 'scale(1.1)', opacity: 1, offset: .7}, {transform: 'scale(1)', opacity: 1}];
+const PRESS = [{transform: 'scale(1)'}, {transform: 'scale(.88)'}, {transform: 'scale(1)'}];
+const PULSE = [{transform: 'scale(1)'}, {transform: 'scale(1.12)'}, {transform: 'scale(1)'}];
+// 손가락 표시: pts = [[x, y, 시간비율], ...]
+function finger(c, parent, pts, dur, delay){
+  const f = h('div', 'nx-f', parent);
+  A(c, f, pts.map(p => ({transform: `translate(${p[0] - 15}px,${p[1] - 15}px)`, offset: p[2], opacity: p[3] == null ? 1 : p[3]})), dur, delay, 'ease-in-out');
+  return f;
+}
+const ICON = paths => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+function iconDemo(r, c, paths){
+  const box = h('div', 'nx-tile', r, ICON(paths));
+  A(c, box, POP, 450, 150);
+  A(c, box, PRESS, 240, 1300);
+  return 2400;
+}
+
+/* ----- 글자 등장 ----- */
+D('fade-up', (r, c) => { const t = h('div', 'nx-big', r, '오늘의 디자인 팁'); A(c, t, [{opacity: 0, transform: 'translateY(34px)'}, {opacity: 1, transform: 'none'}], 900, 300); A(c, t, OUT, 400, 2200); return 2600; });
+D('mask-reveal', (r, c) => {
+  const w = css(h('div', '', r), {overflow: 'hidden', paddingBottom: '4px', borderBottom: '2px solid #7c6cff'});
+  const t = h('div', 'nx-big', w, '새 기능 출시');
+  A(c, t, [{transform: 'translateY(115%)'}, {transform: 'none'}], 800, 300, 'cubic-bezier(.2,.8,.2,1)');
+  A(c, t, [{transform: 'none'}, {transform: 'translateY(-115%)'}], 500, 2100, 'ease-in');
+  return 2700;
+});
+D('text-highlight', (r, c) => {
+  const w = css(h('div', 'nx-big', r), {position: 'relative', padding: '2px 8px'});
+  const m = css(h('i', '', w), {position: 'absolute', left: 0, right: 0, top: '30%', bottom: '4%', background: '#f6b93f', borderRadius: '4px', transformOrigin: '0 50%'});
+  const tx = css(h('span', '', w, '핵심만 기억해요'), {position: 'relative'});
+  A(c, m, [{transform: 'scaleX(0)'}, {transform: 'scaleX(1)'}], 800, 500, 'ease-in-out');
+  A(c, tx, [{color: '#fff'}, {color: '#241a00'}], 500, 800);
+  return 2600;
+});
+D('word-rotate', (r, c) => {
+  const w = css(h('div', 'nx-big', r), {display: 'flex', gap: '10px'});
+  h('span', '', w, '오늘은');
+  const box = css(h('span', '', w), {display: 'block', position: 'relative', overflow: 'hidden', width: '4.2em', height: '1.25em', color: '#f6b93f'});
+  ['월요일', '화요일', '수요일'].forEach((t, i) => {
+    const s = css(h('span', '', box, t), {position: 'absolute', left: 0, top: 0});
+    const o = i / 3;
+    A(c, s, [
+      {transform: i ? 'translateY(110%)' : 'none', offset: 0},
+      {transform: i ? 'translateY(110%)' : 'none', offset: Math.max(0, o - .001)},
+      ...(i ? [{transform: 'none', offset: o + .05}] : []),
+      {transform: 'none', offset: o + .28},
+      {transform: 'translateY(-110%)', offset: o + .33},
+      {transform: 'translateY(-110%)', offset: 1},
+    ], 3300, 0, 'linear');
+  });
+  return 3300;
+});
+D('blur-in', (r, c) => { const t = h('div', 'nx-big', r, '지금 집중'); A(c, t, [{filter: 'blur(18px)', opacity: 0}, {filter: 'blur(0)', opacity: 1}], 1200, 300); A(c, t, OUT, 400, 2300); return 2700; });
+
+/* ----- 스크롤 ----- */
+D('rubber-band', (r, c) => {
+  const p = PH(r), list = h('div', '', p, ROWS(8)), sh = 150;
+  A(c, list, [
+    {transform: 'translateY(0)', offset: 0, easing: 'ease-in-out'},
+    {transform: `translateY(${-sh}px)`, offset: .35, easing: 'ease-out'},
+    {transform: `translateY(${-sh - 44}px)`, offset: .47, easing: 'cubic-bezier(.3,1.4,.5,1)'},
+    {transform: `translateY(${-sh}px)`, offset: .68},
+    {transform: `translateY(${-sh}px)`, offset: 1},
+  ], 2600, 200, 'linear');
+  return 3000;
+});
+D('momentum-scroll', (r, c) => {
+  const p = PH(r), list = h('div', '', p, ROWS(16));
+  finger(c, p, [[70, 170, 0, 0], [70, 170, .05], [70, 70, .2], [70, 70, .25, 0], [70, 70, 1, 0]], 3000, 100);
+  A(c, list, [
+    {transform: 'translateY(0)', offset: 0},
+    {transform: 'translateY(0)', offset: .05},
+    {transform: 'translateY(-110px)', offset: .2, easing: 'cubic-bezier(.05,.75,.2,1)'},
+    {transform: 'translateY(-520px)', offset: .9},
+    {transform: 'translateY(-520px)', offset: 1},
+  ], 3000, 100, 'linear');
+  return 3300;
+});
+
+/* ----- 화면 전환 ----- */
+function twoScreens(r){
+  const p = PH(r);
+  const a = h('div', 'nx-cl', p, `<div class="nx-pad" style="padding-bottom:4px">${LN(55, 1)}</div>${ROWS(5)}`);
+  const b = css(h('div', 'nx-cl', p, `<div class="nx-hero"></div><div class="nx-pad">${LN(70, 1)}${LN(95)}${LN(85)}${LN(60)}<div class="nx-btn" style="margin-top:8px;width:100%">담기</div></div>`), {visibility: 'hidden'});
+  return [p, a, b];
+}
+const showAt = (c, el, ms) => c.timeout(() => { el.style.visibility = 'visible'; }, ms);
+D('push', (r, c) => {
+  const [p, a, b] = twoScreens(r); showAt(c, b, 450);
+  finger(c, p, [[70, 70, 0, 0], [70, 70, .2], [70, 70, .3, 0], [70, 70, 1, 0]], 1500);
+  A(c, a, [{transform: 'none'}, {transform: 'translateX(-35%)', opacity: .5}], 500, 450, 'cubic-bezier(.2,.8,.3,1)');
+  A(c, b, [{transform: 'translateX(100%)'}, {transform: 'none'}], 500, 450, 'cubic-bezier(.2,.8,.3,1)');
+  return 2500;
+});
+D('modal-present', (r, c) => {
+  const [p, a, b] = twoScreens(r); showAt(c, b, 450);
+  b.style.top = '16px'; b.style.borderRadius = '14px 14px 0 0'; b.style.boxShadow = '0 -6px 20px #0005'; b.style.overflow = 'hidden';
+  a.style.background = '#c4c7dc';
+  A(c, a, [{transform: 'none'}, {transform: 'scale(.92)', borderRadius: '14px'}], 500, 450);
+  A(c, b, [{transform: 'translateY(100%)'}, {transform: 'none'}], 500, 450, 'cubic-bezier(.2,.8,.3,1)');
+  return 2500;
+});
+D('fade-through', (r, c) => {
+  const [, a, b] = twoScreens(r); showAt(c, b, 600);
+  A(c, a, OUT, 280, 500, 'ease-in');
+  A(c, b, [{opacity: 0, transform: 'scale(.9)'}, {opacity: 1, transform: 'none'}], 400, 800);
+  return 2500;
+});
+D('card-expand', (r, c) => {
+  const p = PH(r), bg = h('div', 'nx-cl', p, `<div class="nx-pad">${LN(50, 1)}</div>${ROWS(4)}`);
+  const k = css(h('div', '', p, `<div class="nx-hero" style="height:100%"></div>`), {position: 'absolute', left: '12px', top: '46px', width: '118px', height: '60px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 6px 14px #0003'});
+  bg.style.background = '#f6f7ff';
+  A(c, k, [{left: '12px', top: '46px', width: '118px', height: '60px', borderRadius: '12px'}, {left: '0', top: '0', width: '142px', height: '110px', borderRadius: '0'}], 550, 700, 'cubic-bezier(.3,.8,.3,1)');
+  const d = css(h('div', '', p, `${LN(70, 1)}${LN(95)}${LN(85)}${LN(60)}`), {position: 'absolute', left: '12px', right: '12px', top: '122px'});
+  const under = css(h('div', '', p), {position: 'absolute', left: 0, right: 0, top: '110px', bottom: 0, background: '#f6f7ff'}); p.insertBefore(under, d);
+  A(c, under, [{opacity: 0}, {opacity: 1}], 300, 900); A(c, d, IN, 350, 1050);
+  return 2700;
+});
+D('zoom-transition', (r, c) => {
+  const [p, a, b] = twoScreens(r); showAt(c, b, 500); p.style.background = '#111';
+  A(c, a, [{transform: 'none', opacity: 1}, {transform: 'scale(2.2)', opacity: 0}], 550, 500, 'ease-in');
+  A(c, b, [{transform: 'scale(.35)', opacity: 0}, {transform: 'none', opacity: 1}], 550, 500);
+  return 2600;
+});
+D('tab-switch', (r, c) => {
+  const p = PH(r), wrap = css(h('div', '', p), {display: 'flex', width: '426px', height: '100%'});
+  ['#b3a8ff', '#f6b93f', '#7be3bd'].forEach(col => h('div', '', css(h('div', '', wrap), {width: '142px', flex: 'none'}), `<div class="nx-pad">${LN(50, 1)}</div>${ROWS(3, col)}`));
+  const tb = h('div', 'nx-tb', p, '<i class="on"></i><i></i><i></i>'), it = [...tb.children];
+  const go = k => { it.forEach((x, j) => x.classList.toggle('on', j === k)); wrap.style.transition = 'transform .4s cubic-bezier(.2,.8,.3,1)'; wrap.style.transform = `translateX(${-142 * k}px)`; };
+  SEQ(c, [[800, () => go(1)], [1800, () => go(2)]]);
+  return 3000;
+});
+D('sheet-expand', (r, c) => {
+  const p = PH(r); h('div', '', p, `<div class="nx-pad">${LN(50, 1)}</div>${ROWS(4)}`);
+  const s = css(h('div', 'nx-sheet', p, `<div class="nx-grab"></div>${LN(60, 1)}${LN(90)}${LN(80)}${LN(70)}${LN(90)}${LN(60)}${LN(85)}`), {top: '0'});
+  A(c, s, [
+    {transform: 'translateY(100%)', offset: 0, easing: 'cubic-bezier(.2,.8,.3,1)'},
+    {transform: 'translateY(55%)', offset: .18}, {transform: 'translateY(55%)', offset: .45, easing: 'cubic-bezier(.2,.8,.3,1)'},
+    {transform: 'translateY(8%)', offset: .65}, {transform: 'translateY(8%)', offset: 1},
+  ], 2700, 200, 'linear');
+  finger(c, p, [[70, 130, 0, 0], [70, 130, .38], [70, 30, .62], [70, 30, .68, 0], [70, 30, 1, 0]], 2700, 200);
+  return 3100;
+});
+
+/* ----- 완료 표시 ----- */
+function drawCheck(c, parent, size, col, delay){
+  const box = css(h('div', '', parent, `<svg viewBox="0 0 60 60" width="${size}" height="${size}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="30" r="25" pathLength="1" stroke-dasharray="1" transform="rotate(-90 30 30)"/><path d="M19 31l8 8 15-17" pathLength="1" stroke-dasharray="1"/></svg>`), {lineHeight: 0});
+  const [ci, ch] = box.querySelectorAll('circle,path');
+  A(c, ci, [{strokeDashoffset: 1}, {strokeDashoffset: 0}], 550, delay, 'ease-in-out');
+  A(c, ch, [{strokeDashoffset: 1}, {strokeDashoffset: 0}], 320, delay + 480);
+  return box;
+}
+D('check-animation', (r, c) => { drawCheck(c, r, 130, '#3ddc97', 300); return 2500; });
+D('strikethrough', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {padding: '26px 24px', display: 'grid', gap: '16px', fontSize: '15px', fontWeight: 600});
+  ['기획서 쓰기', '메일 보내기', '운동 30분'].forEach((t, i) => {
+    const row = css(h('div', '', w), {display: 'flex', gap: '10px', alignItems: 'center'});
+    const box = css(h('span', '', row), {flex: 'none', width: '20px', height: '20px', borderRadius: '6px', border: '2px solid #5b4bf0', display: 'grid', placeItems: 'center', color: '#fff', fontSize: '12px'});
+    const tx = css(h('span', '', row, t), {position: 'relative'});
+    const ln = css(h('i', '', tx), {position: 'absolute', left: '-2px', right: '-2px', top: '50%', height: '2px', background: '#23264a', transformOrigin: '0 50%'});
+    const at = 500 + i * 700;
+    c.timeout(() => { box.style.background = '#5b4bf0'; box.textContent = '✓'; }, at);
+    A(c, ln, [{transform: 'scaleX(0)'}, {transform: 'scaleX(1)'}], 350, at, 'ease-in-out');
+    A(c, tx, [{opacity: 1}, {opacity: .45}], 300, at + 250);
+  });
+  return 3400;
+});
+D('button-morph', (r, c) => {
+  const b = css(h('div', 'nx-btn', r, '<span>결제하기</span>'), {height: '48px', fontSize: '16px', padding: 0, overflow: 'hidden'});
+  A(c, b, [{width: '180px', borderRadius: '12px'}, {width: '180px', borderRadius: '12px', offset: .2}, {width: '48px', borderRadius: '24px', offset: .32}, {width: '48px', borderRadius: '24px', background: '#5b4bf0', offset: .68}, {width: '48px', borderRadius: '24px', background: '#3ddc97', offset: .74}, {width: '48px', borderRadius: '24px', background: '#3ddc97'}], 2800);
+  SEQ(c, [[600, () => { b.innerHTML = '<i class="nx-spin"></i>'; }], [1950, () => { b.textContent = '✓'; }]]);
+  return 3000;
+});
+D('progress-complete', (r, c) => {
+  const s = SCR(r), w = css(h('div', 'nx-cen', s), {alignItems: 'stretch', padding: '0 26px'});
+  const top = css(h('div', '', w, '<b>업로드</b>'), {display: 'flex', justifyContent: 'space-between', fontSize: '14px'});
+  const ok = css(h('b', '', top, '✓ 끝'), {color: '#17a974'});
+  const tr = css(h('div', '', w), {height: '10px', borderRadius: '5px', background: '#dfe1f2', overflow: 'hidden'});
+  const bar = css(h('i', '', tr), {display: 'block', height: '100%', background: '#5b4bf0', transformOrigin: '0 50%'});
+  A(c, bar, [{transform: 'scaleX(0)', background: '#5b4bf0', offset: 0}, {transform: 'scaleX(1)', background: '#5b4bf0', offset: .85}, {transform: 'scaleX(1)', background: '#17a974'}], 1800, 200, 'ease-in-out');
+  A(c, ok, POP, 350, 1900);
+  return 3000;
+});
+D('send-animation', (r, c) => {
+  const s = SCR(r); css(h('div', '', s, `${LN(60, 1)}${LN(90)}${LN(75)}`), {padding: '18px'});
+  const pl = css(h('div', '', s, ICON('<path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/>')), {position: 'absolute', left: '50%', top: '58%', width: '46px', height: '46px', color: '#5b4bf0'});
+  A(c, pl, [{transform: 'translate(-50%,-50%) rotate(0)', opacity: 1, offset: 0}, {transform: 'translate(-90%,-30%) rotate(-12deg)', opacity: 1, offset: .25, easing: 'ease-in'}, {transform: 'translate(320%,-340%) rotate(8deg) scale(.5)', opacity: 0, offset: .8}, {transform: 'translate(320%,-340%) scale(.5)', opacity: 0}], 1700, 400);
+  A(c, css(h('div', 'nx-cen', s, '<div class="nx-h">보냈어요</div>'), {justifyContent: 'flex-end', paddingBottom: '20px'}), IN, 350, 1500);
+  return 2900;
+});
+D('stamp', (r, c) => {
+  const s = SCR(r); css(h('div', '', s, `${LN(55, 1)}${LN(90)}${LN(85)}${LN(92)}${LN(60)}`), {padding: '18px 22px'});
+  const st = css(h('div', '', s, '승인'), {position: 'absolute', right: '26px', bottom: '22px', width: '82px', height: '82px', borderRadius: '50%', border: '5px solid #e5484d', color: '#e5484d', display: 'grid', placeItems: 'center', fontWeight: 900, fontSize: '22px', rotate: '-14deg'});
+  A(c, st, [{transform: 'scale(3)', opacity: 0}, {transform: 'scale(1)', opacity: 1}], 260, 700, 'ease-in');
+  A(c, s, [{transform: 'none'}, {transform: 'scale(.97)'}, {transform: 'none'}], 200, 950);
+  return 2700;
+});
+D('badge-unlock', (r, c) => {
+  const b = css(h('div', '', r, '★'), {width: '110px', height: '110px', borderRadius: '50%', background: 'radial-gradient(circle at 35% 30%,#ffe9a8,#f6b93f 60%,#c98a12)', display: 'grid', placeItems: 'center', fontSize: '52px', color: '#fff', boxShadow: '0 0 0 #f6b93f00'});
+  A(c, b, [{transform: 'scale(.3) rotateY(0)', filter: 'grayscale(1)', opacity: .4, boxShadow: '0 0 0 #f6b93f00'}, {transform: 'scale(1.15) rotateY(720deg)', filter: 'grayscale(0)', opacity: 1, boxShadow: '0 0 50px #f6b93fcc', offset: .8}, {transform: 'scale(1) rotateY(720deg)', filter: 'grayscale(0)', opacity: 1, boxShadow: '0 0 30px #f6b93f88'}], 1300, 300);
+  css(h('div', 'nx-sub', r, '7일 연속 달성'), {alignSelf: 'end', marginBottom: '18%', color: '#cfd2ff'});
+  return 2900;
+});
+D('success-screen', (r, c) => {
+  const p = PH(r); h('div', '', p, `<div class="nx-pad">${LN(50, 1)}</div>${ROWS(4)}`);
+  const s = h('div', 'nx-cl', p), w = h('div', 'nx-cen', s);
+  A(c, s, [{transform: 'translateY(100%)'}, {transform: 'none'}], 450, 400, 'cubic-bezier(.2,.8,.3,1)');
+  drawCheck(c, w, 62, '#17a974', 800);
+  h('div', 'nx-h', w, '주문했어요'); h('div', 'nx-sub', w, '내일 도착 예정'); h('div', 'nx-btn', w, '주문 내역');
+  return 3100;
+});
+
+/* ----- 입력 폼 ----- */
+D('text-field', (r, c) => {
+  const s = SCR(r), w = css(h('div', 'nx-cen', s), {alignItems: 'stretch', padding: '0 34px'});
+  h('div', 'nx-lab', w, '이메일');
+  const f = h('div', 'nx-field', w), msg = css(h('div', 'nx-sub', w, ' '), {textAlign: 'left', minHeight: '16px'});
+  const set = (col, txt, m, mc) => { f.style.borderColor = col; f.textContent = txt; msg.textContent = m || ' '; msg.style.color = mc || ''; };
+  SEQ(c, [[600, () => set('#5b4bf0', '')], [1000, () => set('#5b4bf0', 'woody@')], [1600, () => set('#e5484d', 'woody@', '형식을 확인해 주세요', '#e5484d')], [2500, () => set('#5b4bf0', 'woody@mail.com')], [3100, () => set('#17a974', 'woody@mail.com', '사용할 수 있어요', '#17a974')]]);
+  return 4200;
+});
+D('select', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {padding: '24px 34px'});
+  h('div', 'nx-lab', w, '희망 직무');
+  const f = css(h('div', 'nx-field', w, '<span style="color:#9da1c4">선택해 주세요</span>'), {justifyContent: 'space-between'});
+  css(h('b', '', f, '▾'), {color: '#7a7fa6'});
+  const m = css(h('div', '', w), {background: '#fff', borderRadius: '9px', boxShadow: '0 8px 20px #0003', marginTop: '4px', overflow: 'hidden', opacity: 0});
+  const it = ['디자이너', '개발자', '기획자'].map(t => css(h('div', '', m, t), {padding: '7px 10px'}));
+  SEQ(c, [[500, () => A(c, m, IN, 200)], [1200, () => { it[1].style.background = '#e9e7ff'; }], [1600, () => { m.style.visibility = 'hidden'; f.firstChild.textContent = '개발자'; f.firstChild.style.color = '#23264a'; f.style.borderColor = '#5b4bf0'; }]]);
+  return 3000;
+});
+D('segmented-control', (r, c) => {
+  const w = css(h('div', '', r), {position: 'relative', display: 'flex', width: '270px', background: '#2a3070', borderRadius: '12px', padding: '4px', color: '#fff', fontWeight: 700});
+  const th = css(h('i', '', w), {position: 'absolute', left: '4px', top: '4px', bottom: '4px', width: 'calc((100% - 8px)/3)', background: '#7c6cff', borderRadius: '9px', transition: 'transform .3s cubic-bezier(.2,.8,.3,1)'});
+  ['일', '주', '월'].forEach(t => css(h('div', '', w, t), {position: 'relative', flex: 1, textAlign: 'center', padding: '10px 0'}));
+  SEQ(c, [[700, () => { th.style.transform = 'translateX(100%)'; }], [1500, () => { th.style.transform = 'translateX(200%)'; }], [2300, () => { th.style.transform = 'none'; }]]);
+  return 3100;
+});
+D('switch', (r, c) => {
+  const s = SCR(r), w = css(h('div', 'nx-cen', s), {flexDirection: 'row', justifyContent: 'space-between', padding: '0 32px'});
+  h('b', '', w, '새 공고 알림');
+  const t = css(h('div', '', w), {width: '60px', height: '34px', borderRadius: '17px', background: '#c8cbe4', position: 'relative', transition: 'background .25s'});
+  const k = css(h('i', '', t), {position: 'absolute', left: '3px', top: '3px', width: '28px', height: '28px', borderRadius: '50%', background: '#fff', boxShadow: '0 2px 5px #0005', transition: 'transform .25s'});
+  const set = on => { t.style.background = on ? '#5b4bf0' : '#c8cbe4'; k.style.transform = on ? 'translateX(26px)' : 'none'; };
+  SEQ(c, [[700, () => set(true)], [2000, () => set(false)]]);
+  return 2900;
+});
+D('checkbox', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {padding: '30px 40px', display: 'grid', gap: '14px', fontWeight: 600, fontSize: '15px'});
+  const bs = ['포트폴리오', '이력서', '자기소개서'].map(t => { const row = css(h('div', '', w), {display: 'flex', gap: '10px', alignItems: 'center'}); const b = css(h('span', '', row), {width: '22px', height: '22px', borderRadius: '6px', border: '2px solid #a6aad0', display: 'grid', placeItems: 'center', color: '#fff'}); h('span', '', row, t); return b; });
+  const on = (k, v) => { bs[k].style.background = v ? '#5b4bf0' : ''; bs[k].style.borderColor = v ? '#5b4bf0' : '#a6aad0'; bs[k].textContent = v ? '✓' : ''; if (v) A(c, bs[k], POP, 220); };
+  SEQ(c, [[500, () => on(0, true)], [1100, () => on(2, true)], [1700, () => on(1, true)], [2500, () => on(2, false)]]);
+  return 3300;
+});
+D('radio-button', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {padding: '30px 40px', display: 'grid', gap: '14px', fontWeight: 600, fontSize: '15px'});
+  const bs = ['대면 면접', '화상 면접', '전화 면접'].map(t => { const row = css(h('div', '', w), {display: 'flex', gap: '10px', alignItems: 'center'}); const b = css(h('span', '', row), {width: '22px', height: '22px', borderRadius: '50%', border: '2px solid #a6aad0', display: 'grid', placeItems: 'center'}); h('span', '', row, t); return b; });
+  const pick = k => bs.forEach((b, i) => { b.style.borderColor = i === k ? '#5b4bf0' : '#a6aad0'; b.innerHTML = i === k ? '<i style="width:12px;height:12px;border-radius:50%;background:#5b4bf0;display:block"></i>' : ''; });
+  SEQ(c, [[500, () => pick(0)], [1300, () => pick(1)], [2100, () => pick(2)]]);
+  return 3100;
+});
+D('slider', (r, c) => {
+  const s = SCR(r), w = css(h('div', 'nx-cen', s), {alignItems: 'stretch', padding: '0 34px'});
+  const top = css(h('div', '', w, '<b>하루 연습 시간</b>'), {display: 'flex', justifyContent: 'space-between'});
+  const val = css(h('b', '', top, '1시간'), {color: '#5b4bf0'});
+  const tr = css(h('div', '', w), {position: 'relative', height: '6px', borderRadius: '3px', background: '#dfe1f2', margin: '12px 0'});
+  const fil = css(h('i', '', tr), {position: 'absolute', left: 0, top: 0, bottom: 0, width: '100%', background: '#5b4bf0', borderRadius: '3px', transformOrigin: '0 50%'});
+  const kn = css(h('i', '', tr), {position: 'absolute', top: '-9px', left: '-12px', width: '24px', height: '24px', borderRadius: '50%', background: '#fff', border: '3px solid #5b4bf0'});
+  c.loop(now => {
+    const v = .5 + .35 * Math.sin(now / 900);
+    fil.style.transform = `scaleX(${v})`; kn.style.left = `calc(${v * 100}% - 12px)`; val.textContent = Math.round(v * 8) + '시간';
+  });
+  return 0;
+});
+D('stepper', (r, c) => {
+  const w = css(h('div', '', r), {display: 'flex', alignItems: 'center', background: '#fff', borderRadius: '14px', color: '#23264a', boxShadow: '0 10px 26px #0007', fontSize: '24px', fontWeight: 800});
+  const mk = t => css(h('div', '', w, t), {width: '64px', height: '60px', display: 'grid', placeItems: 'center', color: '#5b4bf0'});
+  const m = mk('−'), n = css(h('div', '', w, '1'), {width: '50px', textAlign: 'center'}), p = mk('+');
+  let v = 1; const go = (b, d) => () => { v += d; n.textContent = v; A(c, b, PRESS, 200); A(c, n, [{transform: 'scale(1.3)'}, {transform: 'none'}], 200); };
+  SEQ(c, [[600, go(p, 1)], [1200, go(p, 1)], [1800, go(p, 1)], [2600, go(m, -1)]]);
+  return 3400;
+});
+D('date-picker', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {padding: '12px 18px'});
+  h('b', '', w, '11월');
+  const g = css(h('div', '', w), {display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '2px', marginTop: '6px', fontSize: '12px', textAlign: 'center'});
+  const cells = Array.from({length: 28}, (_, i) => css(h('div', '', g, i + 1), {padding: '4px 0', borderRadius: '50%', aspectRatio: 'auto'}));
+  const pick = k => cells.forEach((x, i) => { x.style.background = i === k ? '#5b4bf0' : ''; x.style.color = i === k ? '#fff' : ''; });
+  SEQ(c, [[700, () => pick(8)], [1700, () => { pick(16); A(c, cells[16], POP, 220); }]]);
+  return 3000;
+});
+D('placeholder', (r, c) => {
+  const s = SCR(r), w = css(h('div', 'nx-cen', s), {alignItems: 'stretch', padding: '0 34px'});
+  const f = css(h('div', 'nx-field', w, '<span style="color:#a6aad0">이메일을 입력하세요</span>'), {height: '44px', fontSize: '15px'});
+  const sp = f.firstChild, txt = 'woody@mail.com';
+  c.timeout(() => { f.style.borderColor = '#5b4bf0'; }, 800);
+  [...txt].forEach((ch, i) => c.timeout(() => { if (!i) { sp.textContent = ''; sp.style.color = '#23264a'; } sp.textContent += ch; }, 1200 + i * 70));
+  return 3200;
+});
+D('input-label', (r, c) => {
+  const s = SCR(r), w = css(h('div', 'nx-cen', s), {alignItems: 'stretch', padding: '0 34px'});
+  const lb = css(h('div', 'nx-lab', w, '이메일'), {fontSize: '15px', color: '#5b4bf0', alignSelf: 'flex-start', padding: '2px 6px', borderRadius: '6px', background: '#e9e7ff'});
+  const f = css(h('div', 'nx-field', w), {height: '44px', fontSize: '15px'}), txt = 'woody@mail.com';
+  A(c, lb, PULSE, 500, 300);
+  [...txt].forEach((ch, i) => c.timeout(() => { f.textContent += ch; }, 900 + i * 70));
+  A(c, lb, PULSE, 500, 2100);
+  return 3100;
+});
+
+/* ----- 버튼과 표시 ----- */
+D('ui-button', (r, c) => {
+  const s = SCR(r), w = h('div', 'nx-cen', s), b = css(h('div', 'nx-btn', w, '저장하기'), {padding: '13px 34px', fontSize: '16px'});
+  const m = css(h('div', 'nx-h', w, '저장됐어요'), {color: '#17a974', opacity: 0});
+  A(c, b, PRESS, 220, 800); A(c, m, IN, 300, 1050);
+  return 2500;
+});
+D('text-link', (r, c) => {
+  const p = PH(r), a = h('div', 'nx-cl', p), w = h('div', 'nx-pad', a, `${LN(90)}${LN(70)}`);
+  const l = css(h('div', '', w, '자세히 보기'), {color: '#2563eb', textDecoration: 'underline', fontWeight: 600, margin: '8px 0'});
+  h('div', '', w, `${LN(85)}${LN(60)}`);
+  const n = css(h('div', 'nx-cl', p, `<div class="nx-hero"></div><div class="nx-pad">${LN(60, 1)}${LN(90)}${LN(80)}</div>`), {visibility: 'hidden'});
+  A(c, l, [{opacity: 1}, {opacity: .4}, {opacity: 1}], 240, 800);
+  showAt(c, n, 1050); A(c, n, [{transform: 'translateX(100%)'}, {transform: 'none'}], 400, 1050);
+  return 2800;
+});
+D('icon-button', (r, c) => {
+  const w = css(h('div', '', r), {display: 'flex', gap: '14px'});
+  const ps = ['<path d="M12 21s-7-4.5-9-9c-1.300-3.200.8-7 4.500-7 2 0 3.400 1.100 4.500 2.800C13.100 6.100 14.500 5 16.500 5 20.200 5 22.300 8.800 21 12c-2 4.500-9 9-9 9z"/>', '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.500-4.500"/>', '<path d="M6 6h12v15l-6-4-6 4z"/>'];
+  ps.forEach((p, i) => { const b = css(h('div', '', w, ICON(p)), {width: '56px', height: '56px', borderRadius: '16px', background: '#232a62', color: '#fff', padding: '15px'}); A(c, b, [{transform: 'scale(1)', background: '#232a62'}, {transform: 'scale(.86)', background: '#7c6cff'}, {transform: 'scale(1)', background: '#232a62'}], 340, 500 + i * 600); });
+  return 2800;
+});
+D('fab', (r, c) => {
+  const p = PH(r), list = h('div', '', p, ROWS(10));
+  const b = css(h('div', '', p, '+'), {position: 'absolute', right: '12px', bottom: '14px', width: '46px', height: '46px', borderRadius: '50%', background: '#5b4bf0', color: '#fff', display: 'grid', placeItems: 'center', fontSize: '26px', boxShadow: '0 6px 14px #5b4bf088'});
+  c.anim(list, [{transform: 'none'}, {transform: 'translateY(-240px)'}], {duration: 2600, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out'});
+  c.anim(b, PULSE, {duration: 1300, iterations: Infinity});
+  return 0;
+});
+D('chip', (r, c) => {
+  const w = css(h('div', '', r), {display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '300px'});
+  const ch = ['무료배송', '오늘도착', '특가', '신상품', '리뷰많은순'].map(t => h('span', 'nx-chip', w, t));
+  [0, 2, 3].forEach((k, i) => c.timeout(() => { ch[k].classList.add('on'); A(c, ch[k], PRESS, 200); }, 500 + i * 600));
+  c.timeout(() => ch[2].classList.remove('on'), 2500);
+  return 3200;
+});
+D('ui-badge', (r, c) => {
+  const box = h('div', 'nx-tile', r, ICON('<path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 9h18c0-1-3-2-3-9"/><path d="M10 21a2 2 0 0 0 4 0"/>'));
+  const b = css(h('div', 'badge', box, '2'), {background: '#e5484d', width: '36px', height: '36px', fontSize: '17px'});
+  A(c, b, POP, 300, 700);
+  SEQ(c, [[1600, () => { b.textContent = '3'; A(c, b, POP, 300); }]]);
+  return 2900;
+});
+D('avatar', (r, c) => {
+  const w = css(h('div', '', r), {display: 'flex'});
+  [['#7c6cff', '민'], ['#f6b93f', '수'], ['#3ddc97', '지'], ['#ff6b81', '현']].forEach(([bg, t], i) => {
+    const a = css(h('div', '', w, t), {width: '76px', height: '76px', borderRadius: '50%', background: bg, color: '#fff', fontWeight: 800, fontSize: '26px', display: 'grid', placeItems: 'center', border: '4px solid var(--stage)', marginLeft: i ? '-18px' : 0});
+    A(c, a, POP, 350, 200 + i * 180);
+  });
+  return 2700;
+});
+D('thumbnail', (r, c) => {
+  const w = css(h('div', '', r), {display: 'grid', gridTemplateColumns: 'repeat(2,130px)', gap: '10px'});
+  ['#7c6cff,#ff8fb1', '#5fe3ff,#3b6bff', '#f6b93f,#ff6b81', '#3ddc97,#1f7ad0'].forEach((g, i) => {
+    const t = css(h('div', '', w, '<span style="width:0;height:0;border-left:15px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent"></span>'), {height: '74px', borderRadius: '10px', background: `linear-gradient(135deg,${g})`, display: 'grid', placeItems: 'center'});
+    A(c, t, IN, 350, 200 + i * 160);
+  });
+  return 2600;
+});
+D('list-view', (r, c) => {
+  const s = SCR(r), rows = ['채용 공고', '합격 후기', '면접 질문', '포트폴리오'];
+  rows.forEach((t, i) => { const row = css(h('div', 'nx-row', s, `<span class="nx-dot"></span><b style="flex:1">${t}</b><span style="color:#a6aad0">›</span>`), {borderBottom: '1px solid #e3e5f6', padding: '11px 16px'}); A(c, row, IN, 300, 150 + i * 130); });
+  return 2500;
+});
+
+/* ----- 창과 안내 ----- */
+D('bottom-sheet', (r, c) => {
+  const p = PH(r); h('div', '', p, `<div class="nx-pad">${LN(50, 1)}</div>${ROWS(4)}`);
+  const d = h('div', 'nx-dim', p), s = h('div', 'nx-sheet', p, '<div class="nx-grab"></div><div style="display:grid;gap:9px;font-weight:600"><span>공유하기</span><span>이름 바꾸기</span><span style="color:#e5484d">삭제하기</span></div>');
+  A(c, d, [{opacity: 0}, {opacity: 1}], 300, 500); A(c, s, [{transform: 'translateY(100%)'}, {transform: 'none'}], 400, 500, 'cubic-bezier(.2,.8,.3,1)');
+  return 2700;
+});
+D('popover', (r, c) => {
+  const s = SCR(r); css(h('div', '', s, `${LN(55, 1)}${LN(85)}`), {padding: '16px', width: '62%'});
+  const b = css(h('div', '', s, '⋯'), {position: 'absolute', right: '16px', top: '14px', width: '34px', height: '34px', borderRadius: '10px', background: '#e3e5f6', display: 'grid', placeItems: 'center', fontWeight: 900});
+  const m = css(h('div', '', s, '<div style="padding:9px 14px">수정</div><div style="padding:9px 14px">복사</div><div style="padding:9px 14px;color:#e5484d">삭제</div>'), {position: 'absolute', right: '14px', top: '56px', background: '#fff', borderRadius: '10px', boxShadow: '0 10px 24px #0004', fontWeight: 600, transformOrigin: '100% 0'});
+  A(c, b, PRESS, 200, 500); A(c, m, [{transform: 'scale(.7)', opacity: 0}, {transform: 'none', opacity: 1}], 220, 650);
+  return 2600;
+});
+D('banner', (r, c) => {
+  const s = SCR(r), b = css(h('div', '', s, '<b style="flex:1">서류 마감이 3일 남았어요</b><span>✕</span>'), {display: 'flex', padding: '11px 14px', background: '#dfe9ff', color: '#1d4ed8'});
+  const con = css(h('div', '', s, ROWS(4)), {paddingTop: '4px'});
+  A(c, b, [{marginTop: '-42px'}, {marginTop: 0}], 400, 500);
+  return 2700;
+});
+D('popup', (r, c) => {
+  const p = PH(r); h('div', '', p, `<div class="nx-pad">${LN(50, 1)}</div>${ROWS(4)}`);
+  const d = h('div', 'nx-dim', p), m = css(h('div', '', p, '<div class="nx-hero" style="height:62px"></div><div style="padding:8px 10px;font-weight:800;font-size:13px;text-align:center">오늘만 50% 할인!</div><div style="position:absolute;right:6px;top:4px;color:#fff;font-weight:900">✕</div>'), {position: 'absolute', left: '14px', right: '14px', top: '50px', background: '#fff', borderRadius: '12px', overflow: 'hidden'});
+  A(c, d, [{opacity: 0}, {opacity: 1}], 200, 600); A(c, m, POP, 300, 600);
+  return 2700;
+});
+D('inline-error', (r, c) => {
+  const s = SCR(r), w = css(h('div', 'nx-cen', s), {alignItems: 'stretch', padding: '0 34px'});
+  h('div', 'nx-lab', w, '이메일');
+  const f = h('div', 'nx-field', w, 'woody@mail');
+  const e = css(h('div', '', w, '이메일 형식을 확인해 주세요'), {color: '#e5484d', fontSize: '13px', fontWeight: 600, textAlign: 'left', opacity: 0});
+  c.timeout(() => { f.style.borderColor = '#e5484d'; }, 900);
+  A(c, f, [{transform: 'translateX(0)'}, {transform: 'translateX(-5px)'}, {transform: 'translateX(5px)'}, {transform: 'translateX(0)'}], 240, 900);
+  A(c, e, IN, 260, 950);
+  return 2800;
+});
+D('coach-mark', (r, c) => {
+  const p = PH(r); h('div', '', p, `<div class="nx-pad">${LN(50, 1)}</div>${ROWS(4)}`);
+  const f = css(h('div', '', p, '+'), {position: 'absolute', right: '12px', bottom: '14px', width: '44px', height: '44px', borderRadius: '50%', background: '#5b4bf0', color: '#fff', display: 'grid', placeItems: 'center', fontSize: '24px'});
+  const spot = css(h('div', '', p), {position: 'absolute', right: '6px', bottom: '8px', width: '56px', height: '56px', borderRadius: '50%', boxShadow: '0 0 0 400px #000b', border: '2px solid #fff'});
+  const t = css(h('div', '', p, '<b>여기서 글을 올려요</b><div style="margin-top:6px"><span class="nx-chip">알겠어요</span></div>'), {position: 'absolute', left: '12px', right: '12px', top: '56px', color: '#fff', textAlign: 'left'});
+  A(c, spot, [{opacity: 0, transform: 'scale(2.2)'}, {opacity: 1, transform: 'none'}], 450, 500); A(c, t, IN, 300, 900);
+  return 3000;
+});
+
+/* ----- 내비게이션 ----- */
+D('app-bar', (r, c) => {
+  const p = PH(r), bar = css(h('div', '', p, '<span style="font-size:17px">‹</span><b style="flex:1;text-align:center">주문 내역</b><span>⋯</span>'), {display: 'flex', alignItems: 'center', padding: '11px 10px', background: '#fff', boxShadow: '0 2px 8px #0002', position: 'relative', zIndex: 1});
+  h('div', '', p, ROWS(5));
+  A(c, bar, [{background: '#fff'}, {background: '#dcd8ff'}, {background: '#fff'}], 1200, 500);
+  return 2300;
+});
+D('tab-bar', (r, c) => {
+  const p = PH(r); const body = h('div', '', p, `<div class="nx-pad">${LN(50, 1)}</div>${ROWS(3)}`);
+  const tb = css(h('div', 'nx-tb', p, ['홈', '검색', '쇼핑', '나'].map((t, i) => `<div style="display:grid;justify-items:center;gap:3px;font-size:9px;color:#7a7fa6"><i class="${i ? '' : 'on'}"></i>${t}</div>`).join('')), {padding: '7px 0 6px'});
+  const it = [...tb.querySelectorAll('i')];
+  [1, 2, 3].forEach((k, n) => c.timeout(() => it.forEach((x, j) => x.classList.toggle('on', j === k)), 700 + n * 750));
+  return 3200;
+});
+D('breadcrumb', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {display: 'flex', gap: '6px', padding: '18px', fontSize: '14px', color: '#7a7fa6', fontWeight: 600});
+  ['홈', '의류', '상의', '티셔츠'].forEach((t, i, a) => { const sp = h('span', '', w, (i ? '› ' : '') + t); if (i === a.length - 1){ sp.style.color = '#23264a'; sp.style.fontWeight = 800; } A(c, sp, IN, 260, 300 + i * 350); });
+  css(h('div', '', s, `${LN(60, 1)}${LN(90)}${LN(75)}`), {padding: '0 18px'});
+  return 2900;
+});
+D('pagination', (r, c) => {
+  const s = SCR(r), con = css(h('div', '', s, ROWS(3)), {paddingTop: '10px'});
+  const w = css(h('div', '', s), {position: 'absolute', left: 0, right: 0, bottom: '12px', display: 'flex', justifyContent: 'center', gap: '6px', fontWeight: 700});
+  const ps = [1, 2, 3, 4, 5].map(n => css(h('span', '', w, n), {width: '28px', height: '28px', borderRadius: '8px', display: 'grid', placeItems: 'center'}));
+  const go = k => { ps.forEach((x, i) => { x.style.background = i === k ? '#5b4bf0' : ''; x.style.color = i === k ? '#fff' : ''; }); A(c, con, [{opacity: .2}, {opacity: 1}], 300); };
+  go(0); [1, 2, 3].forEach((k, n) => c.timeout(() => go(k), 800 + n * 800));
+  return 3500;
+});
+D('infinite-scroll', (r, c) => {
+  const p = PH(r), list = h('div', '', p, ROWS(24));
+  c.anim(list, [{transform: 'none'}, {transform: 'translateY(-880px)'}], {duration: 6000, iterations: Infinity, easing: 'linear'});
+  css(h('div', '', css(h('div', '', p), {position: 'absolute', left: 0, right: 0, bottom: '8px', display: 'grid', placeItems: 'center', color: '#5b4bf0'}), '<i class="nx-spin" style="border-color:#5b4bf033;border-top-color:#5b4bf0"></i>'), {});
+  return 0;
+});
+D('back-navigation', (r, c) => {
+  const p = PH(r), a = h('div', 'nx-cl', p, `<div class="nx-pad">${LN(50, 1)}</div>${ROWS(5)}`);
+  const b = h('div', 'nx-cl', p, `<div style="padding:8px 10px;font-size:22px;font-weight:700;color:#5b4bf0" class="bk">‹</div><div class="nx-hero" style="height:50px"></div><div class="nx-pad">${LN(70, 1)}${LN(90)}${LN(80)}</div>`);
+  A(c, b.querySelector('.bk'), [{transform: 'none'}, {transform: 'scale(1.5)'}, {transform: 'none'}], 400, 700);
+  A(c, b, [{transform: 'none'}, {transform: 'translateX(100%)'}], 450, 1050, 'cubic-bezier(.4,0,.2,1)');
+  A(c, a, [{transform: 'translateX(-30%)', opacity: .5}, {transform: 'none', opacity: 1}], 450, 1050);
+  return 2800;
+});
+
+/* ----- 인디케이터 ----- */
+D('progress-bar', (r, c) => {
+  const s = SCR(r), w = css(h('div', 'nx-cen', s), {alignItems: 'stretch', padding: '0 30px'});
+  const tr = css(h('div', '', w), {height: '12px', borderRadius: '6px', background: '#dfe1f2', overflow: 'hidden'});
+  const bar = css(h('i', '', tr), {display: 'block', height: '100%', background: '#5b4bf0', transformOrigin: '0 50%'});
+  const n = css(h('b', '', w, '0%'), {textAlign: 'right', fontSize: '18px', color: '#5b4bf0'});
+  let t0 = null; c.loop(now => { if (t0 === null) t0 = now; const p = Math.min(1, (now - t0) / 2200); bar.style.transform = `scaleX(${p})`; n.textContent = Math.round(p * 100) + '%'; });
+  return 2800;
+});
+D('step-indicator', (r, c) => {
+  const w = css(h('div', '', r), {display: 'flex', alignItems: 'center', width: '300px'});
+  const ds = [], ls = [];
+  [1, 2, 3, 4].forEach((n, i) => {
+    if (i){ const l = css(h('div', '', css(h('div', '', w), {flex: 1, height: '4px', background: '#2d3470'})), {height: '100%', background: '#7c6cff', transformOrigin: '0 50%', transform: 'scaleX(0)'}); ls.push(l); }
+    ds.push(css(h('div', '', w, n), {width: '38px', height: '38px', borderRadius: '50%', background: '#2d3470', color: '#fff', fontWeight: 800, display: 'grid', placeItems: 'center', flex: 'none'}));
+  });
+  c.timeout(() => { ds[0].style.background = '#7c6cff'; }, 200);
+  ls.forEach((l, i) => { A(c, l, [{transform: 'scaleX(0)'}, {transform: 'scaleX(1)'}], 450, 600 + i * 800); c.timeout(() => { ds[i + 1].style.background = '#7c6cff'; A(c, ds[i + 1], PULSE, 260); }, 1050 + i * 800); });
+  return 3900;
+});
+D('page-indicator', (r, c) => {
+  const s = SCR(r), vw = css(h('div', '', s), {position: 'absolute', inset: '14px 14px 40px', borderRadius: '12px', overflow: 'hidden'});
+  const row = css(h('div', '', vw), {display: 'flex', height: '100%', transition: 'transform .45s cubic-bezier(.2,.8,.3,1)'});
+  const cs = ['#7c6cff,#ff8fb1', '#5fe3ff,#3b6bff', '#f6b93f,#ff6b81', '#3ddc97,#1f7ad0'];
+  cs.forEach(g => css(h('div', '', row), {flex: '0 0 100%', background: `linear-gradient(135deg,${g})`}));
+  const dots = css(h('div', '', s), {position: 'absolute', left: 0, right: 0, bottom: '14px', display: 'flex', justifyContent: 'center', gap: '7px'});
+  const ds = cs.map(() => css(h('i', '', dots), {width: '9px', height: '9px', borderRadius: '50%', background: '#c8cbe4', transition: '.3s'}));
+  const go = k => { row.style.transform = `translateX(${-k * 100}%)`; ds.forEach((d, i) => { d.style.background = i === k ? '#5b4bf0' : '#c8cbe4'; d.style.width = i === k ? '22px' : '9px'; d.style.borderRadius = '5px'; }); };
+  go(0); [1, 2, 3].forEach((k, n) => c.timeout(() => go(k), 800 + n * 900));
+  return 3800;
+});
+D('story-progress', (r, c) => {
+  const p = PH(r); p.style.background = 'linear-gradient(160deg,#7c6cff,#ff8fb1)';
+  const w = css(h('div', '', p), {display: 'flex', gap: '4px', padding: '9px'});
+  [0, 1, 2, 3].forEach(i => { const t = css(h('div', '', w), {flex: 1, height: '3px', borderRadius: '2px', background: '#ffffff55', overflow: 'hidden'}); A(c, css(h('i', '', t), {display: 'block', height: '100%', background: '#fff', transformOrigin: '0 50%'}), [{transform: 'scaleX(0)'}, {transform: 'scaleX(1)'}], 800, 200 + i * 800, 'linear'); });
+  return 3500;
+});
+D('scroll-progress', (r, c) => {
+  const s = SCR(r), doc = css(h('div', '', s, `<div class="nx-pad">${LN(55, 1)}${(LN(92) + LN(84) + LN(95) + LN(70)).repeat(6)}</div>`), {paddingTop: '6px'});
+  const bar = css(h('i', '', s), {position: 'absolute', left: 0, top: 0, height: '5px', width: '100%', background: '#5b4bf0', transformOrigin: '0 50%'});
+  const o = {duration: 3200, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out'};
+  c.anim(doc, [{transform: 'none'}, {transform: 'translateY(-300px)'}], o);
+  c.anim(bar, [{transform: 'scaleX(.02)'}, {transform: 'scaleX(1)'}], o);
+  return 0;
+});
+D('progress-ring', (r, c) => {
+  const w = css(h('div', '', r, '<svg viewBox="0 0 120 120" width="150" height="150"><circle cx="60" cy="60" r="50" fill="none" stroke="#2d3470" stroke-width="10"/><circle class="a" cx="60" cy="60" r="50" fill="none" stroke="#7c6cff" stroke-width="10" stroke-linecap="round" pathLength="100" stroke-dasharray="100" transform="rotate(-90 60 60)"/></svg>'), {position: 'relative', display: 'grid', placeItems: 'center'});
+  const n = css(h('b', '', w, '0%'), {position: 'absolute', fontSize: '26px'}), arc = w.querySelector('.a');
+  let t0 = null; c.loop(now => { if (t0 === null) t0 = now; const p = Math.min(1, (now - t0) / 2200), e = EASE.inout(p); arc.setAttribute('stroke-dashoffset', 100 - e * 100); n.textContent = Math.round(e * 100) + '%'; });
+  return 2900;
+});
+D('strength-meter', (r, c) => {
+  const s = SCR(r), w = css(h('div', 'nx-cen', s), {alignItems: 'stretch', padding: '0 30px'});
+  const f = css(h('div', 'nx-field', w), {letterSpacing: '3px', fontSize: '18px'});
+  const bs = css(h('div', '', w), {display: 'flex', gap: '5px'});
+  const seg = [0, 1, 2, 3].map(() => css(h('i', '', bs), {flex: 1, height: '6px', borderRadius: '3px', background: '#dfe1f2', transition: 'background .2s'}));
+  const m = css(h('b', '', w, ' '), {textAlign: 'left', fontSize: '13px'});
+  const lv = [[3, 1, '#e5484d', '약해요'], [6, 2, '#f09a1a', '보통이에요'], [9, 3, '#e8c61b', '꽤 안전해요'], [12, 4, '#17a974', '아주 안전해요']];
+  for (let i = 1; i <= 12; i++) c.timeout(() => {
+    f.textContent = '•'.repeat(i);
+    const l = lv.find(x => i <= x[0]);
+    seg.forEach((g, j) => { g.style.background = j < l[1] ? l[2] : '#dfe1f2'; }); m.textContent = l[3]; m.style.color = l[2];
+  }, 300 + i * 220);
+  return 3700;
+});
+D('tab-indicator', (r, c) => {
+  const w = css(h('div', '', r), {position: 'relative', display: 'flex', width: '300px', color: '#fff', fontWeight: 700, borderBottom: '1px solid #2d3470'});
+  ['홈', '쇼핑', '혜택'].forEach(t => css(h('div', '', w, t), {flex: 1, textAlign: 'center', padding: '13px 0'}));
+  const ln = css(h('i', '', w), {position: 'absolute', left: 0, bottom: '-2px', width: '33.33%', height: '4px', borderRadius: '2px', background: '#f6b93f', transition: 'transform .35s cubic-bezier(.2,.8,.3,1)'});
+  SEQ(c, [[700, () => { ln.style.transform = 'translateX(100%)'; }], [1500, () => { ln.style.transform = 'translateX(200%)'; }], [2300, () => { ln.style.transform = 'none'; }]]);
+  return 3100;
+});
+D('home-indicator', (r, c) => {
+  const p = PH(r); p.style.background = 'linear-gradient(160deg,#5fe3ff,#7c6cff)';
+  const b = css(h('i', '', p), {position: 'absolute', left: '50%', bottom: '8px', width: '62px', height: '5px', marginLeft: '-31px', borderRadius: '3px', background: '#111'});
+  c.anim(b, [{transform: 'none'}, {transform: 'scaleX(1.25) translateY(-4px)'}, {transform: 'none'}], {duration: 1100, iterations: Infinity, easing: 'ease-in-out'});
+  return 0;
+});
+
+/* ----- 로딩 ----- */
+D('spinner', (r) => { css(h('i', 'nx-spin', r), {width: '64px', height: '64px', borderWidth: '7px', color: '#7c6cff', borderColor: '#2d3470', borderTopColor: '#7c6cff'}); return 0; });
+D('blur-up', (r, c) => {
+  const f = css(h('div', '', r, '<svg viewBox="0 0 280 170" width="280" height="170"><defs><linearGradient id="nxsky" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8fb9ff"/><stop offset="1" stop-color="#3f6bef"/></linearGradient></defs><rect width="280" height="170" fill="url(#nxsky)"/><circle cx="215" cy="48" r="20" fill="#fff"/><path d="M0 170 80 62l48 62 44-40 108 86z" fill="#1c45b5"/><path d="M0 170 66 110l56 60zM150 170l66-52 64 52z" fill="#0d2b80"/></svg>'), {borderRadius: '12px', overflow: 'hidden', lineHeight: 0});
+  A(c, f.firstChild, [{filter: 'blur(18px)', transform: 'scale(1.1)', offset: 0}, {filter: 'blur(18px)', transform: 'scale(1.1)', offset: .4}, {filter: 'blur(0)', transform: 'none', offset: 1}], 2100, 200, 'ease-in-out');
+  return 3100;
+});
+D('optimistic-ui', (r, c) => {
+  const w = css(h('div', '', r), {display: 'flex', alignItems: 'center', gap: '10px', background: '#fff', color: '#23264a', padding: '14px 22px', borderRadius: '16px', fontSize: '24px', fontWeight: 800, boxShadow: '0 10px 26px #0007'});
+  const ht = css(h('span', '', w, '♡'), {color: '#a6aad0', fontSize: '34px'}), n = h('span', '', w, '127');
+  const st = css(h('span', '', w, '<i class="nx-spin" style="width:14px;height:14px;border-width:2px;color:#a6aad0;border-color:#e3e5f6;border-top-color:#a6aad0"></i>'), {visibility: 'hidden'});
+  SEQ(c, [[700, () => { ht.textContent = '♥'; ht.style.color = '#e5484d'; n.textContent = '128'; st.style.visibility = 'visible'; A(c, ht, POP, 260); }], [2100, () => { st.innerHTML = '<span style="font-size:13px;color:#17a974">✓</span>'; }]]);
+  return 3200;
+});
+D('loading-button', (r, c) => {
+  const b = css(h('div', 'nx-btn', r, '저장하기'), {padding: '14px 30px', fontSize: '16px', minWidth: '160px'});
+  SEQ(c, [[700, () => { b.innerHTML = '<i class="nx-spin"></i> 저장 중'; b.style.opacity = .75; A(c, b, PRESS, 200); }], [2200, () => { b.textContent = '✓ 저장됐어요'; b.style.opacity = 1; b.style.background = '#17a974'; }]]);
+  return 3300;
+});
+
+/* ----- 제스처 ----- */
+function ripple(c, parent, x, y, delay, col){
+  const e = css(h('i', '', parent), {position: 'absolute', left: x - 30 + 'px', top: y - 30 + 'px', width: '60px', height: '60px', borderRadius: '50%', border: `3px solid ${col || '#7c6cff'}`, zIndex: 5});
+  A(c, e, [{transform: 'scale(.2)', opacity: 1}, {transform: 'scale(1)', opacity: 0}], 500, delay);
+}
+D('tap', (r, c) => {
+  const s = SCR(r), w = h('div', 'nx-cen', s), b = css(h('div', 'nx-btn', w, '지원하기'), {padding: '13px 40px', fontSize: '16px'});
+  const x = () => s.clientWidth / 2, y = () => s.clientHeight / 2;
+  finger(c, s, [[x(), y(), 0, 0], [x(), y(), .25], [x(), y(), .55], [x(), y(), .75, 0], [x(), y(), 1, 0]], 1500, 300);
+  ripple(c, s, x(), y(), 800); A(c, b, PRESS, 220, 800);
+  return 2400;
+});
+D('long-press', (r, c) => {
+  const s = SCR(r), row = css(h('div', 'nx-row', s, `<span class="nx-dot"></span><b style="flex:1">회의록.pdf</b>`), {marginTop: '18px', background: '#fff', borderRadius: '10px', margin: '18px 16px 0'});
+  finger(c, s, [[90, 42, 0, 0], [90, 42, .12], [90, 42, .72], [90, 42, .8, 0], [90, 42, 1, 0]], 2800, 200);
+  const ring = css(h('div', '', s, '<svg viewBox="0 0 40 40" width="52" height="52" fill="none" stroke="#7c6cff" stroke-width="3"><circle cx="20" cy="20" r="17" pathLength="1" stroke-dasharray="1" transform="rotate(-90 20 20)"/></svg>'), {position: 'absolute', left: '64px', top: '16px', zIndex: 7, lineHeight: 0});
+  A(c, ring.querySelector('circle'), [{strokeDashoffset: 1}, {strokeDashoffset: 0}], 1150, 550, 'linear');
+  A(c, ring, [{opacity: 1}, {opacity: 0}], 100, 1700);
+  const m = css(h('div', '', s, '<div style="padding:7px 14px">공유</div><div style="padding:7px 14px">이름 변경</div><div style="padding:7px 14px;color:#e5484d">삭제</div>'), {position: 'absolute', left: '90px', top: '64px', background: '#fff', borderRadius: '10px', boxShadow: '0 10px 24px #0004', fontWeight: 600});
+  A(c, row, [{transform: 'none'}, {transform: 'scale(1.04)'}], 200, 1600); A(c, m, POP, 260, 1700);
+  return 3300;
+});
+D('swipe', (r, c) => {
+  const s = SCR(r), row = css(h('div', '', s), {position: 'absolute', left: '40px', top: '26px', bottom: '36px', display: 'flex', gap: '14px', width: 'max-content'});
+  ['#7c6cff', '#ff8fb1', '#3ddc97'].forEach(col => css(h('div', '', row), {width: '200px', height: '100%', borderRadius: '14px', background: col}));
+  A(c, row, [{transform: 'none', offset: 0}, {transform: 'none', offset: .2}, {transform: 'translateX(-214px)', offset: .4}, {transform: 'translateX(-214px)', offset: .6}, {transform: 'translateX(-428px)', offset: .8}, {transform: 'translateX(-428px)', offset: 1}], 2800, 100, 'ease-out');
+  const m = (a, b) => finger(c, s, [[250, 100, 0, 0], [250, 100, a], [80, 100, b], [80, 100, b + .03, 0], [80, 100, 1, 0]], 2800, 100);
+  m(.2, .36); m(.6, .76);
+  return 3100;
+});
+D('swipe-to-delete', (r, c) => {
+  const s = SCR(r), wrap = css(h('div', '', s), {padding: '14px'});
+  const mk = t => css(h('div', '', wrap, `<div style="position:relative;background:#fff;border-radius:10px;padding:11px 14px;font-weight:600">${t}</div>`), {position: 'relative', marginBottom: '8px', borderRadius: '10px', overflow: 'hidden'});
+  mk('A사 지원서'); const del = mk('B사 지원서'), under = mk('C사 지원서');
+  const bg = css(h('div', '', del, '삭제'), {position: 'absolute', right: 0, top: 0, bottom: 0, width: '76px', background: '#e5484d', color: '#fff', display: 'grid', placeItems: 'center', fontWeight: 700});
+  del.insertBefore(bg, del.firstChild);
+  A(c, del.lastChild, [{transform: 'none', offset: 0}, {transform: 'none', offset: .2}, {transform: 'translateX(-76px)', offset: .45}, {transform: 'translateX(-76px)', offset: 1}], 2200, 100);
+  finger(c, s, [[230, 74, 0, 0], [230, 74, .2], [140, 74, .45], [140, 74, .5, 0], [140, 74, 1, 0]], 2200, 100);
+  A(c, del, [{transform: 'none', opacity: 1, marginBottom: '8px'}, {transform: 'translateX(-110%)', opacity: 0, marginBottom: '-36px'}], 400, 1900);
+  return 2900;
+});
+D('drag-and-drop', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {padding: '14px', display: 'grid', gap: '8px'});
+  const mk = t => css(h('div', '', w, t), {background: '#fff', borderRadius: '10px', padding: '10px 14px', fontWeight: 600, boxShadow: '0 1px 4px #0002'});
+  const a = mk('1순위 공고'), b = mk('2순위 공고'), d = mk('3순위 공고');
+  const step = 49;
+  A(c, a, [{transform: 'none', boxShadow: '0 1px 4px #0002', offset: 0}, {transform: 'none', offset: .1}, {transform: 'scale(1.05)', boxShadow: '0 12px 24px #0005', offset: .22}, {transform: `translateY(${step * 2}px) scale(1.05)`, boxShadow: '0 12px 24px #0005', offset: .6}, {transform: `translateY(${step * 2}px)`, boxShadow: '0 1px 4px #0002', offset: .7}, {transform: `translateY(${step * 2}px)`, offset: 1}], 2500, 200, 'ease-in-out');
+  [b, d].forEach(x => A(c, x, [{transform: 'none', offset: 0}, {transform: 'none', offset: .35}, {transform: `translateY(${-step}px)`, offset: .6}, {transform: `translateY(${-step}px)`, offset: 1}], 2500, 200, 'ease-in-out'));
+  a.style.position = 'relative'; a.style.zIndex = 2;
+  finger(c, s, [[150, 34, 0, 0], [150, 34, .12], [150, 34, .22], [150, 132, .6], [150, 132, .7, 0], [150, 132, 1, 0]], 2500, 200);
+  return 3100;
+});
+D('pinch-to-zoom', (r, c) => {
+  const s = SCR(r), img = css(h('div', '', s), {position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 50%,#ffe08a 0 18px,transparent 19px),linear-gradient(135deg,#7c6cff,#5fe3ff)'});
+  A(c, img, [{transform: 'none', offset: 0}, {transform: 'none', offset: .15}, {transform: 'scale(2.6)', offset: .6}, {transform: 'scale(2.6)', offset: 1}], 2400, 200);
+  const cx = 150, cy = 100;
+  finger(c, s, [[cx - 22, cy + 22, 0, 0], [cx - 22, cy + 22, .15], [cx - 88, cy + 70, .6], [cx - 88, cy + 70, .68, 0], [cx - 88, cy + 70, 1, 0]], 2400, 200);
+  finger(c, s, [[cx + 22, cy - 22, 0, 0], [cx + 22, cy - 22, .15], [cx + 88, cy - 70, .6], [cx + 88, cy - 70, .68, 0], [cx + 88, cy - 70, 1, 0]], 2400, 200);
+  return 2900;
+});
+D('double-tap', (r, c) => {
+  const s = SCR(r), img = css(h('div', '', s), {position: 'absolute', inset: 0, background: 'linear-gradient(135deg,#7c6cff,#ff8fb1)'});
+  const x = 150, y = 100;
+  ripple(c, s, x, y, 500, '#fff'); ripple(c, s, x, y, 750, '#fff');
+  const ht = css(h('div', '', s, '♥'), {position: 'absolute', left: '50%', top: '50%', fontSize: '80px', color: '#fff', lineHeight: 1});
+  A(c, ht, [{transform: 'translate(-50%,-50%) scale(0)', opacity: 0, offset: 0}, {transform: 'translate(-50%,-50%) scale(1.2)', opacity: 1, offset: .4}, {transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: .7}, {transform: 'translate(-50%,-60%) scale(1)', opacity: 0, offset: 1}], 1200, 850);
+  return 2600;
+});
+D('pull-to-refresh', (r, c) => {
+  const p = PH(r), sp = css(h('div', '', p, '<i class="nx-spin" style="color:#5b4bf0;border-color:#5b4bf033;border-top-color:#5b4bf0"></i>'), {position: 'absolute', left: 0, right: 0, top: '14px', display: 'grid', placeItems: 'center'});
+  const list = css(h('div', 'nx-cl', p, ROWS(6)), {});
+  A(c, list, [{transform: 'none', offset: 0}, {transform: 'none', offset: .1}, {transform: 'translateY(56px)', offset: .38}, {transform: 'translateY(44px)', offset: .45}, {transform: 'translateY(44px)', offset: .8}, {transform: 'none', offset: .95}, {transform: 'none', offset: 1}], 3000, 100, 'ease-out');
+  finger(c, p, [[70, 40, 0, 0], [70, 40, .1], [70, 110, .38], [70, 110, .43, 0], [70, 110, 1, 0]], 3000, 100);
+  return 3400;
+});
+D('edge-swipe', (r, c) => {
+  const p = PH(r), a = h('div', 'nx-cl', p, `<div class="nx-pad">${LN(50, 1)}</div>${ROWS(5)}`);
+  const b = css(h('div', 'nx-cl', p, `<div class="nx-hero"></div><div class="nx-pad">${LN(70, 1)}${LN(90)}${LN(80)}</div>`), {boxShadow: '-6px 0 16px #0004'});
+  A(c, b, [{transform: 'none', offset: 0}, {transform: 'none', offset: .2}, {transform: 'translateX(100%)', offset: .65}, {transform: 'translateX(100%)', offset: 1}], 2500, 100, 'ease-in-out');
+  A(c, a, [{transform: 'translateX(-30%)', opacity: .5, offset: 0}, {transform: 'translateX(-30%)', opacity: .5, offset: .2}, {transform: 'none', opacity: 1, offset: .65}, {transform: 'none', opacity: 1, offset: 1}], 2500, 100, 'ease-in-out');
+  finger(c, p, [[4, 110, 0, 0], [4, 110, .2], [130, 110, .65], [130, 110, .7, 0], [130, 110, 1, 0]], 2500, 100);
+  return 2900;
+});
+
+/* ----- AI 화면 ----- */
+const chat = r => css(SCR(r), {paddingTop: '6px'});
+const bub = (p, t, me) => h('div', 'nx-bub' + (me ? ' me' : ''), p, t);
+D('thinking-indicator', (r, c) => {
+  const s = chat(r); bub(s, '제주 일정 짜 줘', true);
+  const b = css(bub(s, ''), {display: 'inline-flex', gap: '5px', padding: '12px 14px'});
+  [0, 1, 2].forEach(i => c.anim(css(h('i', '', b), {width: '9px', height: '9px', borderRadius: '50%', background: '#7c6cff'}), [{transform: 'none', opacity: .4}, {transform: 'translateY(-6px)', opacity: 1}, {transform: 'none', opacity: .4}], {duration: 800, delay: i * 150, iterations: Infinity}));
+  return 0;
+});
+D('streaming-response', (r, c) => {
+  const s = chat(r); bub(s, '제주 일정 짜 줘', true);
+  const b = bub(s, ''), txt = '첫날은 공항 근처부터 돌아보세요. 동선이 짧아서 덜 피곤해요. 둘째 날은 동쪽 해안을 따라가요.';
+  [...txt].forEach((ch, i) => c.timeout(() => { b.textContent += ch; }, 400 + i * 45));
+  return 400 + txt.length * 45 + 1100;
+});
+D('suggested-prompts', (r, c) => {
+  const s = chat(r); bub(s, '제주 일정은 이렇게 짰어요.');
+  const w = css(h('div', '', s), {display: 'grid', gap: '6px', padding: '6px 12px', justifyItems: 'start'});
+  const cs = ['맛집 추천해 줘', '숙소도 골라 줘', '비 오면 어떡해?'].map((t, i) => { const e = h('span', 'nx-chip', w, t); A(c, e, IN, 280, 400 + i * 180); return e; });
+  c.timeout(() => { cs[1].classList.add('on'); A(c, cs[1], PRESS, 200); }, 1700);
+  return 3000;
+});
+D('regenerate', (r, c) => {
+  const s = chat(r); const b = bub(s, '동쪽 해안 일정을 추천해요.');
+  const w = css(h('div', '', s), {display: 'flex', justifyContent: 'space-between', padding: '4px 12px', fontSize: '12px', fontWeight: 700, color: '#6a6f9a'});
+  const btn = h('span', 'nx-chip', w, '↻ 다시'); const n = css(h('span', '', w, '1 / 1'), {alignSelf: 'center'});
+  SEQ(c, [[800, () => A(c, btn, PRESS, 200)], [950, () => { b.innerHTML = '<i class="nx-spin" style="color:#7c6cff;border-color:#7c6cff33;border-top-color:#7c6cff"></i>'; }], [1800, () => { b.textContent = '비 소식이 있으니 실내 일정을 넣어 보세요.'; n.textContent = '2 / 2'; A(c, b, IN, 280); }]]);
+  return 3200;
+});
+D('citations', (r, c) => {
+  const s = chat(r), b = bub(s, '');
+  b.innerHTML = '합격률은 24%였어요<sup class="ci" style="color:#5b4bf0;font-weight:800"> [1]</sup> 지원자는 늘었고요<sup class="ci" style="color:#5b4bf0;font-weight:800"> [2]</sup>';
+  [...b.querySelectorAll('.ci')].forEach((e, i) => A(c, e, POP, 240, 500 + i * 400));
+  const w = css(h('div', '', s), {padding: '4px 12px', display: 'grid', gap: '5px', justifyItems: 'start'});
+  ['1 채용 리포트.pdf', '2 hr-news.com'].forEach((t, i) => A(c, h('span', 'nx-chip', w, t), IN, 280, 1300 + i * 200));
+  return 3000;
+});
+D('feedback-buttons', (r, c) => {
+  const s = chat(r); bub(s, '3일 일정을 하루씩 나눠 드릴게요.');
+  const w = css(h('div', '', s), {display: 'flex', gap: '8px', padding: '4px 12px'});
+  const up = h('span', 'nx-chip', w, '👍'), dn = h('span', 'nx-chip', w, '👎');
+  const t = css(h('div', '', s, '의견 고마워요'), {position: 'absolute', left: '50%', bottom: '12px', transform: 'translateX(-50%)', background: '#23264a', color: '#fff', borderRadius: '999px', padding: '6px 14px', fontSize: '12px', opacity: 0});
+  c.timeout(() => up.classList.add('on'), 900); A(c, up, PRESS, 220, 900);
+  A(c, t, [{opacity: 0}, {opacity: 1}], 260, 1150);
+  return 2800;
+});
+D('edit-and-resend', (r, c) => {
+  const s = chat(r), b = bub(s, '3박 4일로 짜 줘', true);
+  const pen = css(h('div', '', s, '✎ 수정'), {textAlign: 'right', padding: '0 12px', fontSize: '12px', color: '#6a6f9a', fontWeight: 700});
+  const a = bub(s, '3박 4일 일정이에요.');
+  SEQ(c, [[800, () => A(c, pen, PRESS, 200)], [1000, () => { b.style.background = '#fff'; b.style.color = '#23264a'; b.style.outline = '2px solid #5b4bf0'; pen.style.visibility = 'hidden'; a.style.visibility = 'hidden'; }],
+    [1450, () => { b.textContent = '2박 3일로 짜 줘'; }],
+    [2100, () => { b.style.background = ''; b.style.color = ''; b.style.outline = ''; }],
+    [2400, () => { a.style.visibility = 'visible'; a.textContent = '2박 3일 일정이에요.'; A(c, a, IN, 280); }]]);
+  return 3500;
+});
+D('file-attachment', (r, c) => {
+  const s = chat(r), box = css(h('div', '', s, '<span style="background:#e5484d;color:#fff;font-size:10px;font-weight:800;padding:6px 5px;border-radius:5px">PDF</span><div style="flex:1;min-width:0"><b style="font-size:12px">항공권.pdf</b><div style="height:4px;border-radius:2px;background:#dfe1f2;margin-top:5px;overflow:hidden"><i class="b" style="display:block;height:100%;background:#5b4bf0;transform-origin:0 50%"></i></div></div>'), {display: 'flex', gap: '8px', alignItems: 'center', background: '#fff', margin: '8px 12px', padding: '8px', borderRadius: '10px', boxShadow: '0 2px 8px #0002'});
+  const inp = css(h('div', 'nx-field', s, '<span style="margin-right:8px;font-size:16px">📎</span><span style="color:#a6aad0">메시지 입력</span>'), {position: 'absolute', left: '12px', right: '12px', bottom: '12px'});
+  A(c, inp.firstChild, PRESS, 240, 300);
+  A(c, box, IN, 300, 500); A(c, box.querySelector('.b'), [{transform: 'scaleX(0)'}, {transform: 'scaleX(1)'}], 1400, 800, 'ease-in-out');
+  return 3100;
+});
+D('agent-steps', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {padding: '26px 30px', display: 'grid', gap: '16px', fontWeight: 600});
+  const st = ['항공권 읽기', '숙소 비교하기', '일정 정리하기'].map(t => { const row = css(h('div', '', w), {display: 'flex', gap: '10px', alignItems: 'center', color: '#a6aad0'}); const m = css(h('span', '', row, '○'), {width: '20px', textAlign: 'center'}); h('span', '', row, t); return [row, m]; });
+  st.forEach(([row, m], i) => { c.timeout(() => { row.style.color = '#23264a'; m.innerHTML = '<i class="nx-spin" style="width:15px;height:15px;border-width:2px;color:#5b4bf0;border-color:#5b4bf033;border-top-color:#5b4bf0"></i>'; }, 300 + i * 900); c.timeout(() => { m.innerHTML = '<b style="color:#17a974">✓</b>'; }, 1100 + i * 900); });
+  return 3800;
+});
+
+/* ----- 평점 ----- */
+const STAR = '★';
+D('star-rating', (r, c) => {
+  const w = css(h('div', '', r), {display: 'flex', gap: '6px', fontSize: '50px', color: '#3a4190'});
+  const ss = [0, 1, 2, 3, 4].map(() => h('span', '', w, STAR));
+  ss.forEach((e, i) => { if (i < 4){ c.timeout(() => { e.style.color = '#f6b93f'; A(c, e, POP, 240); }, 400 + i * 320); } });
+  return 2900;
+});
+D('half-star-rating', (r, c) => {
+  const w = css(h('div', '', r), {display: 'flex', gap: '6px', fontSize: '50px', color: '#3a4190'});
+  [1, 1, 1, .5, 0].forEach((v, i) => { const e = css(h('span', '', w, STAR), {position: 'relative'}); if (v){ const f = css(h('span', '', e, STAR), {position: 'absolute', left: 0, top: 0, width: v * 100 + '%', overflow: 'hidden', color: '#f6b93f'}); A(c, f, [{opacity: 0}, {opacity: 1}], 250, 400 + i * 300); } });
+  const n = css(h('div', 'nx-big', r, '3.5'), {alignSelf: 'end', marginBottom: '16%', fontSize: '24px'});
+  A(c, n, IN, 300, 1600);
+  return 3000;
+});
+D('nps', (r, c) => {
+  const s = SCR(r), w = h('div', 'nx-cen', s); css(h('div', 'nx-h', w, '주변에 추천하시겠어요?'), {fontSize: '14px'});
+  const g = css(h('div', '', w), {display: 'flex', gap: '2px'});
+  const cs = Array.from({length: 11}, (_, i) => css(h('span', '', g, i), {width: '21px', height: '30px', borderRadius: '5px', background: '#e3e5f6', display: 'grid', placeItems: 'center', fontSize: '11px', fontWeight: 700}));
+  css(h('div', 'nx-sub', w, '<span>전혀 아니다</span><span>매우 그렇다</span>'), {display: 'flex', justifyContent: 'space-between', width: '100%'});
+  [3, 6, 9].forEach((k, n) => c.timeout(() => cs.forEach((x, i) => { x.style.background = i === k ? '#5b4bf0' : '#e3e5f6'; x.style.color = i === k ? '#fff' : ''; }), 500 + n * 800));
+  return 3300;
+});
+D('emoji-rating', (r, c) => {
+  const w = css(h('div', '', r), {display: 'flex', gap: '12px', fontSize: '42px'});
+  const es = ['😡', '🙁', '😐', '🙂', '😍'].map(t => css(h('span', '', w, t), {filter: 'grayscale(1)', opacity: .5, transition: '.2s'}));
+  const pick = k => es.forEach((e, i) => { e.style.filter = i === k ? '' : 'grayscale(1)'; e.style.opacity = i === k ? 1 : .5; e.style.transform = i === k ? 'scale(1.35)' : ''; });
+  [2, 4].forEach((k, n) => c.timeout(() => pick(k), 600 + n * 1000));
+  return 3000;
+});
+D('thumbs-rating', (r, c) => {
+  const w = css(h('div', '', r), {display: 'flex', gap: '26px', fontSize: '56px'});
+  const u = css(h('div', '', w, '👍'), {filter: 'grayscale(1)', opacity: .5, transition: '.2s'}), d = css(h('div', '', w, '👎'), {filter: 'grayscale(1)', opacity: .5, transition: '.2s'});
+  SEQ(c, [[600, () => { u.style.filter = ''; u.style.opacity = 1; A(c, u, POP, 300); }], [1800, () => { u.style.filter = 'grayscale(1)'; u.style.opacity = .5; d.style.filter = ''; d.style.opacity = 1; A(c, d, POP, 300); }]]);
+  return 3000;
+});
+D('rating-slider', (r, c) => {
+  const s = SCR(r), w = css(h('div', 'nx-cen', s), {alignItems: 'stretch', padding: '0 30px'});
+  const top = css(h('div', '', w, '<b>만족도</b>'), {display: 'flex', justifyContent: 'space-between'});
+  const n = css(h('b', '', top, '0 / 10'), {color: '#5b4bf0'});
+  const tr = css(h('div', '', w), {position: 'relative', height: '8px', borderRadius: '4px', background: '#dfe1f2', margin: '12px 0'});
+  const fil = css(h('i', '', tr), {position: 'absolute', left: 0, top: 0, bottom: 0, width: '100%', background: 'linear-gradient(90deg,#f6b93f,#5b4bf0)', borderRadius: '4px', transformOrigin: '0 50%'});
+  const kn = css(h('i', '', tr), {position: 'absolute', top: '-8px', width: '24px', height: '24px', borderRadius: '50%', background: '#fff', border: '3px solid #5b4bf0'});
+  let t0 = null; c.loop(now => { if (t0 === null) t0 = now; const p = EASE.inout(Math.min(1, (now - t0 - 300) / 1700 > 0 ? (now - t0 - 300) / 1700 : 0)) * .8; fil.style.transform = `scaleX(${p})`; kn.style.left = `calc(${p * 100}% - 12px)`; n.textContent = Math.round(p * 10) + ' / 10'; });
+  return 3000;
+});
+D('rating-summary', (r, c) => {
+  const s = SCR(r), w = css(h('div', 'nx-cen', s), {flexDirection: 'row', gap: '20px'});
+  h('div', '', w, '<div style="font-size:40px;font-weight:900">4.6</div><div style="color:#f6b93f">★★★★★</div><div class="nx-sub">1,204개</div>');
+  const b = css(h('div', '', w), {flex: 1, display: 'grid', gap: '6px'});
+  [78, 14, 5, 2, 1].forEach((v, i) => { const row = css(h('div', '', b, `<span style="font-size:11px;width:10px">${5 - i}</span>`), {display: 'flex', alignItems: 'center', gap: '6px'}); const t = css(h('div', '', row), {flex: 1, height: '7px', background: '#e3e5f6', borderRadius: '4px', overflow: 'hidden'}); A(c, css(h('i', '', t), {display: 'block', height: '100%', width: v + '%', background: '#f6b93f', transformOrigin: '0 50%'}), [{transform: 'scaleX(0)'}, {transform: 'scaleX(1)'}], 500, 300 + i * 130); });
+  return 2500;
+});
+D('rating-tags', (r, c) => {
+  const s = SCR(r), wr = h('div', 'nx-cen', s); css(h('div', '', wr, '★★★★★'), {color: '#f6b93f', fontSize: '22px'});
+  const w = css(h('div', '', wr), {display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center'});
+  const cs = ['빠른 배송', '친절해요', '가성비 좋아요', '포장이 꼼꼼해요'].map(t => h('span', 'nx-chip', w, t));
+  [0, 3].forEach((k, n) => c.timeout(() => { cs[k].classList.add('on'); A(c, cs[k], PRESS, 200); }, 600 + n * 750));
+  return 2800;
+});
+D('rating-badge', (r, c) => {
+  const s = SCR(r), rows = [['무선 이어폰', '4.8', '1,204'], ['블루투스 스피커', '4.5', '382'], ['노트북 파우치', '4.9', '76']];
+  rows.forEach(([t, v, n], i) => {
+    const row = css(h('div', 'nx-row', s, `<span class="nx-dot" style="width:38px;height:38px"></span><div class="nx-b"><b>${t}</b></div>`), {padding: '10px 16px'});
+    A(c, h('div', '', row.querySelector('.nx-b'), `<span style="color:#f6b93f">★</span> <b>${v}</b> <span class="nx-sub">(${n})</span>`), POP, 300, 400 + i * 250);
+  });
+  return 2600;
+});
+
+/* ----- 공유 아이콘 ----- */
+D('share-ios', (r, c) => iconDemo(r, c, '<path d="M12 15V3M7.500 7.500 12 3l4.500 4.500"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/>'));
+D('share-android', (r, c) => iconDemo(r, c, '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.600 10.500 6.800-4M8.600 13.500l6.800 4"/>'));
+D('forward', (r, c) => iconDemo(r, c, '<path d="m14 5 7 7-7 7"/><path d="M21 12H9a6 6 0 0 0-6 6v1"/>'));
+D('send-icon', (r, c) => iconDemo(r, c, '<path d="M21 3 10 14"/><path d="m21 3-7 18-4-7-7-4z"/>'));
+D('copy-link', (r, c) => {
+  const ms = iconDemo(r, c, '<path d="M10 14a4 4 0 0 0 5.700 0l3-3a4 4 0 0 0-5.700-5.700l-1 1"/><path d="M14 10a4 4 0 0 0-5.700 0l-3 3A4 4 0 0 0 11 18.700l1-1"/>');
+  const t = css(h('div', '', r, '복사했어요'), {alignSelf: 'end', marginBottom: '6%', background: '#fff', color: '#23264a', borderRadius: '999px', padding: '5px 13px', fontSize: '12px', fontWeight: 700});
+  A(c, t, IN, 260, 1450);
+  return ms;
+});
+D('repost', (r, c) => iconDemo(r, c, '<path d="m17 2 4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="m7 22-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>'));
+D('qr-code', (r) => {
+  const n = 11, on = '11111011111100010101000110111011011101001011101110111011000101000111110101011111000000110000011011011001100110100101111101001101000101111011111000'.padEnd(121, '0');
+  const g = css(h('div', '', r), {display: 'grid', gridTemplateColumns: `repeat(${n},12px)`, padding: '10px', background: '#fff', borderRadius: '12px'});
+  for (let i = 0; i < n * n; i++) css(h('i', '', g), {width: '12px', height: '12px', background: on[i] === '1' ? '#111' : '#fff'});
+  return 0;
+});
+D('nearby-share', (r, c) => {
+  const w = css(h('div', '', r), {position: 'relative', width: '180px', height: '180px', display: 'grid', placeItems: 'center'});
+  [0, 1, 2].forEach(i => c.anim(css(h('i', '', w), {position: 'absolute', inset: 0, borderRadius: '50%', border: '2px solid #7c6cff'}), [{transform: 'scale(.3)', opacity: .9}, {transform: 'scale(1)', opacity: 0}], {duration: 1800, delay: i * 600, iterations: Infinity}));
+  css(h('div', '', w), {width: '52px', height: '92px', borderRadius: '12px', border: '5px solid #fff', background: '#232a62'});
+  return 0;
+});
+D('share-sheet', (r, c) => {
+  const p = PH(r); h('div', '', p, `<div class="nx-pad">${LN(50, 1)}</div>${ROWS(3)}`);
+  const d = h('div', 'nx-dim', p), s = h('div', 'nx-sheet', p, '<div class="nx-grab"></div>');
+  const g = css(h('div', '', s), {display: 'flex', justifyContent: 'space-between', marginBottom: '10px'});
+  ['#5b4bf0', '#3ddc97', '#f6b93f', '#ff6b81'].forEach(col => css(h('i', '', g), {width: '24px', height: '24px', borderRadius: '50%', background: col}));
+  h('div', '', s, `${LN(100)}${LN(100)}`);
+  A(c, d, [{opacity: 0}, {opacity: 1}], 250, 500); A(c, s, [{transform: 'translateY(100%)'}, {transform: 'none'}], 400, 500, 'cubic-bezier(.2,.8,.3,1)');
+  return 2700;
+});
+
+/* ----- 빈 화면 ----- */
+function emptyDemo(r, c, o){
+  const s = SCR(r), w = h('div', 'nx-cen', s);
+  if (o.top) css(h('div', '', s, o.top), {position: 'absolute', left: '12px', right: '12px', top: '10px', textAlign: 'left'});
+  if (o.top) w.style.paddingTop = '34px';
+  const ic = css(h('div', '', w, o.icon), {fontSize: '30px', lineHeight: 1});
+  const t = h('div', 'nx-h', w, o.title), sub = o.sub ? h('div', 'nx-sub', w, o.sub) : null;
+  const b = o.cta ? h('div', 'nx-btn', w, o.cta) : null;
+  A(c, ic, POP, 350, 250); A(c, t, IN, 300, 400); if (sub) A(c, sub, IN, 300, 500);
+  if (b){ A(c, b, IN, 300, 650); A(c, b, PULSE, 500, 1300); }
+  return 2800;
+}
+D('first-use', (r, c) => emptyDemo(r, c, {icon: '📁', title: '아직 담은 상품이 없어요', sub: '마음에 드는 상품을 찜해 보세요', cta: '구경하러 가기'}));
+D('no-search-results', (r, c) => emptyDemo(r, c, {top: '<div class="nx-field">🔍 우산 이어폰</div>', icon: '🔍', title: '찾는 상품이 없어요', sub: '다른 단어로 찾아보세요'}));
+D('no-filter-results', (r, c) => emptyDemo(r, c, {top: '<span class="nx-chip on">오늘 도착</span> <span class="nx-chip on">무료배송</span> <span class="nx-chip on">특가</span>', icon: '🧺', title: '조건에 맞는 상품이 없어요', cta: '조건 풀기'}));
+D('offline', (r, c) => emptyDemo(r, c, {icon: '📡', title: '인터넷이 끊겼어요', sub: '연결을 확인한 뒤 다시 시도해 주세요', cta: '다시 시도'}));
+D('permission-needed', (r, c) => emptyDemo(r, c, {icon: '🔔', title: '알림을 켜야 받아 볼 수 있어요', cta: '설정에서 허용하기'}));
+D('all-caught-up', (r, c) => emptyDemo(r, c, {icon: '✅', title: '오늘 할 일을 다 끝냈어요', sub: '내일 새 미션으로 만나요'}));
+D('emptied', (r, c) => {
+  const s = SCR(r), row = css(h('div', 'nx-row', s, '<span class="nx-dot" style="width:36px;height:36px"></span><b style="flex:1">무선 이어폰</b><span style="color:#e5484d;font-weight:800">✕</span>'), {position: 'absolute', left: '14px', right: '14px', top: '16px', background: '#fff', borderRadius: '10px'});
+  A(c, row, [{opacity: 1, transform: 'none'}, {opacity: 0, transform: 'translateX(40%)'}], 350, 800);
+  const w = h('div', 'nx-cen', s), ic = css(h('div', '', w, '🛒'), {fontSize: '30px'}), t = h('div', 'nx-h', w, '장바구니를 비웠어요'), b = h('div', 'nx-btn g', w, '되돌리기');
+  [ic, t, b].forEach((e, i) => A(c, e, IN, 300, 1100 + i * 120));
+  return 3000;
+});
+D('error-state', (r, c) => emptyDemo(r, c, {icon: '⚠️', title: '문제가 생겼어요', sub: '잠시 후 다시 시도해 주세요', cta: '다시 시도'}));
+D('locked-content', (r, c) => {
+  const s = SCR(r); css(h('div', '', s, `<div class="nx-pad">${LN(60, 1)}${LN(90)}${LN(85)}${LN(92)}${LN(70)}${LN(90)}</div>`), {filter: 'blur(4px)'});
+  const w = h('div', 'nx-cen', s), ic = css(h('div', '', w, '🔒'), {fontSize: '32px'}), t = h('div', 'nx-h', w, '구독하면 볼 수 있어요'), b = h('div', 'nx-btn', w, '구독하기');
+  A(c, ic, POP, 350, 400); A(c, t, IN, 300, 550); A(c, b, IN, 300, 700);
+  return 2700;
+});
+
+/* ----- 메뉴 아이콘 ----- */
+const barsIcon = (r, c, ws, off) => {
+  const b = h('div', 'nx-tile', r), w = css(h('div', '', b), {display: 'grid', gap: '10px', justifyItems: off ? 'start' : 'center'});
+  ws.forEach((v, i) => css(h('i', '', w), {display: 'block', width: v + 'px', height: '9px', borderRadius: '5px', background: '#fff', marginLeft: off ? off[i] + 'px' : 0}));
+  A(c, b, POP, 450, 150); A(c, b, PRESS, 240, 1300);
+  return 2400;
+};
+const dotsIcon = (r, c, n, cols, round) => {
+  const b = h('div', 'nx-tile', r), g = css(h('div', '', b), {display: 'grid', gridTemplateColumns: `repeat(${cols},16px)`, gap: '8px'});
+  for (let i = 0; i < n; i++) css(h('i', '', g), {display: 'block', width: '16px', height: '16px', borderRadius: round ? '50%' : '3px', background: '#fff'});
+  A(c, b, POP, 450, 150); A(c, b, PRESS, 240, 1300);
+  return 2400;
+};
+D('hamburger', (r, c) => barsIcon(r, c, [64, 64, 64]));
+D('kebab', (r, c) => dotsIcon(r, c, 3, 1, true));
+D('meatballs', (r, c) => dotsIcon(r, c, 3, 3, true));
+D('waffle', (r, c) => dotsIcon(r, c, 9, 3, true));
+D('bento-menu', (r, c) => dotsIcon(r, c, 9, 3, false));
+D('doner', (r, c) => barsIcon(r, c, [68, 44, 22]));
+D('veggie-burger', (r, c) => barsIcon(r, c, [64, 64]));
+D('stairs', (r, c) => barsIcon(r, c, [40, 40, 40], [0, 12, 24]));
+D('sliders-icon', (r, c) => iconDemo(r, c, '<path d="M3 8h10M19 8h2M3 16h2M11 16h10"/><circle cx="16" cy="8" r="3"/><circle cx="8" cy="16" r="3"/>'));
+
+/* ----- 디자인 스타일 ----- */
+function styleDemo(r, c, cls, inner){
+  const k = h('div', 'st ' + cls, r, inner || '<div class="tt">오늘의 메모</div><div class="bb">저장하기</div>');
+  A(c, k, IN, 500, 150);
+  const b = k.querySelector('.bb'); if (b) A(c, b, PRESS, 260, 1300);
+  return 2700;
+}
+D('skeuomorphism', (r, c) => styleDemo(r, c, 'st-skeu'));
+D('flat-design', (r, c) => styleDemo(r, c, 'st-flat'));
+D('material-design', (r, c) => styleDemo(r, c, 'st-mat', '<div class="tt">오늘의 메모</div><div class="nx-sub">카드는 종이처럼 겹쳐요</div><div class="bb">저장하기</div><div class="fb">+</div>'));
+D('neumorphism', (r, c) => { r.style.background = '#e4e8f1'; return styleDemo(r, c, 'st-neu'); });
+D('claymorphism', (r, c) => { r.style.background = '#fbe9dd'; return styleDemo(r, c, 'st-clay'); });
+D('neo-brutalism', (r, c) => styleDemo(r, c, 'st-brut'));
+D('3d-icon', (r, c) => {
+  const k = css(h('div', '', r, '<div style="position:absolute;inset:0;border-radius:28px;background:linear-gradient(145deg,#9d8bff,#4a35d8);box-shadow:inset 6px 6px 12px #ffffff55,inset -8px -8px 16px #2a1a99,0 24px 36px #0009"></div><div style="position:absolute;left:28%;right:28%;top:22%;height:14%;border-radius:10px;background:linear-gradient(#fff,#cfc9ff);box-shadow:0 5px 8px #1a0f6688"></div><div style="position:absolute;left:28%;right:28%;top:46%;height:14%;border-radius:10px;background:linear-gradient(#fff,#cfc9ff);box-shadow:0 5px 8px #1a0f6688"></div><div style="position:absolute;left:28%;right:45%;top:70%;height:14%;border-radius:10px;background:linear-gradient(#fff,#cfc9ff);box-shadow:0 5px 8px #1a0f6688"></div>'), {position: 'relative', width: '130px', height: '130px', transformStyle: 'preserve-3d'});
+  c.anim(k, [{transform: 'perspective(500px) rotateY(-26deg) rotateX(12deg)'}, {transform: 'perspective(500px) rotateY(26deg) rotateX(-8deg)'}], {duration: 1800, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out'});
+  return 0;
+});
+D('liquid-glass', (r, c) => {
+  const k = h('div', 'st st-liq', r);
+  const g = h('div', 'gl', k, '<div class="tt" style="font-weight:800">오늘의 메모</div><div class="nx-sub" style="color:#33406e">빛이 휘어요</div>');
+  c.anim(g, [{transform: 'translateX(-14px) scale(.98)'}, {transform: 'translateX(14px) scale(1.02)'}], {duration: 1800, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out'});
+  return 0;
+});
+D('y2k', (r, c) => styleDemo(r, c, 'st-y2k', '<div class="tt">~* oNeUL mEmO *~</div><div class="nx-sub" style="color:#1b1d6b">♡ 2000.01.01 ♡</div><div class="bb">SAVE &gt;&gt;</div>'));
+D('minimal', (r, c) => styleDemo(r, c, 'st-min'));
+D('dark-mode', (r, c) => {
+  const s = SCR(r); const w = css(h('div', '', s, `<div class="nx-pad"><b style="font-size:15px">오늘의 메모</b>${LN(90)}${LN(80)}${LN(60)}</div>`), {height: '100%'});
+  const t = css(h('div', '', s), {position: 'absolute', right: '14px', bottom: '14px', width: '50px', height: '28px', borderRadius: '14px', background: '#c8cbe4'});
+  const k = css(h('i', '', t), {position: 'absolute', left: '3px', top: '3px', width: '22px', height: '22px', borderRadius: '50%', background: '#fff', display: 'grid', placeItems: 'center', fontSize: '12px', fontStyle: 'normal', transition: 'transform .3s'}); k.textContent = '☀';
+  const o = {duration: 1000, fill: 'both', easing: 'ease-in-out'};
+  c.timeout(() => {
+    s.style.transition = 'background .4s,color .4s'; s.style.background = '#14162c'; s.style.color = '#eef0ff';
+    w.querySelectorAll('.nx-l').forEach(l => { l.style.background = '#3a3f70'; });
+    t.style.background = '#7c6cff'; k.style.transform = 'translateX(22px)'; k.textContent = '☾'; k.style.color = '#333';
+  }, 1000);
+  return 2800;
+});
+
+/* ----- 다크패턴 ----- */
+D('roach-motel', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {padding: '18px', textAlign: 'center'});
+  h('div', 'nx-h', w, '구독 관리');
+  css(h('div', 'nx-btn', w, '계속 이용하기'), {width: '100%', marginTop: '14px', padding: '13px'});
+  css(h('div', 'nx-btn g', w, '혜택 더 보기'), {width: '100%', marginTop: '8px', padding: '11px'});
+  const t = css(h('div', '', s, '해지'), {position: 'absolute', right: '10px', bottom: '6px', fontSize: '8px', color: '#b8bbd6'});
+  const cur = fakeCursor(s, 40, 160);
+  SEQ(c, [[300, () => cur.to([250, 40])], [1000, () => cur.to([60, 110])], [1700, () => cur.to([180, 170])], [2300, () => { cur.to([288, 182]); }], [2900, () => { t.style.color = '#e5484d'; t.style.fontSize = '11px'; }]]);
+  return 3700;
+});
+D('pre-checked', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {padding: '16px 18px', display: 'grid', gap: '10px', fontSize: '13px'});
+  h('div', 'nx-h', w, '가입 약관');
+  [['서비스 이용약관 (필수)', 0], ['개인정보 수집 (필수)', 0], ['마케팅 정보 수신 (선택)', 1], ['제3자 광고 제공 (선택)', 1]].forEach(([t, bad]) => {
+    const row = css(h('div', '', w, `<span style="width:18px;height:18px;border-radius:5px;background:#5b4bf0;color:#fff;display:grid;place-items:center;font-size:11px">✓</span><span>${t}</span>`), {display: 'flex', gap: '8px', alignItems: 'center', padding: '2px 4px', borderRadius: '6px'});
+    if (bad) A(c, row, [{boxShadow: '0 0 0 0 #e5484d00'}, {boxShadow: '0 0 0 2px #e5484d'}], 400, 1000);
+  });
+  return 2800;
+});
+D('fake-countdown', (r, c) => {
+  const s = SCR(r), w = h('div', 'nx-cen', s); css(h('div', '', w, '오늘만 70% 할인'), {color: '#e5484d', fontWeight: 800});
+  const t = css(h('div', '', w, '00:00:03'), {fontSize: '38px', fontWeight: 900, fontVariantNumeric: 'tabular-nums'});
+  const set = (v, col) => { t.textContent = v; t.style.color = col || ''; };
+  SEQ(c, [[700, () => set('00:00:02')], [1400, () => set('00:00:01')], [2100, () => set('00:00:00', '#e5484d')], [2700, () => { set('00:10:00'); A(c, t, POP, 300); }]]);
+  return 3900;
+});
+D('confirmshaming', (r, c) => {
+  const s = SCR(r), w = css(h('div', 'nx-cen', s), {padding: '0 22px'});
+  h('div', 'nx-h', w, '할인 쿠폰 받으실래요?');
+  css(h('div', 'nx-btn', w, '쿠폰 받기'), {width: '100%', padding: '12px'});
+  const no = css(h('div', '', w, '아니요, 저는 손해 볼래요'), {fontSize: '12px', color: '#7a7fa6', textDecoration: 'underline'});
+  A(c, no, [{color: '#7a7fa6', transform: 'none'}, {color: '#e5484d', transform: 'scale(1.12)'}], 400, 1100);
+  return 2800;
+});
+D('sneak-into-basket', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {padding: '16px 18px', display: 'grid', gap: '10px', fontWeight: 600});
+  h('div', 'nx-h', w, '장바구니');
+  const rw = (a, b) => css(h('div', '', w, `<span>${a}</span><span>${b}</span>`), {display: 'flex', justifyContent: 'space-between'});
+  rw('무선 이어폰', '29,000원');
+  const x = rw('파손 보험', '+4,900원'); x.style.color = '#e5484d';
+  css(h('div', '', w), {borderTop: '1px solid #dfe1f2'});
+  const tot = rw('합계', '<b>29,000원</b>');
+  A(c, x, [{opacity: 0, transform: 'translateX(-14px)'}, {opacity: 1, transform: 'none'}], 400, 1000);
+  c.timeout(() => { tot.lastChild.innerHTML = '<b>33,900원</b>'; }, 1400);
+  return 3000;
+});
+D('fake-scarcity', (r, c) => {
+  const s = SCR(r), w = h('div', 'nx-cen', s); h('div', 'nx-h', w, '모의면접 특강');
+  css(h('div', '', w, '남은 자리 2석!'), {color: '#e5484d', fontSize: '22px', fontWeight: 900});
+  const n = h('div', 'nx-sub', w, '지금 19명이 보고 있어요');
+  const t = css(h('div', '', s, '🗓 어제 → 오늘 → 내일: 계속 2석'), {position: 'absolute', left: 0, right: 0, bottom: '10px', textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#5b4bf0'});
+  A(c, t, IN, 300, 1500);
+  return 3100;
+});
+D('hidden-costs', (r, c) => {
+  const p = PH(r), a = h('div', 'nx-cl', p), w = h('div', 'nx-cen', a); h('div', 'nx-sub', w, '티켓'); css(h('div', '', w, '29,000원'), {fontWeight: 900, fontSize: '22px'}); h('div', 'nx-btn', w, '결제하기');
+  const b = css(h('div', 'nx-cl', p), {padding: '14px 10px', fontSize: '12px', fontWeight: 600, visibility: 'hidden'});
+  [['티켓', '29,000'], ['예매 수수료', '+3,000'], ['서비스 비용', '+1,900']].forEach(([x, y], i) => { const row = css(h('div', '', b, `<span>${x}</span><span>${y}</span>`), {display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: i ? '#e5484d' : ''}); if (i) A(c, row, IN, 300, 1200 + i * 300); });
+  css(h('div', '', b, '<span>합계</span><b>33,900원</b>'), {display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #dfe1f2', paddingTop: '8px', fontSize: '14px'});
+  showAt(c, b, 1000); A(c, b, [{transform: 'translateX(100%)'}, {transform: 'none'}], 300, 1000);
+  return 3200;
+});
+D('forced-continuity', (r, c) => {
+  const s = SCR(r), w = css(h('div', 'nx-cen', s), {alignItems: 'stretch', padding: '0 28px'});
+  css(h('div', 'nx-h', w, '7일 무료 체험'), {textAlign: 'left'});
+  const n = css(h('b', '', w, '무료 3일 남음'), {textAlign: 'left', fontSize: '18px'});
+  const tr = css(h('div', '', w), {height: '8px', borderRadius: '4px', background: '#dfe1f2', overflow: 'hidden'});
+  A(c, css(h('i', '', tr), {display: 'block', height: '100%', background: '#5b4bf0', transformOrigin: '0 50%'}), [{transform: 'scaleX(.6)'}, {transform: 'scaleX(1)'}], 1400, 300, 'linear');
+  const d = css(h('div', '', s, '💳 14,900원이 결제되었어요'), {position: 'absolute', left: '16px', right: '16px', bottom: '12px', background: '#23264a', color: '#fff', borderRadius: '10px', padding: '9px', textAlign: 'center', fontWeight: 700});
+  SEQ(c, [[800, () => { n.textContent = '무료 1일 남음'; }], [1400, () => { n.textContent = '무료 체험 종료'; }]]);
+  A(c, d, IN, 300, 1800);
+  return 3400;
+});
+D('nagging', (r, c) => {
+  const p = PH(r); h('div', '', p, `<div class="nx-pad">${LN(50, 1)}</div>${ROWS(4)}`);
+  const d = h('div', 'nx-dim', p), m = css(h('div', '', p, '<b>알림을 켜 주세요!</b><div style="display:flex;gap:4px;margin-top:8px"><span class="nx-btn g" style="flex:1;padding:6px 2px">나중에</span><span class="nx-btn" style="flex:1;padding:6px 2px">켜기</span></div>'), {position: 'absolute', left: '10px', right: '10px', top: '62px', background: '#fff', borderRadius: '12px', padding: '12px 8px', textAlign: 'center', fontSize: '12px'});
+  [300, 1400, 2500].forEach(at => { A(c, m, [{transform: 'scale(.7)', opacity: 0}, {transform: 'none', opacity: 1, offset: .2}, {transform: 'none', opacity: 1, offset: .75}, {transform: 'scale(.7)', opacity: 0}], 900, at); });
+  A(c, d, [{opacity: 0, offset: 0}, {opacity: 1, offset: .08}, {opacity: 1, offset: .95}, {opacity: 0, offset: 1}], 3200, 300);
+  return 3700;
+});
+
+/* ----- 심리와 편향 ----- */
+D('anchoring', (r, c) => {
+  const s = SCR(r), w = h('div', 'nx-cen', s);
+  const old = css(h('div', '', w, '300,000원'), {position: 'relative', fontSize: '22px', fontWeight: 700, color: '#7a7fa6'});
+  const ln = css(h('i', '', old), {position: 'absolute', left: '-4px', right: '-4px', top: '50%', height: '3px', background: '#e5484d', transformOrigin: '0 50%'});
+  const now = css(h('div', '', w, '190,000원'), {fontSize: '36px', fontWeight: 900, color: '#5b4bf0'});
+  A(c, ln, [{transform: 'scaleX(0)'}, {transform: 'scaleX(1)'}], 400, 1000); A(c, now, POP, 400, 1400);
+  return 3100;
+});
+D('loss-aversion', (r, c) => {
+  const s = SCR(r), w = h('div', 'nx-cen', s); h('div', 'nx-h', w, '담아둔 쿠폰 3만 원');
+  const t = css(h('div', '', w, '오늘 지나면 사라져요'), {color: '#e5484d', fontWeight: 800, fontSize: '17px'});
+  const tr = css(h('div', '', w), {width: '76%', height: '8px', borderRadius: '4px', background: '#f2dcdf', overflow: 'hidden'});
+  A(c, css(h('i', '', tr), {display: 'block', height: '100%', background: '#e5484d', transformOrigin: '0 50%'}), [{transform: 'scaleX(1)'}, {transform: 'scaleX(.08)'}], 2400, 200, 'linear');
+  c.anim(t, PULSE, {duration: 800, iterations: Infinity});
+  return 3000;
+});
+D('default-effect', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {padding: '18px', display: 'grid', gap: '9px'});
+  const a = css(h('div', '', w, '◉ <b>추천 옵션</b> <span class="nx-chip" style="float:right;padding:1px 8px">기본</span>'), {padding: '10px', background: '#fff', borderRadius: '10px', border: '2px solid #5b4bf0'});
+  css(h('div', '', w, '○ 직접 고르기'), {padding: '10px', background: '#fff', borderRadius: '10px', border: '2px solid #e3e5f6', color: '#7a7fa6'});
+  const b = css(h('div', 'nx-btn', w, '이대로 진행'), {padding: '11px'});
+  const cur = fakeCursor(s, 240, 30);
+  c.timeout(() => cur.to(relC(b, s)), 800);
+  c.timeout(() => { cur.click(c); A(c, b, PRESS, 200); }, 1500);
+  return 2900;
+});
+D('social-proof', (r, c) => {
+  const s = SCR(r), w = h('div', 'nx-cen', s), g = css(h('div', '', w), {display: 'flex'});
+  ['#7c6cff', '#3ddc97', '#f6b93f', '#ff6b81', '#5fe3ff'].forEach((col, i) => A(c, css(h('i', '', g), {width: '44px', height: '44px', borderRadius: '50%', background: col, border: '3px solid #f6f7ff', marginLeft: i ? '-12px' : 0}), POP, 300, 200 + i * 120));
+  const n = css(h('div', '', w, '<b>0</b>명이 이 강의를 듣고 있어요'), {fontSize: '15px'}), nb = n.firstChild;
+  css(nb, {color: '#5b4bf0', fontSize: '22px'});
+  let t0 = null; c.loop(now => { if (t0 === null) t0 = now; nb.textContent = Math.round(EASE.out(Math.min(1, (now - t0) / 1600)) * 1284).toLocaleString(); });
+  return 3000;
+});
+D('scarcity', (r, c) => {
+  const s = SCR(r), w = h('div', 'nx-cen', s), g = css(h('div', '', w), {display: 'grid', gridTemplateColumns: 'repeat(6,26px)', gap: '6px'});
+  const cs = Array.from({length: 12}, () => css(h('i', '', g), {width: '26px', height: '26px', borderRadius: '6px', background: '#5b4bf0', transition: 'background .2s'}));
+  const m = css(h('b', '', w, '남은 수량 12개'), {color: '#5b4bf0', fontSize: '16px'});
+  for (let i = 0; i < 10; i++) c.timeout(() => { cs[i].style.background = '#dfe1f2'; m.textContent = `남은 수량 ${11 - i}개`; if (i > 6) m.style.color = '#e5484d'; }, 300 + i * 200);
+  return 3200;
+});
+D('framing', (r, c) => {
+  const s = SCR(r), w = h('div', 'nx-cen', s); h('div', 'nx-sub', w, '구매자 후기');
+  const t = css(h('div', '', w, '80% 만족'), {fontSize: '40px', fontWeight: 900, color: '#17a974'});
+  SEQ(c, [[1500, () => { t.textContent = '20% 불만족'; t.style.color = '#e5484d'; A(c, t, IN, 300); }]]);
+  return 3000;
+});
+D('choice-overload', (r, c) => {
+  const s = SCR(r), g = css(h('div', '', s), {display: 'grid', gridTemplateColumns: 'repeat(8,1fr)', gap: '4px', padding: '12px'});
+  const col = ['#b3a8ff', '#f6b93f', '#7be3bd', '#ff9fb1', '#8fd3ff'];
+  for (let i = 0; i < 40; i++) A(c, css(h('i', '', g), {height: '24px', borderRadius: '5px', background: col[i * 7 % 5]}), [{opacity: 0}, {opacity: 1}], 200, i * 25);
+  const cur = fakeCursor(s, 40, 40);
+  SEQ(c, [[1100, () => cur.to([250, 110])], [1700, () => cur.to([60, 130])], [2300, () => cur.to([190, 30])]]);
+  const q = css(h('div', '', s, '뭘 고르지…'), {position: 'absolute', left: 0, right: 0, bottom: '6px', textAlign: 'center', fontWeight: 800});
+  A(c, q, IN, 300, 2200);
+  return 3400;
+});
+D('peak-end', (r, c) => {
+  const s = SCR(r); s.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 300 200" width="100%" height="100%" fill="none"><path d="M14 150C60 150 74 140 92 96s28-68 46-30 34 76 62 66 48-56 84-82" stroke="#5b4bf0" stroke-width="4" stroke-linecap="round" pathLength="1" stroke-dasharray="1"/><circle class="a" cx="119" cy="42" r="9" fill="#f6b93f"/><circle class="b" cx="284" cy="50" r="9" fill="#17a974"/><text class="a" x="119" y="24" font-size="13" font-weight="800" fill="#23264a" text-anchor="middle">가장 강렬한 순간</text><text class="b" x="284" y="30" font-size="13" font-weight="800" fill="#23264a" text-anchor="end">마지막</text></svg>');
+  A(c, s.querySelector('path'), [{strokeDashoffset: 1}, {strokeDashoffset: 0}], 1600, 200, 'ease-in-out');
+  s.querySelectorAll('.a').forEach(e => A(c, e, OUT.slice().reverse(), 300, 800));
+  s.querySelectorAll('.b').forEach(e => A(c, e, OUT.slice().reverse(), 300, 1800));
+  return 3200;
+});
+D('zeigarnik', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {padding: '20px 24px', display: 'grid', gap: '12px'});
+  css(h('div', '', w, '<b>프로필 완성</b><b style="color:#5b4bf0">80%</b>'), {display: 'flex', justifyContent: 'space-between', fontSize: '15px'});
+  const tr = css(h('div', '', w), {height: '8px', borderRadius: '4px', background: '#dfe1f2', overflow: 'hidden'});
+  A(c, css(h('i', '', tr), {display: 'block', height: '100%', width: '80%', background: '#5b4bf0', transformOrigin: '0 50%'}), [{transform: 'scaleX(0)'}, {transform: 'scaleX(1)'}], 700, 200);
+  h('div', '', w, '<b style="color:#17a974">✓</b> 사진 올리기'); h('div', '', w, '<b style="color:#17a974">✓</b> 경력 적기');
+  const left = css(h('div', '', w, '<b>○</b> 소개 한 줄 쓰기'), {fontWeight: 800, color: '#e5484d'});
+  c.anim(left, [{opacity: 1}, {opacity: .35}, {opacity: 1}], {duration: 1000, delay: 800, iterations: Infinity});
+  return 0;
+});
+D('compromise-effect', (r, c) => {
+  const w = css(h('div', '', r), {display: 'flex', gap: '8px', alignItems: 'center'});
+  [['기본', '9,000원', 0], ['스탠다드', '19,000원', 1], ['프리미엄', '49,000원', 0]].forEach(([n, v, on]) => {
+    const k = css(h('div', '', w, `<div style="font-weight:700;font-size:13px">${n}</div><div style="font-weight:900;font-size:15px;margin-top:8px">${v}</div>`), {width: '92px', padding: '20px 4px', borderRadius: '12px', background: '#f6f7ff', color: '#23264a', textAlign: 'center'});
+    if (on) A(c, k, [{transform: 'none', background: '#f6f7ff', color: '#23264a'}, {transform: 'scale(1.14)', background: '#5b4bf0', color: '#fff'}], 450, 1000);
+  });
+  return 2800;
+});
+D('variable-reward', (r, c) => {
+  const w = css(h('div', '', r), {display: 'flex', gap: '8px'});
+  const syms = ['⭐', '🍒', '💎', '🔔', '🍋'], rs = [0, 1, 2].map(() => css(h('div', '', w, '❓'), {width: '74px', height: '90px', background: '#f6f7ff', borderRadius: '12px', display: 'grid', placeItems: 'center', fontSize: '38px'}));
+  const finals = [['🍒', '🍋', '🔔'], ['⭐', '⭐', '🍋'], ['💎', '💎', '💎'], ['🔔', '🍒', '⭐']][Math.random() * 4 | 0];
+  let t0 = null, last = 0;
+  c.loop(now => {
+    if (t0 === null) t0 = now;
+    if (now - last < 70) return; last = now;
+    rs.forEach((e, i) => { const stop = 800 + i * 500; if (now - t0 < stop) e.textContent = syms[Math.random() * 5 | 0]; else e.textContent = finals[i]; });
+  });
+  return 3000;
+});
+
+/* ----- 리서치 ----- */
+D('user-interview', (r, c) => {
+  const s = chat(r);
+  [['장바구니에 담고 왜 안 사셨어요?', 1], ['배송비가 마지막에 보여서요', 0], ['그때 어떤 기분이셨어요?', 1]].forEach(([t, me], i) => A(c, bub(s, t, !me), IN, 300, 300 + i * 800));
+  return 3200;
+});
+D('usability-test', (r, c) => {
+  const s = SCR(r), t = css(h('div', '', s, '과제: 환불 신청하기'), {padding: '10px 14px', fontWeight: 800, background: '#fff4d8', color: '#8a6100'});
+  css(h('div', '', s, `${ROWS(2)}`), {});
+  const cl = css(h('div', '', s, '00:00'), {position: 'absolute', right: '12px', top: '10px', fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: '#8a6100'});
+  const cur = fakeCursor(s, 40, 70);
+  SEQ(c, [[300, () => cur.to([240, 80])], [1000, () => cur.to([90, 120])], [1700, () => cur.to([270, 130])], [2400, () => cur.to([140, 80])]]);
+  const q = css(h('div', '', s, '🧐 어디 있지…'), {position: 'absolute', left: 0, right: 0, bottom: '10px', textAlign: 'center', fontWeight: 700});
+  A(c, q, IN, 300, 1400);
+  let t0 = null; c.loop(now => { if (t0 === null) t0 = now; cl.textContent = '00:' + String(Math.floor((now - t0) / 300) % 60).padStart(2, '0'); });
+  return 3300;
+});
+D('ab-test', (r, c) => {
+  const w = css(h('div', '', r), {display: 'flex', gap: '30px', alignItems: 'flex-end', height: '170px'});
+  [['A', '3.5%', 74, '#8a90c4'], ['B', '7.8%', 150, '#7c6cff']].forEach(([n, v, hh, col], i) => {
+    const k = css(h('div', '', w), {display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: '5px', color: '#fff', fontWeight: 800, width: '80px', height: '100%'});
+    const lb = h('div', '', k, v), bar = css(h('div', '', k), {width: '100%', height: hh + 'px', borderRadius: '10px 10px 0 0', background: col, transformOrigin: '50% 100%'}); h('div', '', k, n);
+    A(c, bar, [{transform: 'scaleY(0)'}, {transform: 'scaleY(1)'}], 700, 300 + i * 100); A(c, lb, IN, 300, 1000);
+  });
+  return 2700;
+});
+D('card-sorting', (r, c) => {
+  const s = SCR(r);
+  [['돈', 14], ['내 정보', 164]].forEach(([t, x]) => css(h('div', '', s, t), {position: 'absolute', left: x + 'px', top: '12px', width: '130px', height: '170px', border: '2px dashed #bcc0e0', borderRadius: '12px', textAlign: 'center', paddingTop: '6px', fontWeight: 700, color: '#6a6f9a'}));
+  [['환불', 140, 165, 22, 40], ['주문', 150, 95, 22, 80], ['쿠폰', 80, 170, 22, 120], ['주소', 60, 90, 172, 40], ['비밀번호', 180, 165, 172, 80]].forEach(([t, x0, y0, x1, y1], i) => {
+    const k = css(h('div', '', s, t), {position: 'absolute', left: 0, top: 0, width: '76px', background: '#fff', borderRadius: '8px', padding: '6px', fontSize: '12px', fontWeight: 700, textAlign: 'center', boxShadow: '0 3px 8px #0003'});
+    A(c, k, [{transform: `translate(${x0}px,${y0}px) rotate(${i % 2 ? 6 : -6}deg)`}, {transform: `translate(${x1}px,${y1}px)`}], 500, 500 + i * 450, 'ease-in-out');
+  });
+  return 3700;
+});
+D('tree-testing', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {padding: '12px 16px', display: 'grid', gap: '6px', fontWeight: 600, fontSize: '13px'});
+  const t = css(h('div', '', w, '과제: 환불 메뉴를 찾아보세요'), {background: '#fff4d8', color: '#8a6100', padding: '5px 8px', borderRadius: '6px', fontWeight: 800});
+  const it = [['홈', 0], ['주문', 1], ['주문 내역', 2], ['환불 신청', 3], ['설정', 1]].map(([x, d]) => css(h('div', '', w, `${d ? '└ ' : ''}${x}`), {marginLeft: d * 14 + 'px', padding: '2px 6px', borderRadius: '6px', width: 'fit-content'}));
+  [0, 1, 2, 3].forEach((k, n) => A(c, it[k], [{background: '#f6f7ff00', color: '#23264a'}, {background: '#5b4bf0', color: '#ffffff'}], 200, 500 + n * 500));
+  return 3200;
+});
+D('survey', (r, c) => {
+  const s = SCR(r), w = css(h('div', '', s), {padding: '18px 22px', display: 'grid', gap: '10px'});
+  h('div', 'nx-h', w, '배송에 만족하시나요?');
+  [['매우 만족', 62], ['만족', 26], ['보통', 9], ['불만족', 3]].forEach(([t, v], i) => {
+    const row = css(h('div', '', w, `<span style="width:58px;font-size:12px;font-weight:600">${t}</span>`), {display: 'flex', alignItems: 'center', gap: '8px'});
+    const tr = css(h('div', '', row), {flex: 1, height: '10px', borderRadius: '5px', background: '#e3e5f6', overflow: 'hidden'});
+    A(c, css(h('i', '', tr), {display: 'block', height: '100%', width: v + '%', background: '#5b4bf0', transformOrigin: '0 50%'}), [{transform: 'scaleX(0)'}, {transform: 'scaleX(1)'}], 600, 300 + i * 200);
+    A(c, css(h('b', '', row, v + '%'), {width: '30px', fontSize: '11px'}), IN, 300, 500 + i * 200);
+  });
+  return 2800;
+});
+D('diary-study', (r, c) => {
+  const w = css(h('div', '', r), {display: 'flex', gap: '6px'});
+  ['월', '화', '수', '목', '금', '토', '일'].forEach((t, i) => {
+    const d = css(h('div', '', w, `<div style="font-size:12px;font-weight:700">${t}</div>`), {width: '46px', height: '112px', background: '#f6f7ff', color: '#23264a', borderRadius: '10px', padding: '8px 6px', textAlign: 'center'});
+    if (i < 5){ const n = css(h('div', '', d, `${LN(100, 1)}${LN(90)}${LN(70)}`), {}); A(c, n, IN, 260, 300 + i * 400); }
+  });
+  return 3000;
+});
+D('heatmap', (r, c) => {
+  const s = SCR(r); css(h('div', '', s, `<div class="nx-pad">${LN(55, 1)}${LN(90)}</div><div style="margin:4px 12px;height:50px;border-radius:10px;background:#e3e5f6"></div><div class="nx-pad"><div class="nx-btn g">자세히</div></div>`), {});
+  [[60, 30, 90], [150, 90, 110], [70, 170, 70], [240, 85, 60]].forEach(([x, y, sz], i) => A(c, css(h('i', '', s), {position: 'absolute', left: x - sz / 2 + 'px', top: y - sz / 2 + 'px', width: sz + 'px', height: sz + 'px', borderRadius: '50%', background: 'radial-gradient(circle,#ff2d2dcc 0,#ffb300aa 40%,#ffee0055 62%,#ffee0000 72%)'}), [{opacity: 0, transform: 'scale(.3)'}, {opacity: 1, transform: 'none'}], 600, 300 + i * 350));
+  return 3000;
+});
+D('funnel-analysis', (r, c) => {
+  const w = css(h('div', '', r), {display: 'grid', gap: '7px', justifyItems: 'center', width: '300px'});
+  [['상품 보기', 100], ['장바구니', 62], ['결제 시작', 34], ['구매 완료', 12]].forEach(([t, v], i) => {
+    const b = css(h('div', '', w, `<b>${t}</b> ${v}%`), {width: Math.max(v, 44) + '%', padding: '10px 0', background: ['#7c6cff', '#6e5fe0', '#5f51c4', '#f6b93f'][i], color: i === 3 ? '#221a00' : '#fff', borderRadius: '8px', textAlign: 'center', fontSize: '13px', whiteSpace: 'nowrap'});
+    A(c, b, [{transform: 'scaleX(.2)', opacity: 0}, {transform: 'none', opacity: 1}], 400, 300 + i * 350);
+  });
+  return 3000;
+});
+
 /* ================= 퀴즈 진행 ================= */
 const BEST_KEY = (sheetId, m, all) => `${sheetId}Quiz.best.${m}${all ? '.all' : ''}`;
 const store = {
@@ -1152,7 +2635,8 @@ function renderSheet(){
   const sh = curSheet();
   $('#cats').innerHTML = sh.categories.map(cat => `<label class="cat"><input type="checkbox" value="${cat.id}" checked><span>${cat.name} (${cat.terms.length})</span></label>`).join('');
   $('#btnSheet').textContent = `📋 전체 보기 (${sh.short} ${sheetSize(sh)}개 한눈에)`;
-  $('#credit').innerHTML = '문제 출처: 유튜브 코드깎는노인<br>' + [...SHEETS].reverse().map(s => s === sh ? `<b>${s.credit}</b>` : s.credit).join('<br>');
+  const credits = [DERIVED, SHEETS[1].credit, SHEETS[0].credit];
+  $('#credit').innerHTML = '문제 출처: 유튜브 코드깎는노인<br>' + credits.map(s => s === sh.credit ? `<b>${s}</b>` : s).join('<br>');
   updatePool(); renderBests();
 }
 function selectedPool(){
@@ -1187,7 +2671,9 @@ function buildChoices(term){
   const others = term.sheet.categories.flatMap(c => c.terms).filter(t => t.cat !== term.cat);
   const pick = (FORCED[term.id] || []).map(id => BYID[id]);
   shuffle(same.filter(t => !pick.includes(t))).forEach(t => { if (pick.length < 3) pick.push(t); });
-  pick.push(...shuffle(others).slice(0, 4 - pick.length));
+  pick.push(...shuffle(others.filter(t => !pick.includes(t))).slice(0, 4 - pick.length));
+  // 카테고리가 하나뿐인 시트는 같은 카테고리에서 마저 채운다
+  pick.push(...shuffle(same.filter(t => !pick.includes(t))).slice(0, 4 - pick.length));
   return shuffle([term, ...pick]);
 }
 
@@ -1311,10 +2797,11 @@ $('#btnHint').addEventListener('click', () => {
 $('#btnRetry').addEventListener('click', () => startRound(S.results.filter(x => !x.ok).map(x => x.term), false, true));
 // 전체 보기: 시트의 용어를 카테고리별로 한 화면에 모두 띄우고, 카드마다 데모를 따로 재생한다
 const SV = {players: [], ro: null};
-const SV_CODE = {motion: 'MOTION CHEAT SHEET', ui: 'UI CHEAT SHEET'};
+const SV_CODE = {motion: 'MOTION CHEAT SHEET', ui: 'UI CHEAT SHEET', style: 'STYLE CHEAT SHEET', dark: 'DARK PATTERN CHEAT SHEET', psych: 'PSYCHOLOGY CHEAT SHEET', research: 'RESEARCH CHEAT SHEET'};
 function stopSheet(){
   SV.players.forEach(p => p.stop()); SV.players = [];
   if (SV.ro) SV.ro.disconnect(); SV.ro = null;
+  if (SV.io) SV.io.disconnect(); SV.io = null;
   $('#svBody').innerHTML = '';
   document.querySelector('.app').classList.remove('wide');
 }
@@ -1335,9 +2822,15 @@ function showSheet(){
   // 데모는 480×300 무대에 그린 뒤 카드 폭에 맞게 줄인다
   const fit = mini => { mini.firstChild.style.transform = `scale(${mini.clientWidth / 480})`; };
   SV.ro = new ResizeObserver(es => es.forEach(e => fit(e.target)));
+  // 카드가 많으므로 화면에 보이는 카드의 데모만 재생한다
+  SV.io = new IntersectionObserver(es => es.forEach(e => {
+    const p = e.target._player;
+    if (e.isIntersecting){ if (!p.root) p.start(e.target.querySelector('.stage'), e.target.dataset.id); }
+    else p.stop();
+  }), {rootMargin: '120px'});
   document.querySelectorAll('#svBody .sv-card').forEach(card => {
     const mini = card.querySelector('.mini'); fit(mini); SV.ro.observe(mini);
-    const p = createPlayer(); p.start(mini.firstChild, card.dataset.id); SV.players.push(p);
+    const p = createPlayer(); card._player = p; SV.players.push(p); SV.io.observe(card);
   });
 }
 const goHome = () => { Player.stop(); stopSheet(); S.phase = 'idle'; renderBests(); show('start'); };
