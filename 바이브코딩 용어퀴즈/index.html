@@ -802,13 +802,30 @@ function lev(a, b){
   }
   return d[m][n];
 }
+// 영어 이름 옆 [ ]에 보여줄 발음. 우리말 이름(ko)은 주관식 정답으로 계속 인정한다
+const PRON = {
+  'tabs': '탭스', 'modal-present': '모달 프레젠트', 'card-expand': '카드 익스팬드', 'zoom-transition': '줌 트랜지션', 'tab-switch': '탭 스위치', 'sheet-expand': '시트 익스팬드',
+  'check-animation': '체크 애니메이션', 'strikethrough': '스트라이크스루', 'progress-complete': '프로그레스 컴플리트', 'send-animation': '센드 애니메이션', 'badge-unlock': '배지 언락', 'success-screen': '석세스 스크린',
+  'responsive-layout': '리스폰시브 레이아웃', 'segmented-control': '세그먼티드 컨트롤', 'switch': '토글 스위치', 'fab': '팹', 'inline-error': '인라인 에러',
+  'infinite-scroll': '인피니트 스크롤', 'back-navigation': '백 내비게이션', 'story-progress': '스토리 프로그레스', 'scroll-progress': '스크롤 프로그레스', 'strength-meter': '스트렝스 미터', 'optimistic-ui': '옵티미스틱 UI',
+  'tap': '탭', 'swipe-to-delete': '스와이프 투 딜리트', 'pinch-to-zoom': '핀치 투 줌', 'pull-to-refresh': '풀 투 리프레시', 'edge-swipe': '엣지 스와이프',
+  'thinking-indicator': '씽킹 인디케이터', 'streaming-response': '스트리밍 리스폰스', 'suggested-prompts': '서제스티드 프롬프트', 'regenerate': '리제너레이트', 'citations': '사이테이션', 'feedback-buttons': '피드백 버튼', 'edit-and-resend': '에디트 앤 리센드', 'file-attachment': '파일 어태치먼트', 'agent-steps': '에이전트 스텝',
+  'star-rating': '스타 레이팅', 'half-star-rating': '하프 스타 레이팅', 'nps': '엔피에스', 'emoji-rating': '이모지 레이팅', 'thumbs-rating': '썸즈 업 · 다운', 'rating-slider': '레이팅 슬라이더', 'rating-summary': '레이팅 서머리', 'rating-tags': '레이팅 태그', 'rating-badge': '레이팅 배지',
+  'share-ios': '아이오에스 셰어', 'share-android': '안드로이드 셰어', 'forward': '포워드', 'send-icon': '센드', 'copy-link': '카피 링크', 'qr-code': '큐알 코드', 'nearby-share': '니어바이 셰어', 'share-sheet': '셰어 시트',
+  'first-use': '퍼스트 유즈', 'no-search-results': '노 서치 리절트', 'no-filter-results': '노 필터 리절트', 'permission-needed': '퍼미션 니디드', 'all-caught-up': '올 코트 업', 'emptied': '엠티드', 'error-state': '에러 스테이트', 'locked-content': '락트 콘텐츠', 'stairs': '스테어스',
+  'roach-motel': '로치 모텔', 'pre-checked': '프리체크트 컨센트', 'fake-countdown': '페이크 카운트다운', 'confirmshaming': '컨펌셰이밍', 'sneak-into-basket': '스니크 인투 배스킷', 'fake-scarcity': '페이크 스케어시티', 'hidden-costs': '히든 코스트', 'forced-continuity': '포스드 컨티뉴이티', 'nagging': '내깅',
+  'loss-aversion': '로스 어버전', 'default-effect': '디폴트 이펙트', 'social-proof': '소셜 프루프', 'scarcity': '스케어시티', 'choice-overload': '초이스 오버로드', 'peak-end': '피크엔드 룰', 'zeigarnik': '자이가르닉 이펙트', 'compromise-effect': '컴프로마이즈 이펙트', 'variable-reward': '베리어블 리워드',
+  'user-interview': '유저 인터뷰', 'usability-test': '유저빌리티 테스트', 'tree-testing': '트리 테스팅', 'survey': '서베이', 'funnel-analysis': '퍼널 어낼리시스',
+};
 const ALL = [], BYID = {};
 SHEETS.forEach(sh => sh.categories.forEach(cat => cat.terms.forEach(t => {
   t.sheet = sh; t.cat = cat;
+  if (PRON[t.id]){ t.koDisplay = PRON[t.id]; t.ko.push(PRON[t.id]); }
   t.keys = [...new Set([...t.en, ...t.ko].map(norm))];
   t.jkeys = t.keys.map(jamo);
   t.nickKeys = t.nick.split(/[\/→]/).map(norm).filter(Boolean).concat(norm(t.nick));
   t.koDisplay = t.koDisplay || t.ko[0];
+  t.label = `${t.display} [${t.koDisplay}]`; // 읽기 쉽도록 한글 이름을 함께 표시
   ALL.push(t); BYID[t.id] = t;
 })));
 
@@ -2694,7 +2711,7 @@ function ask(){
     $('#ans').focus();
   } else {
     S.choices = buildChoices(term);
-    area.innerHTML = '<div class="choices">' + S.choices.map((t, i) => `<button class="choice" data-i="${i}"><kbd>${i + 1}</kbd>${t.display}</button>`).join('') + '</div>';
+    area.innerHTML = '<div class="choices">' + S.choices.map((t, i) => `<button class="choice" data-i="${i}"><kbd>${i + 1}</kbd>${t.label}</button>`).join('') + '</div>';
     area.querySelectorAll('.choice').forEach(b => b.addEventListener('click', () => choose(+b.dataset.i)));
   }
   Player.start($('#stage'), term.id);
@@ -2708,7 +2725,7 @@ function choose(i){
     if (S.choices[j] === term) b.classList.add('right');
     else if (j === i) b.classList.add('wrong');
   });
-  finishAnswer(picked === term ? {ok: true, kind: 'exact'} : {ok: false, kind: 'pick'}, picked.display);
+  finishAnswer(picked === term ? {ok: true, kind: 'exact'} : {ok: false, kind: 'pick'}, picked.label);
 }
 function answer(text){
   if (S.phase !== 'asking') return;
@@ -2730,7 +2747,7 @@ function finishAnswer(g, given){
   const msg = {
     exact: S.hint ? '힌트를 써서 0.5점이에요.' : '',
     typo: `오타는 봐드렸어요${S.hint ? ' (힌트 사용 0.5점)' : ''}. 올바른 철자를 확인하세요.`,
-    other: g.other ? `입력한 답은 다른 효과(${g.other.display})예요.` : '',
+    other: g.other ? `입력한 답은 다른 효과(${g.other.label})예요.` : '',
     nick: `${S.sheet.nickLabel}은(는) 정답으로 인정하지 않아요. 용어 이름으로 답해주세요.`,
     skip: '괜찮아요, 정답을 확인해보세요.',
     empty: '', wrong: given ? `내 답: ${esc(given)}` : '',
@@ -2740,7 +2757,7 @@ function finishAnswer(g, given){
   const fb = $('#feedback');
   fb.innerHTML = `<div class="verdict ${g.ok ? 'ok' : 'bad'}">${g.ok ? (g.kind === 'typo' ? '✅ 정답! (오타 인정)' : '✅ 정답!') : '❌ 아쉬워요'}</div>
     ${msg ? `<div class="msg">${msg}</div>` : ''}
-    <div class="name">${term.display}<small>(${term.koDisplay})</small>${term.extra ? '<span class="tag">시트 외 추가</span>' : ''}</div>
+    <div class="name">${term.display}<small>[${term.koDisplay}]</small>${term.extra ? '<span class="tag">시트 외 추가</span>' : ''}</div>
     <div class="nick">${S.sheet.nickLabel} “${term.nick}”</div>
     <div class="desc">${term.desc}</div>
     <button class="primary" id="btnNext">${last ? '결과 보기' : '다음 →'}</button>`;
@@ -2775,7 +2792,7 @@ function finish(){
   $('#btnRetry').hidden = !wrong.length;
   if (!wrong.length){ $('#rBest').textContent += ' · 전부 맞혔어요!'; return; }
   const list = $('#rWrongs');
-  list.innerHTML = wrong.map((x, i) => `<button data-i="${i}"><b>${x.term.display}</b> ${x.term.koDisplay} · ${S.sheet.nickLabel} “${x.term.nick}”${x.given ? `<br><small>내 답: ${esc(x.given)}</small>` : ''}</button>`).join('');
+  list.innerHTML = wrong.map((x, i) => `<button data-i="${i}"><b>${x.term.label}</b> ·${S.sheet.nickLabel} “${x.term.nick}”${x.given ? `<br><small>내 답: ${esc(x.given)}</small>` : ''}</button>`).join('');
   const play = i => { list.querySelectorAll('button').forEach((b, j) => b.classList.toggle('on', i === j)); Player.start($('#rStage'), wrong[i].term.id); };
   list.querySelectorAll('button').forEach(b => b.addEventListener('click', () => play(+b.dataset.i)));
   play(0);
@@ -2815,7 +2832,7 @@ function showSheet(){
   $('#svBody').innerHTML = sh.categories.map(cat => {
     const from = n + 1; n += cat.terms.length;
     return `<div class="sv-cat"><h3><div>${cat.name}<span>${from}–${n}</span></div><small>${cat.id.toUpperCase()}</small></h3><div class="sv-grid">` +
-      cat.terms.map((t, i) => `<div class="sv-card" data-id="${t.id}"><div class="mini"><div class="stage"></div></div><b>${t.display}</b><div class="meta"><span>${t.nick}</span><i>${String(from + i).padStart(2, '0')}</i></div></div>`).join('') +
+      cat.terms.map((t, i) => `<div class="sv-card" data-id="${t.id}"><div class="mini"><div class="stage"></div></div><b>${t.label}</b><div class="meta"><span>${t.nick}</span><i>${String(from + i).padStart(2, '0')}</i></div></div>`).join('') +
       '</div></div>';
   }).join('');
   show('sheetView'); window.scrollTo(0, 0);
