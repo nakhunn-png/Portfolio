@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>실시간감시 사용법</title>
+<title>실시간감시 사용법 (에이레네)</title>
 <style>
   :root {
     --bg: #0b1626; --card: #12233b; --line: #22395a; --text: #e8f1ff; --muted: #9db0c9;
@@ -32,6 +32,7 @@
   .gam { flex: none; display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
          background: #10233d; border: 3px solid var(--gold); color: var(--gold); font-weight: 800; font-size: 14px; }
   .gam.big { width: 40px; height: 40px; font-size: 19px; border-width: 4px; }
+  .gam { background: #7a1fa2; border-color: #f0d6ff; color: #f0d6ff; }   /* 에이레네용: 자주색 아이콘 */
 
   /* 그림: 작업 표시줄 + 우클릭 메뉴 */
   .demo { margin: 14px 0 6px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; padding: 16px; border-radius: 12px; background: linear-gradient(#34507a, #233a5c); overflow: hidden; }
@@ -53,15 +54,16 @@
 </head>
 <body>
 <main>
-  <h1><span class="gam big">감</span> 실시간감시 사용법</h1>
+  <h1><span class="gam big">감</span> 실시간감시 사용법 (에이레네)</h1>
   <p class="lead">게임에서 교역소 창을 열면 시세가 자동으로 공유 지도에 올라갑니다.</p>
 
   <section>
     <h2><span class="num">1</span> 켜기</h2>
-    <p><code>실시간감시 켜기(등록용).exe</code>를 원하는 폴더에 넣고 더블클릭합니다.</p>
+    <p><code>에이레네섭 Ver 1.24.exe</code>를 원하는 폴더에 넣고 더블클릭합니다.</p>
     <ul>
+      <li>에이레네용입니다. 헬레네·폴라리스는 <code>헬폴섭 Ver 3.24.exe</code>와 <b>사용법(헬폴)</b>을 보세요.</li>
       <li>처음 실행할 때 "Windows의 PC 보호" 창이 뜨면 <b>[추가 정보] → [실행]</b>을 누릅니다.</li>
-      <li>실행하면 지도가 열리고, 작업 표시줄 오른쪽 아래(시계 옆)에 <span class="gam">감</span> 아이콘이 생깁니다.</li>
+      <li>실행하면 지도가 열리고, 작업 표시줄 오른쪽 아래(시계 옆)에 <b>자주색</b> <span class="gam">감</span> 아이콘이 생깁니다. 마우스를 올리면 "실시간감시 켜짐 (에이레네)"라고 나옵니다.</li>
     </ul>
   </section>
 
@@ -71,11 +73,9 @@
   </section>
 
   <section>
-    <h2><span class="num">3</span> 처음 캐릭터 설정</h2>
-    <p>캐릭터의 서버는 <code>내 문서\KOEI\GV Online\Mail</code> 폴더를 보고 자동으로 알아냅니다.</p>
-    <p>처음 켜면 <b>"캐릭터 설정"</b> 창이 뜹니다. <b>클라이언트A·클라이언트B</b>의 캐릭터1~6 칸(모두 12칸)에 캐릭터 이름을 적고 <span class="warn">원래 서버</span>(헬레네·폴라리스 중 하나)를 고른 뒤 <b>[저장]</b>을 누르세요.<br>
-       Mail 폴더에서 찾은 캐릭터(보낸 편지함 SendBox 파일 기준)는 미리 채워져 있습니다. 시세캐릭이 아니면 적을 필요가 없습니다.</p>
-    <p>등록하지 않은 캐릭터는 서버를 알 수 없어 시세가 등록되지 않습니다. 게임 화면에 안내가 뜨면 트레이 메뉴 <b>[캐릭터 설정 다시 하기]</b>에서 추가하세요.</p>
+    <h2><span class="num">3</span> 설정할 것 없음</h2>
+    <p><b>캐릭터 등록이 필요 없습니다.</b> 캐릭터 이름을 읽지 않고, 시세는 항상 <b>에이레네</b>에 올라갑니다.</p>
+    <p>헬레네·폴라리스에 접속한 채로 켜 두면 시세를 올리지 않고, 게임 화면에 <b>"에이레네용 실시간감시입니다. 헬레네 서버 시세는 등록하지 않습니다"</b> 같은 안내가 뜹니다 (폴라리스면 폴라리스). 그 서버에서는 <code>헬폴섭 Ver 3.24.exe</code>를 쓰세요.</p>
   </section>
 
   <section class="key">
@@ -84,10 +84,10 @@
     <div class="demo" aria-label="감 아이콘 오른쪽 클릭 메뉴 그림">
       <div class="menu-box">
         <div class="def hl">지도 열기</div>
-        <div class="hl">캐릭터 설정 다시 하기</div>
         <div class="chk">게임 화면 알림</div>
+        <div class="chk hl">네비</div>
         <div class="sep"></div>
-        <div>실시간감시 끄기</div>
+        <div>감지기 Ver 1.24 닫기</div>
       </div>
       <div class="taskbar"><span class="up">^</span><span class="gam on">감</span><span>한</span><span>오후 3:10</span></div>
       <div class="cap">작업 표시줄 오른쪽 아래 (시계 옆)</div>
@@ -97,13 +97,17 @@
     <h2 style="margin-top:18px">🗺 <b class="menu">[지도 열기]</b></h2>
     <p>공유 시세 지도를 엽니다. 지도는 <a href="https://real-time-dho.web.app" target="_blank" rel="noopener">https://real-time-dho.web.app</a> 에서도 볼 수 있습니다.</p>
 
-    <h2 style="margin-top:18px">🔧 <b class="menu">[캐릭터 설정 다시 하기]</b></h2>
+    <h2 style="margin-top:18px">🧭 <b class="menu">[네비]</b> <span class="tag">새 기능</span></h2>
     <ul>
-      <li><b>서버를 잘못 골랐을 때</b> 여기서 고칠 수 있습니다.</li>
-      <li><b>캐릭터 인식이 안 될 경우</b>나 <b>캐릭터를 추가할 때</b>도 여기서 캐릭터 칸에 이름과 원래 서버를 등록하면 됩니다.</li>
+      <li>체크되어 있으면 켜진 것입니다. 누를 때마다 켜고 끕니다.</li>
+      <li>켜져 있을 때 바다에서 <b>측량</b>을 켜면, 지도에 <b>내 배 위치</b>와 <b>바라보는 방향(파란 선)</b>이 실시간으로 나옵니다. 카메라를 돌리면 파란 선이 바로 따라갑니다.</li>
+      <li>끄면 측량 좌표와 나침반을 읽지 않고, 지도에서 내 배가 바로 사라집니다.</li>
+      <li>실시간감시를 켤 때마다 <b>켜진 채로</b> 시작합니다.</li>
+      <li>내 배는 <b>[지도 열기]</b>로 연 지도에만 보입니다. 크롬이 처음에 "로컬 네트워크" 접근을 물으면 <b>허용</b>을 누르세요.</li>
+      <li>지도 오른쪽 아래 <b>[내 배 따라가기(F)]</b>를 켜거나 <b>F</b> 키를 누르면 지도가 내 배를 따라갑니다.</li>
     </ul>
 
-    <h2 style="margin-top:18px">⏻ <b class="menu">[실시간감시 끄기]</b></h2>
+    <h2 style="margin-top:18px">⏻ <b class="menu">[감지기 Ver 1.24 닫기]</b></h2>
     <p>끌 때 누릅니다.</p>
   </section>
 
