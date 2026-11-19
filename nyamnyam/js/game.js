@@ -371,8 +371,8 @@ export class Game {
       return 'open';
     }
     r.wrong++;
-    if (r.diff === 'hell') {
-      // 불지옥: 조각이 흩어진다
+    if (DIFFS[r.diff].scatter) {
+      // 불지옥·어둠의 다크니스: 조각이 흩어진다
       const ids = this.map.objects.filter(o => o.kind === 'search').map(o => o.id);
       r.searched = {}; r.realIds = shuffled(ids).slice(0, this.need); r.scattered++; r.disabled.push(choice);
       this.dirty = true; Sound.bad();

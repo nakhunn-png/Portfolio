@@ -150,7 +150,8 @@ async function startPlay() {
   const oldMap = !!(s.run && s.run.stageId === stageId && s.run.mapVersion !== MAP_VERSION);
   const resumed = !!(s.run && s.run.stageId === stageId) && !oldMap;
   // 과정의 마지막 층은 불이 꺼진다(1시간용 5층, 2시간용 6층)
-  const dark = !s.inTutorial && s.stageIdx === COURSES[s.course].stages.length - 1;
+  // 과정의 마지막 층은 불이 꺼진다. '어둠의 다크니스'는 튜토리얼을 뺀 모든 층
+  const dark = !s.inTutorial && (DIFFS[s.diff]?.allDark || s.stageIdx === COURSES[s.course].stages.length - 1);
   S.game = new Game($('cv'), { stageId, band: s.band, diff: s.diff, char: s.char, pool: poolFor(stageId), run: resumed ? s.run : null, ui: UI, dark });
   $('stageName').textContent = st.name;
   $('tutBox').hidden = $('tutFrame').hidden = stageId !== 0;
@@ -409,7 +410,7 @@ function openNote() {
   askNote();
 
   function askNote() {
-    const hint = r.disabled.length && r.diff !== 'hell' ? `<p class="hint">💡 힌트: ${esc(q.h)}</p>` : '';
+    const hint = r.disabled.length && !DIFFS[r.diff].scatter ? `<p class="hint">💡 힌트: ${esc(q.h)}</p>` : '';
     const sh = openModal(`<h3>📜 쪽지 문제 · 맞히면 탈출문이 열려요!</h3>${hint}<p class="q">${esc(q.q)}</p><div class="choices">${choiceButtons(q, r.disabled)}</div>
       <div class="acts"><button class="big alt" id="nClose">닫기</button></div>`);
     sh.querySelector('#nClose').onclick = close;
@@ -429,7 +430,7 @@ function openNote() {
 }
 
 function diffButtons(current) {
-  return `<div class="diffrow">${Object.entries(DIFFS).map(([k, d]) => `<button data-d="${k}" class="${k === current ? 'on' : ''}">${d.icon} ${d.name}</button>`).join('')}</div>`;
+  return `<div class="diffrow">${Object.entries(DIFFS).map(([k, d]) => `<button data-d="${k}" class="${k}${k === current ? ' on' : ''}">${d.icon} ${d.name}</button>`).join('')}</div>`;
 }
 function onCaught({ name, lives, diff }) {
   const g = S.game;
@@ -470,7 +471,7 @@ function onClear(res) {
   const d = DIFFS[res.diff];
   const sh = openModal(`<h3>🎉 ${esc(STAGES[res.stageId].name)} 탈출 성공!</h3>
     <div class="stars">${'⭐'.repeat(res.stars)}${'☆'.repeat(3 - res.stars)}</div>
-    <p style="text-align:center"><span class="badge ${res.diff}">${d.icon} ${d.name}${res.diff === 'hell' ? ' 클리어 🔥' : ''}</span></p>
+    <p style="text-align:center"><span class="badge ${res.diff}">${d.icon} ${d.name}${res.diff === 'hell' ? ' 클리어 🔥' : res.diff === 'darkness' ? ' 클리어 😈' : ''}</span></p>
     <ul class="crit">
       <li>✅ 탈출하기</li>
       <li>${res.wrong <= 2 ? '✅' : '⬜'} 문제를 2번 이하로 틀리기 (틀린 횟수 ${res.wrong}번)</li>
@@ -564,7 +565,7 @@ function renderTable() {
     if (!s || !s.course) { rows += `<tr><td>${n}</td><td class="empty" colspan="13">기록 없음</td></tr>`; continue; }
     const cells = [1, 2, 3, 4, 5, 6].map(id => {
       if (!COURSES[s.course].stages.includes(id)) return '<td class="empty">·</td>';
-      const r = s.results[id]; return r?.skipped ? '<td title="선생님이 건너뜀">⏭</td>' : r ? `<td>${'⭐'.repeat(r.stars)}${r.diff === 'hell' ? '🔥' : r.diff === 'hard' ? '💪' : ''}</td>` : '<td class="empty">-</td>';
+      const r = s.results[id]; return r?.skipped ? '<td title="선생님이 건너뜀">⏭</td>' : r ? `<td>${'⭐'.repeat(r.stars)}${r.diff === 'darkness' ? '😈' : r.diff === 'hell' ? '🔥' : r.diff === 'hard' ? '💪' : ''}</td>` : '<td class="empty">-</td>';
     }).join('');
     rows += `<tr><td>${n}</td><td>${BANDS[s.band]?.name || ''}</td><td>${COURSES[s.course].name}</td><td>${progressText(s)}</td>${cells}<td>⭐ ${totalStars(s)}</td><td>${DIFFS[s.diff]?.icon || ''} ${DIFFS[s.diff]?.name || ''}</td><td>${fmtTime(s.updated)}</td><td><button data-del="${n}">지우기</button></td></tr>`;
   }

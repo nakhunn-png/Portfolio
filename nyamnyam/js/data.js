@@ -18,13 +18,16 @@ export const COURSES = {
 };
 
 // speed: 균 속도 배율, player: 주인공 속도 배율, tired: 충치쟁이가 지쳐 쉬는 시간 배율, guide: 진짜 쪽지 쪽으로 화살표 안내
+// scatter: 쪽지 문제를 틀리면 조각이 흩어짐(힌트 없음), allDark: 모든 층이 불 꺼짐
 // 키 'easy'는 예전 저장과 맞추려고 그대로 두고 이름만 '중간'으로 바꿨다. 새 '쉬움'은 키 'gentle'
 export const DIFFS = {
   veryeasy: { name: '매우 쉬움', icon: '🐣', lives: Infinity, speed: 0.54, player: 1.725, tired: 1.3, guide: true, extraGerms: 0, desc: '목숨 무한 · 화살표가 쪽지 안내' },
   gentle: { name: '쉬움', icon: '🌱', lives: Infinity, speed: 0.6, player: 1.15, tired: 1.3, extraGerms: 0, desc: '목숨 무한 · 균이 아주 느려요' },
   easy: { name: '중간', icon: '🙂', lives: Infinity, speed: 0.75, extraGerms: 0, desc: '목숨 무한 · 균이 느려요' },
   hard: { name: '어려움', icon: '💪', lives: 3, speed: 1, extraGerms: 2, desc: '목숨 3개 · 균이 빠르고 많아요' },
-  hell: { name: '불지옥', icon: '🔥', lives: 1, speed: 1, extraGerms: 2, desc: '목숨 1개 · 쪽지 문제를 틀리면 조각이 흩어져요' },
+  hell: { name: '불지옥', icon: '🔥', lives: 1, speed: 1, extraGerms: 2, scatter: true, desc: '목숨 1개 · 쪽지 문제를 틀리면 조각이 흩어져요' },
+  // 불지옥 규칙 + 튜토리얼을 뺀 모든 층이 불 꺼진 상태
+  darkness: { name: '어둠의 다크니스', icon: '😈', lives: 1, speed: 1, extraGerms: 2, scatter: true, allDark: true, desc: '불지옥 + 모든 층이 깜깜해요' },
 };
 
 export const CHARS = [

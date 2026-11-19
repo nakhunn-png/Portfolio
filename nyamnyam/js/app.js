@@ -17,7 +17,9 @@
     gentle: { name: "\uC26C\uC6C0", icon: "\u{1F331}", lives: Infinity, speed: 0.6, player: 1.15, tired: 1.3, extraGerms: 0, desc: "\uBAA9\uC228 \uBB34\uD55C \xB7 \uADE0\uC774 \uC544\uC8FC \uB290\uB824\uC694" },
     easy: { name: "\uC911\uAC04", icon: "\u{1F642}", lives: Infinity, speed: 0.75, extraGerms: 0, desc: "\uBAA9\uC228 \uBB34\uD55C \xB7 \uADE0\uC774 \uB290\uB824\uC694" },
     hard: { name: "\uC5B4\uB824\uC6C0", icon: "\u{1F4AA}", lives: 3, speed: 1, extraGerms: 2, desc: "\uBAA9\uC228 3\uAC1C \xB7 \uADE0\uC774 \uBE60\uB974\uACE0 \uB9CE\uC544\uC694" },
-    hell: { name: "\uBD88\uC9C0\uC625", icon: "\u{1F525}", lives: 1, speed: 1, extraGerms: 2, desc: "\uBAA9\uC228 1\uAC1C \xB7 \uCABD\uC9C0 \uBB38\uC81C\uB97C \uD2C0\uB9AC\uBA74 \uC870\uAC01\uC774 \uD769\uC5B4\uC838\uC694" }
+    hell: { name: "\uBD88\uC9C0\uC625", icon: "\u{1F525}", lives: 1, speed: 1, extraGerms: 2, scatter: true, desc: "\uBAA9\uC228 1\uAC1C \xB7 \uCABD\uC9C0 \uBB38\uC81C\uB97C \uD2C0\uB9AC\uBA74 \uC870\uAC01\uC774 \uD769\uC5B4\uC838\uC694" },
+    // 불지옥 규칙 + 튜토리얼을 뺀 모든 층이 불 꺼진 상태
+    darkness: { name: "\uC5B4\uB460\uC758 \uB2E4\uD06C\uB2C8\uC2A4", icon: "\u{1F608}", lives: 1, speed: 1, extraGerms: 2, scatter: true, allDark: true, desc: "\uBD88\uC9C0\uC625 + \uBAA8\uB4E0 \uCE35\uC774 \uAE5C\uAE5C\uD574\uC694" }
   };
   var CHARS = [
     { id: "boy1", name: "\uD558\uB298" },
@@ -2095,7 +2097,7 @@
         return "open";
       }
       r.wrong++;
-      if (r.diff === "hell") {
+      if (DIFFS[r.diff].scatter) {
         const ids = this.map.objects.filter((o) => o.kind === "search").map((o) => o.id);
         r.searched = {};
         r.realIds = shuffled(ids).slice(0, this.need);
@@ -2960,6 +2962,7 @@
     }) : null
   ]);
   async function startPlay() {
+    var _a;
     await imgReady;
     if (S.game) {
       S.game.destroy();
@@ -2969,7 +2972,7 @@
     const s = S.save, stageId = currentStageId(), st = STAGES[stageId];
     const oldMap = !!(s.run && s.run.stageId === stageId && s.run.mapVersion !== MAP_VERSION);
     const resumed = !!(s.run && s.run.stageId === stageId) && !oldMap;
-    const dark = !s.inTutorial && s.stageIdx === COURSES[s.course].stages.length - 1;
+    const dark = !s.inTutorial && (((_a = DIFFS[s.diff]) == null ? void 0 : _a.allDark) || s.stageIdx === COURSES[s.course].stages.length - 1);
     S.game = new Game($("cv"), { stageId, band: s.band, diff: s.diff, char: s.char, pool: poolFor(stageId), run: resumed ? s.run : null, ui: UI, dark });
     $("stageName").textContent = st.name;
     $("tutBox").hidden = $("tutFrame").hidden = stageId !== 0;
@@ -3391,7 +3394,7 @@
     }
     askNote();
     function askNote() {
-      const hint = r.disabled.length && r.diff !== "hell" ? `<p class="hint">\u{1F4A1} \uD78C\uD2B8: ${esc(q.h)}</p>` : "";
+      const hint = r.disabled.length && !DIFFS[r.diff].scatter ? `<p class="hint">\u{1F4A1} \uD78C\uD2B8: ${esc(q.h)}</p>` : "";
       const sh = openModal(`<h3>\u{1F4DC} \uCABD\uC9C0 \uBB38\uC81C \xB7 \uB9DE\uD788\uBA74 \uD0C8\uCD9C\uBB38\uC774 \uC5F4\uB824\uC694!</h3>${hint}<p class="q">${esc(q.q)}</p><div class="choices">${choiceButtons(q, r.disabled)}</div>
       <div class="acts"><button class="big alt" id="nClose">\uB2EB\uAE30</button></div>`);
       sh.querySelector("#nClose").onclick = close;
@@ -3414,7 +3417,7 @@
     }
   }
   function diffButtons(current) {
-    return `<div class="diffrow">${Object.entries(DIFFS).map(([k, d]) => `<button data-d="${k}" class="${k === current ? "on" : ""}">${d.icon} ${d.name}</button>`).join("")}</div>`;
+    return `<div class="diffrow">${Object.entries(DIFFS).map(([k, d]) => `<button data-d="${k}" class="${k}${k === current ? " on" : ""}">${d.icon} ${d.name}</button>`).join("")}</div>`;
   }
   function onCaught({ name, lives, diff }) {
     var _a;
@@ -3467,7 +3470,7 @@
     const d = DIFFS[res.diff];
     const sh = openModal(`<h3>\u{1F389} ${esc(STAGES[res.stageId].name)} \uD0C8\uCD9C \uC131\uACF5!</h3>
     <div class="stars">${"\u2B50".repeat(res.stars)}${"\u2606".repeat(3 - res.stars)}</div>
-    <p style="text-align:center"><span class="badge ${res.diff}">${d.icon} ${d.name}${res.diff === "hell" ? " \uD074\uB9AC\uC5B4 \u{1F525}" : ""}</span></p>
+    <p style="text-align:center"><span class="badge ${res.diff}">${d.icon} ${d.name}${res.diff === "hell" ? " \uD074\uB9AC\uC5B4 \u{1F525}" : res.diff === "darkness" ? " \uD074\uB9AC\uC5B4 \u{1F608}" : ""}</span></p>
     <ul class="crit">
       <li>\u2705 \uD0C8\uCD9C\uD558\uAE30</li>
       <li>${res.wrong <= 2 ? "\u2705" : "\u2B1C"} \uBB38\uC81C\uB97C 2\uBC88 \uC774\uD558\uB85C \uD2C0\uB9AC\uAE30 (\uD2C0\uB9B0 \uD69F\uC218 ${res.wrong}\uBC88)</li>
@@ -3596,7 +3599,7 @@
       const cells = [1, 2, 3, 4, 5, 6].map((id) => {
         if (!COURSES[s.course].stages.includes(id)) return '<td class="empty">\xB7</td>';
         const r = s.results[id];
-        return (r == null ? void 0 : r.skipped) ? '<td title="\uC120\uC0DD\uB2D8\uC774 \uAC74\uB108\uB700">\u23ED</td>' : r ? `<td>${"\u2B50".repeat(r.stars)}${r.diff === "hell" ? "\u{1F525}" : r.diff === "hard" ? "\u{1F4AA}" : ""}</td>` : '<td class="empty">-</td>';
+        return (r == null ? void 0 : r.skipped) ? '<td title="\uC120\uC0DD\uB2D8\uC774 \uAC74\uB108\uB700">\u23ED</td>' : r ? `<td>${"\u2B50".repeat(r.stars)}${r.diff === "darkness" ? "\u{1F608}" : r.diff === "hell" ? "\u{1F525}" : r.diff === "hard" ? "\u{1F4AA}" : ""}</td>` : '<td class="empty">-</td>';
       }).join("");
       rows += `<tr><td>${n}</td><td>${((_a = BANDS[s.band]) == null ? void 0 : _a.name) || ""}</td><td>${COURSES[s.course].name}</td><td>${progressText(s)}</td>${cells}<td>\u2B50 ${totalStars(s)}</td><td>${((_b = DIFFS[s.diff]) == null ? void 0 : _b.icon) || ""} ${((_c = DIFFS[s.diff]) == null ? void 0 : _c.name) || ""}</td><td>${fmtTime(s.updated)}</td><td><button data-del="${n}">\uC9C0\uC6B0\uAE30</button></td></tr>`;
     }
