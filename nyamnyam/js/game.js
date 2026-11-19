@@ -1,7 +1,7 @@
 // 게임 본체: 한 층의 판정(이동·균·숨기·비눗방울·쪽지)과 그리기.
 // 화면 바깥 일(문제 창, 쪽지 창, 잡혔을 때 창, 결과 화면)은 ui 콜백으로 넘긴다.
 import { buildStage, lineOfSight, findPath, MAP_VERSION } from './map.js';
-import { GERMS, DIFFS, PLAYER_SPEED, GERM_SPEED, SEARCH_LOCK, STUN_TIME, WATER_TIME, MASK_TIME, THROW_RANGE, hideName, FOUND_LINES, MISS_LINES } from './data.js';
+import { GERMS, DIFFS, PLAYER_SPEED, GERM_SPEED, SEARCH_LOCK, STUN_TIME, WATER_TIME, MASK_TIME, WEB_TIME, WEB_SLOW, WEB_COUNT, THROW_RANGE, hideName, FOUND_LINES, MISS_LINES } from './data.js';
 import { Sound } from './sound.js';
 
 const IMG = {};
@@ -59,6 +59,8 @@ export class Game {
     this.run = opts.run && opts.run.stageId === opts.stageId && opts.run.mapVersion === MAP_VERSION ? opts.run : this.newRun();
     if (this.run.diff !== opts.diff && DIFFS[opts.diff]) this.changeDiff(opts.diff);
     if (this.run.hidden == null) this.unstick(); // 예전 저장 위치가 벽에 박혀 있으면 바로 빼낸다
+    if (DIFFS[this.run.diff].webs && !this.run.webs && !this.tut) this.run.webs = this.makeWebs();
+    this.webT = 0;
     this.germs = this.run.germs.map(g => this.makeGerm(g.type, g.x, g.y));
     this.invuln = opts.run ? 3 : 1.5;
     this.waterT = 0; this.maskT = 0;
@@ -91,11 +93,22 @@ export class Game {
     const r = this.run, m = this.map;
     r.diff = diff;
     r.lives = DIFFS[diff].lives === Infinity ? -1 : DIFFS[diff].lives;
+    r.webs = DIFFS[diff].webs && !this.tut ? (r.webs && r.webs.length ? r.webs : this.makeWebs()) : [];
     if (!this.tut) {
       const want = this.stageGermList(), have = r.germs || [];
       r.germs = want.map((type, i) => have[i] && have[i].type === type ? have[i] : { type, ...(m.germSpots[i % m.germSpots.length]) });
     }
     this.dirty = true;
+  }
+  // 거미줄 자리: 방 바닥 중 출발 자리에서 4칸 넘게 떨어지고, 줍는 것과 겹치지 않는 곳에 무작위로
+  makeWebs() {
+    const m = this.map, taken = new Set(m.pickups.map(p => p.y * m.W + p.x)), cand = [];
+    for (let y = 0; y < m.H; y++) for (let x = 0; x < m.W; x++) {
+      if (m.solid(x, y) || m.room[y * m.W + x] < 0 || taken.has(y * m.W + x)) continue;
+      if (Math.hypot(x + 0.5 - m.start.x, y + 0.5 - m.start.y) < 4) continue;
+      cand.push({ x, y });
+    }
+    return shuffled(cand).slice(0, WEB_COUNT);
   }
   stageGermList() {
     const list = this.map.S.germs.slice();
@@ -143,6 +156,7 @@ export class Game {
     this.invuln = Math.max(0, this.invuln - dt);
     this.waterT = Math.max(0, this.waterT - dt);
     this.maskT = Math.max(0, this.maskT - dt);
+    this.webT = Math.max(0, this.webT - dt);
     for (const k in this.locks) if ((this.locks[k] -= dt) <= 0) delete this.locks[k];
     this.movePlayer(dt);
     this.updateDoors(dt);
@@ -167,7 +181,7 @@ export class Game {
     if (len < 0.15) { this.walkT = 0; return; }
     if (len > 1) { dx /= len; dy /= len; }
     if (Math.abs(dx) > 0.2) this.face = dx > 0 ? 1 : -1;
-    const sp = PLAYER_SPEED * (DIFFS[this.run.diff].player || 1) * (this.waterT > 0 ? 1.6 : 1) * dt;
+    const sp = PLAYER_SPEED * (DIFFS[this.run.diff].player || 1) * (this.waterT > 0 ? 1.6 : 1) * (this.webT > 0 ? WEB_SLOW : 1) * dt;
     this.walkT += dt;
     this.slide(dx * sp, dy * sp);
   }
@@ -213,6 +227,14 @@ export class Game {
 
   pickups() {
     const r = this.run;
+    // 거미줄: 밟으면 사라지고 잠깐 느려진다
+    if (r.webs && r.webs.length) {
+      const i = r.webs.findIndex(w => Math.hypot(w.x + 0.5 - this.px, w.y + 0.5 - this.py) < 0.6);
+      if (i >= 0) {
+        r.webs.splice(i, 1); this.webT = WEB_TIME; Sound.bad(); this.dirty = true;
+        this.float('🕸️ 거미줄! 느려졌어요', this.px, this.py - 1, '#6b4f9a');
+      }
+    }
     for (const p of this.map.pickups) {
       if (r.picked.includes(p.id)) continue;
       if (Math.hypot(p.x + 0.5 - this.px, p.y + 0.5 - this.py) > 0.65) continue;
@@ -544,6 +566,11 @@ export class Game {
     this.drawArchitecture(c,TS);
     // 탈출문
     this.drawExit(c, TS);
+    // 거미줄(불지옥·어둠의 다크니스): 바닥에 납작하게
+    for (const w of r.webs || []) {
+      const im = emojiCanvas('🕸️', TS * 0.9);
+      c.globalAlpha = 0.85; c.drawImage(im, (w.x + 0.5) * TS - im.width / 2, (w.y + 0.5) * TS - im.height / 2); c.globalAlpha = 1;
+    }
     // 줍는 것
     for (const p of m.pickups) {
       if (r.picked.includes(p.id)) continue;
@@ -798,6 +825,7 @@ export class Game {
     } else { c.fillStyle = '#ff8a3d'; c.beginPath(); c.arc(x, y, TS * 0.35, 0, 7); c.fill(); }
     c.globalAlpha = 1;
     if (this.waterT > 0) this.label(c, '💧', x + TS * 0.45, y - TS * 1.0, Math.round(TS * 0.32));
+    if (this.webT > 0) this.label(c, `🕸️${Math.ceil(this.webT)}`, x, y - TS * 1.25, Math.round(TS * 0.3), '#6b4f9a');
     if (this.maskT > 0) this.label(c, '😷', x - TS * 0.45, y - TS * 1.0, Math.round(TS * 0.32));
   }
   drawGerm(c, g, TS) {

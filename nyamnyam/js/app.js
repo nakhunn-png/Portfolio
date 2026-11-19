@@ -17,9 +17,9 @@
     gentle: { name: "\uC26C\uC6C0", icon: "\u{1F331}", lives: Infinity, speed: 0.6, player: 1.15, tired: 1.3, extraGerms: 0, desc: "\uBAA9\uC228 \uBB34\uD55C \xB7 \uADE0\uC774 \uC544\uC8FC \uB290\uB824\uC694" },
     easy: { name: "\uC911\uAC04", icon: "\u{1F642}", lives: Infinity, speed: 0.75, extraGerms: 0, desc: "\uBAA9\uC228 \uBB34\uD55C \xB7 \uADE0\uC774 \uB290\uB824\uC694" },
     hard: { name: "\uC5B4\uB824\uC6C0", icon: "\u{1F4AA}", lives: 3, speed: 1, extraGerms: 2, desc: "\uBAA9\uC228 3\uAC1C \xB7 \uADE0\uC774 \uBE60\uB974\uACE0 \uB9CE\uC544\uC694" },
-    hell: { name: "\uBD88\uC9C0\uC625", icon: "\u{1F525}", lives: 1, speed: 1, extraGerms: 2, scatter: true, desc: "\uBAA9\uC228 1\uAC1C \xB7 \uCABD\uC9C0 \uBB38\uC81C\uB97C \uD2C0\uB9AC\uBA74 \uC870\uAC01\uC774 \uD769\uC5B4\uC838\uC694" },
+    hell: { name: "\uBD88\uC9C0\uC625", icon: "\u{1F525}", lives: 1, speed: 1, extraGerms: 2, scatter: true, webs: true, desc: "\uBAA9\uC228 1\uAC1C \xB7 \uCABD\uC9C0 \uBB38\uC81C\uB97C \uD2C0\uB9AC\uBA74 \uC870\uAC01\uC774 \uD769\uC5B4\uC838\uC694" },
     // 불지옥 규칙 + 튜토리얼을 뺀 모든 층이 불 꺼진 상태
-    darkness: { name: "\uC5B4\uB460\uC758 \uB2E4\uD06C\uB2C8\uC2A4", icon: "\u{1F608}", lives: 1, speed: 1, extraGerms: 2, scatter: true, allDark: true, desc: "\uBD88\uC9C0\uC625 + \uBAA8\uB4E0 \uCE35\uC774 \uAE5C\uAE5C\uD574\uC694" }
+    darkness: { name: "\uC5B4\uB460\uC758 \uB2E4\uD06C\uB2C8\uC2A4", icon: "\u{1F608}", lives: 1, speed: 1, extraGerms: 2, scatter: true, allDark: true, webs: true, desc: "\uBD88\uC9C0\uC625 + \uBAA8\uB4E0 \uCE35\uC774 \uAE5C\uAE5C\uD574\uC694" }
   };
   var CHARS = [
     { id: "boy1", name: "\uD558\uB298" },
@@ -38,6 +38,9 @@
   var STUN_TIME = 4;
   var WATER_TIME = 5;
   var MASK_TIME = 6;
+  var WEB_TIME = 5;
+  var WEB_SLOW = 0.8;
+  var WEB_COUNT = 8;
   var THROW_RANGE = 7;
   var THEMES = {
     practice: {
@@ -1584,6 +1587,8 @@
       this.run = opts.run && opts.run.stageId === opts.stageId && opts.run.mapVersion === MAP_VERSION ? opts.run : this.newRun();
       if (this.run.diff !== opts.diff && DIFFS[opts.diff]) this.changeDiff(opts.diff);
       if (this.run.hidden == null) this.unstick();
+      if (DIFFS[this.run.diff].webs && !this.run.webs && !this.tut) this.run.webs = this.makeWebs();
+      this.webT = 0;
       this.germs = this.run.germs.map((g) => this.makeGerm(g.type, g.x, g.y));
       this.invuln = opts.run ? 3 : 1.5;
       this.waterT = 0;
@@ -1642,11 +1647,22 @@
       const r = this.run, m = this.map;
       r.diff = diff;
       r.lives = DIFFS[diff].lives === Infinity ? -1 : DIFFS[diff].lives;
+      r.webs = DIFFS[diff].webs && !this.tut ? r.webs && r.webs.length ? r.webs : this.makeWebs() : [];
       if (!this.tut) {
         const want = this.stageGermList(), have = r.germs || [];
         r.germs = want.map((type, i) => have[i] && have[i].type === type ? have[i] : { type, ...m.germSpots[i % m.germSpots.length] });
       }
       this.dirty = true;
+    }
+    // 거미줄 자리: 방 바닥 중 출발 자리에서 4칸 넘게 떨어지고, 줍는 것과 겹치지 않는 곳에 무작위로
+    makeWebs() {
+      const m = this.map, taken = new Set(m.pickups.map((p) => p.y * m.W + p.x)), cand = [];
+      for (let y = 0; y < m.H; y++) for (let x = 0; x < m.W; x++) {
+        if (m.solid(x, y) || m.room[y * m.W + x] < 0 || taken.has(y * m.W + x)) continue;
+        if (Math.hypot(x + 0.5 - m.start.x, y + 0.5 - m.start.y) < 4) continue;
+        cand.push({ x, y });
+      }
+      return shuffled(cand).slice(0, WEB_COUNT);
     }
     stageGermList() {
       const list = this.map.S.germs.slice();
@@ -1713,6 +1729,7 @@
       this.invuln = Math.max(0, this.invuln - dt);
       this.waterT = Math.max(0, this.waterT - dt);
       this.maskT = Math.max(0, this.maskT - dt);
+      this.webT = Math.max(0, this.webT - dt);
       for (const k in this.locks) if ((this.locks[k] -= dt) <= 0) delete this.locks[k];
       this.movePlayer(dt);
       this.updateDoors(dt);
@@ -1745,7 +1762,7 @@
         dy /= len;
       }
       if (Math.abs(dx) > 0.2) this.face = dx > 0 ? 1 : -1;
-      const sp = PLAYER_SPEED * (DIFFS[this.run.diff].player || 1) * (this.waterT > 0 ? 1.6 : 1) * dt;
+      const sp = PLAYER_SPEED * (DIFFS[this.run.diff].player || 1) * (this.waterT > 0 ? 1.6 : 1) * (this.webT > 0 ? WEB_SLOW : 1) * dt;
       this.walkT += dt;
       this.slide(dx * sp, dy * sp);
     }
@@ -1810,6 +1827,16 @@
     }
     pickups() {
       const r = this.run;
+      if (r.webs && r.webs.length) {
+        const i = r.webs.findIndex((w) => Math.hypot(w.x + 0.5 - this.px, w.y + 0.5 - this.py) < 0.6);
+        if (i >= 0) {
+          r.webs.splice(i, 1);
+          this.webT = WEB_TIME;
+          Sound.bad();
+          this.dirty = true;
+          this.float("\u{1F578}\uFE0F \uAC70\uBBF8\uC904! \uB290\uB824\uC84C\uC5B4\uC694", this.px, this.py - 1, "#6b4f9a");
+        }
+      }
       for (const p of this.map.pickups) {
         if (r.picked.includes(p.id)) continue;
         if (Math.hypot(p.x + 0.5 - this.px, p.y + 0.5 - this.py) > 0.65) continue;
@@ -2318,6 +2345,12 @@
       for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) this.drawSceneTile(c, x, y, m.at(x, y), TS);
       this.drawArchitecture(c, TS);
       this.drawExit(c, TS);
+      for (const w of r.webs || []) {
+        const im = emojiCanvas("\u{1F578}\uFE0F", TS * 0.9);
+        c.globalAlpha = 0.85;
+        c.drawImage(im, (w.x + 0.5) * TS - im.width / 2, (w.y + 0.5) * TS - im.height / 2);
+        c.globalAlpha = 1;
+      }
       for (const p of m.pickups) {
         if (r.picked.includes(p.id)) continue;
         const bob = Math.sin(this.time * 3 + p.id) * TS * 0.06;
@@ -2775,6 +2808,7 @@
       }
       c.globalAlpha = 1;
       if (this.waterT > 0) this.label(c, "\u{1F4A7}", x + TS * 0.45, y - TS * 1, Math.round(TS * 0.32));
+      if (this.webT > 0) this.label(c, `\u{1F578}\uFE0F${Math.ceil(this.webT)}`, x, y - TS * 1.25, Math.round(TS * 0.3), "#6b4f9a");
       if (this.maskT > 0) this.label(c, "\u{1F637}", x - TS * 0.45, y - TS * 1, Math.round(TS * 0.32));
     }
     drawGerm(c, g, TS) {
