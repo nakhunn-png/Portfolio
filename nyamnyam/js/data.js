@@ -49,10 +49,10 @@ export const GERM_SPEED = 1.15;     // 모든 균 속도에 곱한다(난이도 
 export const SEARCH_LOCK = 6;      // 가구 문제를 틀리면 잠기는 시간(초)
 export const STUN_TIME = 4;        // 비눗방울에 맞으면 멈추는 시간(초)
 export const WATER_TIME = 5;       // 물 한 컵: 빨라지는 시간
-export const MASK_TIME = 6;
+export const MASK_TIME = 6;         // 마스크: 균이 못 알아채는 시간
 export const WEB_TIME = 4.5;       // 거미줄: 느려지는 시간(초)
 export const WEB_SLOW = 0.6;        // 거미줄에 걸렸을 때 이동 속도 배율(40% 감속)
-export const WEB_COUNT = 8;         // 층마다 거미줄 수        // 마스크: 균이 못 알아채는 시간
+export const WEB_COUNT = 8;         // 층마다 거미줄 수
 export const THROW_RANGE = 7;
 
 // 층마다 테마. decor: 막는 소품, search: ?가구(10개 중 4개 진짜), hide: 숨는 곳 모양
