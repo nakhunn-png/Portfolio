@@ -3008,13 +3008,13 @@
     const g = S.game;
     if (!g || g.paused || g.over) return;
     const r = $("cv").getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-    const inside = Math.abs(x - g.vw / 2) < g.TS * 0.6 && y > g.vh / 2 - g.TS * 1.2 && y < g.vh / 2 + g.TS * 0.5;
+    const inside = Math.abs(x - g.vw / 2) < g.TS * 0.8 && y > g.vh / 2 - g.TS * 1.5 && y < g.vh / 2 + g.TS * 0.7;
     const now = performance.now();
     if (!inside) {
       tapN = 0;
       return;
     }
-    tapN = now - tapT < 800 ? tapN + 1 : 1;
+    tapN = now - tapT < 1200 ? tapN + 1 : 1;
     tapT = now;
     if (tapN < 7) return;
     tapN = 0;

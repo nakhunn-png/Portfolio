@@ -248,10 +248,10 @@ function tapCharacter(e) {
   const g = S.game; if (!g || g.paused || g.over) return;
   const r = $('cv').getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
   // 카메라가 주인공을 화면 가운데에 둔다. 그림은 발 위로 약 1.3칸
-  const inside = Math.abs(x - g.vw / 2) < g.TS * 0.6 && y > g.vh / 2 - g.TS * 1.2 && y < g.vh / 2 + g.TS * 0.5;
+  const inside = Math.abs(x - g.vw / 2) < g.TS * 0.8 && y > g.vh / 2 - g.TS * 1.5 && y < g.vh / 2 + g.TS * 0.7;
   const now = performance.now();
   if (!inside) { tapN = 0; return; }
-  tapN = now - tapT < 800 ? tapN + 1 : 1; tapT = now;
+  tapN = now - tapT < 1200 ? tapN + 1 : 1; tapT = now; // 누르는 사이가 1.2초를 넘으면 처음부터 센다
   if (tapN < 7) return;
   tapN = 0; g.pausedBefore = g.paused; g.paused = true;
   askPin('👩‍🏫 다음 층으로 건너뛰기', skipStage, () => { g.paused = g.pausedBefore ?? false; });
