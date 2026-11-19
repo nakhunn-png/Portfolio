@@ -1,7 +1,7 @@
 // 게임 본체: 한 층의 판정(이동·균·숨기·비눗방울·쪽지)과 그리기.
 // 화면 바깥 일(문제 창, 쪽지 창, 잡혔을 때 창, 결과 화면)은 ui 콜백으로 넘긴다.
-import { buildStage, lineOfSight, findPath } from './map.js';
-import { GERMS, DIFFS, PLAYER_SPEED, SEARCH_LOCK, STUN_TIME, WATER_TIME, MASK_TIME, THROW_RANGE, hideName, FOUND_LINES, MISS_LINES } from './data.js';
+import { buildStage, lineOfSight, findPath, MAP_VERSION } from './map.js';
+import { GERMS, DIFFS, PLAYER_SPEED, GERM_SPEED, SEARCH_LOCK, STUN_TIME, WATER_TIME, MASK_TIME, THROW_RANGE, hideName, FOUND_LINES, MISS_LINES } from './data.js';
 import { Sound } from './sound.js';
 
 const IMG = {};
@@ -48,13 +48,15 @@ export class Game {
     this.o = opts; this.ui = opts.ui;
     this.map = buildStage(opts.stageId);
     this.tut = opts.stageId === 0;
+    this.dark = !!opts.dark && !this.tut; // 마지막 층: 불이 꺼지고 내 주변만 보인다
     this.input = { x: 0, y: 0 };
     this.keys = new Set();
     this.fx = []; this.bubbles = [];
     this.paused = false; this.over = false;
     this.time = 0; this.saveT = 0; this.dirty = true;
     this.locks = {};
-    this.run = opts.run && opts.run.stageId === opts.stageId ? opts.run : this.newRun();
+    this.doorUnits = groupDoors(this.map.doors);
+    this.run = opts.run && opts.run.stageId === opts.stageId && opts.run.mapVersion === MAP_VERSION ? opts.run : this.newRun();
     this.germs = this.run.germs.map(g => this.makeGerm(g.type, g.x, g.y));
     this.invuln = opts.run ? 3 : 1.5;
     this.waterT = 0; this.maskT = 0;
@@ -74,7 +76,7 @@ export class Game {
       list.forEach((type, i) => { const s = m.germSpots[i % m.germSpots.length]; germs.push({ type, x: s.x, y: s.y }); });
     }
     return {
-      stageId: m.id, diff: this.o.diff, lives: DIFFS[this.o.diff].lives === Infinity ? -1 : DIFFS[this.o.diff].lives,
+      mapVersion: MAP_VERSION, stageId: m.id, diff: this.o.diff, lives: DIFFS[this.o.diff].lives === Infinity ? -1 : DIFFS[this.o.diff].lives,
       px: m.start.x, py: m.start.y, soap: this.tut ? 0 : 3, soapGot: 0, soapTotal: m.pickups.filter(p => p.kind === 'soap').length,
       item: null, picked: [], searched: {}, realIds: shuffled(searchIds).slice(0, nReal),
       noteQ, deck: shuffled(pool.map((_, i) => i).filter(i => i !== noteQ)), deckPos: 0,
@@ -130,6 +132,7 @@ export class Game {
     this.maskT = Math.max(0, this.maskT - dt);
     for (const k in this.locks) if ((this.locks[k] -= dt) <= 0) delete this.locks[k];
     this.movePlayer(dt);
+    this.updateDoors(dt);
     this.pickups();
     for (const g of this.germs) this.updateGerm(g, dt);
     this.updateBubbles(dt);
@@ -187,7 +190,7 @@ export class Game {
     if (g.stun > 0) { g.stun -= dt; return; }
     if (g.cool > 0) g.cool -= dt;
     if (g.tired > 0) { g.tired -= dt; return; }
-    const spd = DIFFS[this.run.diff].speed * (this.tut ? 0.6 : 1);
+    const spd = DIFFS[this.run.diff].speed * GERM_SPEED * (this.tut ? 0.6 : 1);
     if (this.canSee(g)) {
       if (g.state !== 'chase') { g.alertT = 1; Sound.spotted(); }
       g.state = 'chase'; g.seen = 0; g.lx = this.px; g.ly = this.py;
@@ -429,7 +432,7 @@ export class Game {
       if (r.soap < 3) r.soap = 3;
       if (!this.germs.length) {
         const rm = this.map.rooms[1] || this.map.rooms[0];
-        this.germs.push(this.makeGerm('basic', (rm.x0 + rm.x1) / 2 + 0.5, (rm.y0 + rm.y1) / 2 + 0.5));
+        this.germs.push(this.makeGerm('basic', rm.cx + 0.5, rm.cy + 0.5));
       }
     }
     if (step.ev === 'water') r.item = 'water';
@@ -442,28 +445,16 @@ export class Game {
   draw() {
     const c = this.cx, TS = this.TS, m = this.map, T = m.T, r = this.run;
     c.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-    c.fillStyle = T.line; c.fillRect(0, 0, this.vw, this.vh);
+    c.fillStyle = this.voidColor(); c.fillRect(0, 0, this.vw, this.vh); // 지도 바깥도 건물 바깥처럼 어둡게
     // 카메라
     // 주인공을 늘 화면 가운데에 둔다(가장자리에서도 안내창·단추에 가려지지 않게)
     const camX = this.px * TS - this.vw / 2, camY = this.py * TS - this.vh / 2;
     c.save(); c.translate(-Math.round(camX), -Math.round(camY));
     const x0 = Math.max(0, Math.floor(camX / TS)), y0 = Math.max(0, Math.floor(camY / TS));
     const x1 = Math.min(m.W - 1, Math.ceil((camX + this.vw) / TS)), y1 = Math.min(m.H - 1, Math.ceil((camY + this.vh) / TS));
-    // 바닥과 벽
-    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
-      const v = m.at(x, y);
-      if (v === 1) {
-        // 벽 윗면은 밝게, 바닥과 맞닿은 앞면만 진하게
-        const front = m.at(x, y + 1) !== 1;
-        c.fillStyle = T.wallTop; c.fillRect(x * TS, y * TS, TS, TS);
-        if (front) { c.fillStyle = T.wall; c.fillRect(x * TS, y * TS + TS * 0.55, TS, TS * 0.45); }
-      } else {
-        c.fillStyle = T.floor[(x + y) & 1]; c.fillRect(x * TS, y * TS, TS, TS);
-      }
-    }
-    // 방 이름
-    c.font = `${Math.round(TS * 0.32)}px "Ssurround",sans-serif`; c.textAlign = 'left'; c.textBaseline = 'top';
-    for (const rm of m.rooms) { c.fillStyle = 'rgba(0,0,0,0.18)'; c.fillText(rm.name, rm.x0 * TS + 6, rm.y0 * TS + 4); }
+    // 테마 바닥, 벽, 문틀, 방별 안내판
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) this.drawSceneTile(c,x,y,m.at(x,y),TS);
+    this.drawArchitecture(c,TS);
     // 탈출문
     this.drawExit(c, TS);
     // 줍는 것
@@ -477,6 +468,8 @@ export class Game {
     }
     // 소품·가구·숨는 곳·사람·균을 y 순서대로
     const list = [];
+    // 큰 설비는 윗줄 기준으로 세워서 옆을 지나는 사람이 가려지지 않게 한다
+    for (const f of m.fixtures) list.push({ y: f.h > 2 ? f.y + 1 : f.y + f.h - 0.05, d: () => this.drawFixture(c, f, TS) });
     for (const o of m.objects) list.push({ y: o.y + 0.9, d: () => this.drawObject(c, o, TS) });
     for (const g of this.germs) list.push({ y: g.y, d: () => this.drawGerm(c, g, TS) });
     if (r.hidden == null) list.push({ y: this.py, d: () => this.drawPlayer(c, TS) });
@@ -487,6 +480,7 @@ export class Game {
       c.beginPath(); c.arc(b.x * TS, b.y * TS, TS * 0.22, 0, 7); c.fill(); c.stroke();
       c.fillStyle = '#fff'; c.beginPath(); c.arc(b.x * TS - TS * 0.07, b.y * TS - TS * 0.07, TS * 0.05, 0, 7); c.fill();
     }
+    if (this.dark) this.drawDark(c, TS, camX, camY);
     // 이펙트 글자
     c.textAlign = 'center'; c.textBaseline = 'middle';
     for (const f of this.fx) {
@@ -528,11 +522,12 @@ export class Game {
     }
     // ?가구
     const st = r.searched[o.id], lock = this.locks[o.id];
-    c.fillStyle = st ? 'rgba(255,255,255,0.55)' : '#fff'; c.strokeStyle = st === 'found' ? '#4cc36a' : lock ? '#e0524a' : '#f0a640'; c.lineWidth = 3;
-    c.beginPath(); c.roundRect(o.x * TS + 3, o.y * TS + 3, TS - 6, TS - 6, TS * 0.18); c.fill(); c.stroke();
-    c.globalAlpha = st ? 0.5 : 1;
-    const im = emojiCanvas(o.emoji, TS * 0.62); c.drawImage(im, cx - im.width / 2, cy - im.height / 2);
-    c.globalAlpha = 1;
+    this.drawFixture(c,{x:o.x,y:o.y,w:1,h:1,type:o.art||'cabinet'},TS);
+    c.strokeStyle = st === 'found' ? '#4cc36a' : lock ? '#e0524a' : '#d9b869'; c.lineWidth = 2;
+    c.strokeRect(o.x*TS+2,o.y*TS+2,TS-4,TS-4);
+    // 작은 단서 봉투로 탐색 가능한 가구를 구별한다.
+    c.fillStyle = st ? '#a7b6aa' : '#f9ecc8';c.fillRect(cx-TS*.16,cy-TS*.1,TS*.32,TS*.23);
+    c.strokeStyle='#9c8052';c.beginPath();c.moveTo(cx-TS*.16,cy-TS*.1);c.lineTo(cx,cy+TS*.02);c.lineTo(cx+TS*.16,cy-TS*.1);c.stroke();
     if (lock) this.label(c, `🔒${Math.ceil(lock)}`, cx, o.y * TS - TS * 0.25, Math.round(TS * 0.34), '#e0524a');
     else if (!st) {
       const b = Math.sin(this.time * 4 + o.id) * TS * 0.06;
@@ -540,6 +535,158 @@ export class Game {
       this.label(c, '?', cx, o.y * TS - TS * 0.22 + b, Math.round(TS * 0.3), '#fff', '#c97a00');
     } else if (st === 'found') this.label(c, '✓', cx, o.y * TS - TS * 0.2, Math.round(TS * 0.34), '#2e9a4a');
   }
+
+  // 외부 이미지 없이 그리는 테마별 공간과 가구.
+  drawSceneTile(c,x,y,v,TS) {
+    const m=this.map, T=m.T, rm=m.roomAt(x,y), style=m.room[y*m.W+x]<0 ? (m.S.theme==='garden'?'stone':m.S.theme==='market'?'stone':'wood') : rm?.floorStyle || 'tile';
+    const px=x*TS, py=y*TS, garden=m.S.theme==='garden', market=m.S.theme==='market';
+    if(v===1) {
+      let boundary=false;
+      for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++) if(m.at(x+dx,y+dy)!==1) boundary=true;
+      if(!boundary){
+        c.fillStyle=garden?'#43644b':market?'#514b47':'#25313a';c.fillRect(px,py,TS,TS);
+        if(garden && (x*7+y*3)%11===0){c.fillStyle='#628357';c.fillRect(px+TS*.25,py+TS*.2,TS*.2,TS*.12);c.fillRect(px+TS*.38,py+TS*.35,TS*.2,TS*.12);}
+        return;
+      }
+      c.fillStyle=garden?'#536b40':market?'#80574c':'#3c4f60'; c.fillRect(px,py,TS,TS);
+      c.fillStyle=garden?'#96b875':T.wallTop; c.fillRect(px+1,py+1,TS-2,TS*.58);
+      c.strokeStyle=garden?'#607f47':'rgba(45,62,75,.20)'; c.lineWidth=1;
+      c.strokeRect(px+1,py+1,TS-2,TS*.58);
+      if(m.at(x,y+1)!==1) {
+        c.fillStyle=garden?'#7c5b39':T.wall; c.fillRect(px+1,py+TS*.58,TS-2,TS*.35);
+        c.fillStyle='rgba(0,0,0,.15)';c.fillRect(px,py+TS*.93,TS,TS*.07);
+      }
+      if(garden) { c.fillStyle='#e0c99b';c.fillRect(px+TS*.16,py+TS*.18,TS*.14,TS*.72);c.fillRect(px+TS*.67,py+TS*.18,TS*.14,TS*.72); }
+      else {c.fillStyle='rgba(255,255,255,.26)';c.fillRect(px+2,py+2,TS-4,2);}
+      return;
+    }
+    const palettes={wood:['#c7a57b','#d1b18b'],tile:['#e0ddd1','#ebe7da'],wet:['#b7d5d9','#c3e0e1'],cold:['#d0e4e9','#e0eef1'],soil:['#82684a','#8c7050'],stone:['#b8b7a4','#c5c1ad']};
+    const pal=palettes[style] || T.floor;
+    c.fillStyle=pal[(x+y)&1];c.fillRect(px,py,TS,TS);
+    c.strokeStyle=style==='soil'?'#63543d':'rgba(61,76,82,.14)';c.lineWidth=1;
+    if(style==='wood') {
+      c.beginPath();c.moveTo(px,py+TS*.5);c.lineTo(px+TS,py+TS*.5);c.moveTo(px+TS*((y&1)?.25:.75),py);c.lineTo(px+TS*((y&1)?.25:.75),py+TS*.5);c.stroke();
+      c.fillStyle='rgba(94,62,28,.10)';c.fillRect(px+TS*.16,py+TS*.18,TS*.46,1);
+    } else if(style==='soil') {
+      c.fillStyle='#aa8b63';for(let i=0;i<3;i++)c.fillRect(px+TS*.12,py+TS*(.18+i*.28),TS*.76,TS*.06);
+    } else {
+      c.strokeRect(px+1,py+1,TS-2,TS-2);
+      if(style==='cold' && (x+y)%5===0) {c.fillStyle='rgba(255,255,255,.6)';c.fillRect(px+TS*.22,py+TS*.28,TS*.2,2);}
+      if(style==='wet' && (x*3+y)%7===0) {c.fillStyle='#728e96';c.fillRect(px+TS*.35,py+TS*.35,TS*.3,TS*.3);c.fillStyle='#b7d5d9';for(let j=0;j<3;j++)c.fillRect(px+TS*.38,py+TS*(.4+j*.08),TS*.24,1);}
+    }
+    // 방 가장자리는 띠로 구분한다.
+    if(rm && m.room[y*m.W+x]>=0 && [[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>m.at(x+dx,y+dy)===1)) {c.fillStyle='rgba(51,61,57,.10)';c.fillRect(px,py,TS,TS);}
+  }
+  drawArchitecture(c,TS) {
+    const m=this.map;
+    for(const rm of m.rooms) {
+      const x=((rm.signX??rm.x0)+.15)*TS,y=((rm.signY??rm.y0)+.08)*TS,w=Math.min(rm.name.length*.28+1.2,rm.x1-rm.x0)*TS;
+      c.fillStyle='#334653';c.fillRect(x,y,w,TS*.55);c.fillStyle='#d8b76c';c.fillRect(x,y,TS*.09,TS*.55);
+      this.label(c,`${String(rm.id+1).padStart(2,'0')}  ${rm.name}`,x+w/2,y+TS*.27,Math.round(TS*.23),'#fff','#334653');
+      // 방 번호와 안내 게시판은 시각 연출이다.
+      const bx=((rm.signX??rm.x0)+.2)*TS,by=((rm.signY??rm.y0)+.85)*TS;
+      c.fillStyle='#765f47';c.fillRect(bx,by,TS*.56,TS*.67);c.fillStyle='#f3e5ba';c.fillRect(bx+TS*.06,by+TS*.06,TS*.44,TS*.55);
+      c.fillStyle='#a47a43';for(let i=0;i<3;i++)c.fillRect(bx+TS*.12,by+TS*(.2+i*.1),TS*.29,TS*.025);
+    }
+    // 문틀: 복도가 방으로 들어가는 칸마다 문지방을 깔고, 방 쪽 가장자리에 문턱을 그린다
+    const garden = m.S.theme === 'garden';
+    for (const d of m.doors) {
+      const x = d.x * TS, y = d.y * TS;
+      c.fillStyle = garden ? '#8a6a43' : '#9b8259'; c.fillRect(x, y, TS, TS);
+      c.fillStyle = garden ? '#c9a873' : '#ddc69a'; c.fillRect(x + TS * 0.1, y + TS * 0.1, TS * 0.8, TS * 0.8);
+      c.fillStyle = garden ? '#5e4428' : '#344c58';
+      if (d.dx) c.fillRect(d.dx > 0 ? x + TS * 0.86 : x, y, TS * 0.14, TS);
+      else c.fillRect(x, d.dy > 0 ? y + TS * 0.86 : y, TS, TS * 0.14);
+    }
+    // 미닫이문: 닫혀 있다가 가까이 가면 양쪽으로 열린다(t: 0 닫힘 ~ 1 열림)
+    for (const u of this.doorUnits || []) this.drawDoorLeaves(c, u, TS, garden);
+    const e=m.exit, x=e.ix*TS,y=e.iy*TS;
+    c.fillStyle='rgba(222,178,61,.26)';c.fillRect(x,y,TS,TS);
+    c.strokeStyle='#a58b42';c.lineWidth=2;c.strokeRect(x+3,y+3,TS-6,TS-6);
+  }
+  // 주인공이나 균이 가까이 오면 문이 열리고, 멀어지면 닫힌다. 주인공이 열 때만 소리를 낸다
+  updateDoors(dt) {
+    this.doorSndT = Math.max(0, (this.doorSndT || 0) - dt);
+    for (const u of this.doorUnits) {
+      const hidden = this.run.hidden != null;
+      const byPlayer = !hidden && Math.hypot(this.px - u.cx, this.py - u.cy) < 1.9;
+      const byGerm = this.germs.some(g => Math.hypot(g.x - u.cx, g.y - u.cy) < 1.5);
+      const want = byPlayer || byGerm ? 1 : 0;
+      // 짧은 복도 양 끝 문이 같이 열릴 때 소리가 겹치지 않게 0.4초 쉰다
+      if (want && !u.opening && u.t < 0.3 && byPlayer && !this.doorSndT) { Sound.door(); this.doorSndT = 0.4; }
+      u.opening = !!want;
+      u.t = Math.max(0, Math.min(1, u.t + (want ? 4 : -2.5) * dt));
+    }
+  }
+  drawDoorLeaves(c, u, TS, garden) {
+    if (u.t >= 0.99) return;
+    const k = 1 - u.t, n = u.n, half = n / 2 * k;  // 문짝 한쪽이 덮는 길이(칸)
+    // 문짝은 방 쪽 문턱 바로 앞의 띠(두께 0.32칸)에 그린다
+    const band = (dir) => dir > 0 ? 0.52 : 0.16;
+    const leaf = (a0, a1) => {
+      if (a1 - a0 <= 0.01) return;
+      let x, y, w, h;
+      if (u.dx) { x = (u.x + band(u.dx)) * TS; w = TS * 0.32; y = a0 * TS; h = (a1 - a0) * TS; }
+      else { y = (u.y + band(u.dy)) * TS; h = TS * 0.32; x = a0 * TS; w = (a1 - a0) * TS; }
+      c.fillStyle = garden ? '#7a5634' : '#8c5a2e'; c.fillRect(x, y, w, h);
+      c.fillStyle = garden ? '#c79a62' : '#d39a5c'; c.fillRect(x + 2, y + 2, Math.max(0, w - 4), Math.max(0, h - 4));
+      c.fillStyle = '#5b3a1c';
+      if (u.dx) c.fillRect(x + w / 2 - 2, y + h / 2 - 2, 4, 4); else c.fillRect(x + w / 2 - 2, y + h / 2 - 2, 4, 4);
+    };
+    const a = u.dx ? u.y : u.x, b = a + n;
+    leaf(a, a + half); leaf(b - half, b);
+  }
+  voidColor() { const t = this.map.S.theme; return t === 'garden' ? '#43644b' : t === 'market' ? '#514b47' : '#25313a'; }
+  // 불 꺼진 층: 주인공 둘레만 밝고 나머지는 어둡다. 쫓아오는 균의 '!'와 열린 탈출문은 어둠 위에 다시 그린다
+  drawDark(c, TS, camX, camY) {
+    const x = this.px * TS, y = (this.py - 0.35) * TS, f = Math.sin(this.time * 2.2) * 0.08;
+    const grd = c.createRadialGradient(x, y, TS * (1.9 + f), x, y, TS * (3.7 + f));
+    grd.addColorStop(0, 'rgba(6,8,22,0)'); grd.addColorStop(0.55, 'rgba(6,8,22,0.75)'); grd.addColorStop(1, 'rgba(6,8,22,0.96)');
+    c.fillStyle = grd; c.fillRect(Math.round(camX) - 2, Math.round(camY) - 2, this.vw + 4, this.vh + 4);
+    for (const g of this.germs) if (g.state === 'chase' && g.stun <= 0 && g.tired <= 0) this.label(c, '!', g.x * TS, (g.y - g.def.size * 0.85) * TS, Math.round(TS * 0.5), '#ff6b5e', '#2a0d0d');
+    if (this.run.exitOpen) this.drawExit(c, TS);
+  }
+  drawFixture(c,f,TS) {
+    const x=f.x*TS,y=f.y*TS,w=(f.w||1)*TS,h=(f.h||1)*TS,type=f.type||'cabinet',theme=this.map.S.theme;
+    c.save();
+    c.fillStyle='rgba(22,31,36,.18)';c.fillRect(x+TS*.1,y+TS*.16,w-TS*.04,h-TS*.06);
+    const metal=['fridge','sink','stove','counter','tank'].includes(type);
+    const base=metal?'#637f8b':type==='bed'?'#65503a':'#745a43';
+    c.fillStyle=base;c.fillRect(x+2,y+2,w-4,h-4);
+    c.fillStyle=metal?'#c2d4d8':type==='bed'?'#947552':'#ba9569';c.fillRect(x+4,y+4,w-8,h-TS*.22-4);
+    c.strokeStyle=metal?'#425d68':'#654a35';c.lineWidth=Math.max(1,TS*.035);c.strokeRect(x+2,y+2,w-4,h-4);
+    if(type==='fridge'||type==='cabinet'||type==='shed') {
+      c.beginPath();c.moveTo(x+w*.5,y+4);c.lineTo(x+w*.5,y+h-4);c.stroke();
+      c.fillStyle=type==='fridge'?'#557887':'#e3c991';c.fillRect(x+w*.42,y+h*.42,TS*.06,TS*.25);c.fillRect(x+w*.55,y+h*.42,TS*.06,TS*.25);
+      if(type==='fridge'){c.fillStyle='#36545e';c.fillRect(x+w*.63,y+h*.15,w*.23,h*.16);c.fillStyle='#78d3c7';c.fillRect(x+w*.67,y+h*.19,w*.12,h*.06);}
+    } else if(type==='table'||type==='desk'||type==='bench') {
+      c.strokeRect(x+TS*.13,y+TS*.13,w-TS*.26,h-TS*.35);
+      if(type==='table') {for(let i=0;i<2;i++){c.fillStyle='#f6eee0';c.beginPath();c.arc(x+w*(.3+i*.4),y+h*.43,TS*.2,0,7);c.fill();c.stroke();}}
+      else if(type==='desk'){c.fillStyle='#f3e6c6';c.fillRect(x+w*.25,y+h*.2,w*.35,h*.42);c.fillStyle='#8d6e4b';c.fillRect(x+w*.3,y+h*.3,w*.2,2);}
+    } else if(type==='sink') {
+      c.fillStyle='#536e79';c.fillRect(x+w*.19,y+h*.2,w*.62,h*.47);c.fillStyle='#a9dbe5';c.fillRect(x+w*.25,y+h*.27,w*.5,h*.3);
+      c.fillStyle='#e6eff2';c.fillRect(x+w*.47,y+h*.08,w*.06,h*.27);
+    } else if(type==='stove') {
+      for(let i=0;i<2;i++){c.fillStyle='#354b55';c.beginPath();c.arc(x+w*(.3+i*.4),y+h*.42,TS*.22,0,7);c.fill();c.strokeStyle='#95a5ad';c.beginPath();c.arc(x+w*(.3+i*.4),y+h*.42,TS*.12,0,7);c.stroke();}
+    } else if(type==='shelf'||type==='crate'||type==='stall') {
+      for(let i=1;i<3;i++){c.fillStyle='#795736';c.fillRect(x+3,y+h*i/3,w-6,TS*.045);}
+      const colors=theme==='dairy'?['#f0eee1','#d6b459','#d0d8d1']:theme==='market'?['#ce704c','#8aa362','#e1b261']:['#89a866','#d3914b','#b96157'];
+      for(let i=0;i<6;i++){c.fillStyle=colors[i%3];c.fillRect(x+w*(.12+(i%3)*.27),y+h*(.17+Math.floor(i/3)*.34),w*.17,h*.2);}
+      if(type==='stall'){c.fillStyle='#bd6752';c.fillRect(x+2,y+2,w-4,h*.22);for(let i=0;i<5;i++){c.fillStyle=i%2?'#bd6752':'#f0d7ae';c.fillRect(x+2+i*(w-4)/5,y+2,(w-4)/5,h*.22);}}
+    } else if(type==='bed') {
+      for(let i=0;i<6;i++){const X=x+w*(.17+(i%3)*.32),Y=y+h*(.3+Math.floor(i/3)*.4);c.fillStyle='#476942';c.fillRect(X-TS*.1,Y-TS*.04,TS*.2,TS*.26);c.fillStyle=theme==='garden'&&f.roomId===3?'#cf6150':'#79a05d';c.beginPath();c.ellipse(X,Y,TS*.18,TS*.1,-.5,0,7);c.fill();}
+    } else if(type==='tank') {c.fillStyle='#94b7bf';c.beginPath();c.ellipse(x+w/2,y+h*.42,w*.35,h*.28,0,0,7);c.fill();c.stroke();}
+    else if(type==='cooler') {
+      // 가운데 냉장 설비: 환기구 줄과 온도 표시창
+      c.fillStyle='#9fc3cf';c.fillRect(x+TS*.3,y+TS*.3,w-TS*.6,h-TS*.6);
+      c.fillStyle='#6f95a3';for(let i=1;i<h/TS-1;i++)c.fillRect(x+TS*.6,y+i*TS+TS*.2,w-TS*1.2,TS*.08);
+      c.fillStyle='#2f4752';c.fillRect(x+w/2-TS*1.3,y+TS*.45,TS*2.6,TS*.7);
+      this.label(c,'❄ 냉장 설비',x+w/2,y+TS*.8,Math.round(TS*.3),'#bff3ff','#2f4752');
+    }
+    else if(type==='board') {c.fillStyle='#f0e2bd';c.fillRect(x+w*.12,y+h*.15,w*.76,h*.58);c.fillStyle='#93744b';for(let i=0;i<3;i++)c.fillRect(x+w*.22,y+h*(.27+i*.12),w*.48,1);}
+    c.restore();
+  }
+
   drawPlayer(c, TS) {
     const im = IMG[this.o.char];
     const blink = this.invuln > 0 && Math.floor(this.time * 10) % 2 === 0;
@@ -572,4 +719,25 @@ export class Game {
     } else if (g.tired > 0) this.label(c, '헥헥 💤', x, y - sz * 0.85, Math.round(TS * 0.28), '#8a5cc7');
     else if (g.state === 'chase') this.label(c, '!', x, y - sz * 0.85 - (g.alertT > 0 ? TS * 0.15 : 0), Math.round(TS * 0.5), '#e0524a');
   }
+}
+
+// 붙어 있는 문 칸(같은 방향)을 문 하나로 묶는다
+function groupDoors(doors) {
+  const units = [], used = new Set(), key = (d) => `${d.x},${d.y}`;
+  const byKey = new Map(doors.map(d => [key(d), d]));
+  for (const d of doors) {
+    if (used.has(key(d))) continue;
+    const cells = [d]; used.add(key(d));
+    for (let i = 0; i < cells.length; i++) {
+      const c = cells[i];
+      for (const [ox, oy] of d.dx ? [[0, 1], [0, -1]] : [[1, 0], [-1, 0]]) {
+        const n = byKey.get(`${c.x + ox},${c.y + oy}`);
+        if (n && !used.has(key(n)) && n.dx === d.dx && n.dy === d.dy) { used.add(key(n)); cells.push(n); }
+      }
+    }
+    const xs = cells.map(c => c.x), ys = cells.map(c => c.y);
+    const x = Math.min(...xs), y = Math.min(...ys);
+    units.push({ x, y, dx: d.dx, dy: d.dy, n: cells.length, cx: (x + Math.max(...xs) + 1) / 2, cy: (y + Math.max(...ys) + 1) / 2, t: 0, opening: false });
+  }
+  return units;
 }

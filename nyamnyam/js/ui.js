@@ -4,6 +4,7 @@ import { QUESTIONS } from './questions.js';
 import { Save } from './save.js';
 import { Sound } from './sound.js';
 import { Game, TUTORIAL, loadImages } from './game.js';
+import { MAP_VERSION } from './map.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
@@ -145,14 +146,20 @@ async function startPlay() {
   if (S.game) { S.game.destroy(); S.game = null; }
   show(null);
   const s = S.save, stageId = currentStageId(), st = STAGES[stageId];
-  const resumed = !!(s.run && s.run.stageId === stageId);
-  S.game = new Game($('cv'), { stageId, band: s.band, diff: s.diff, char: s.char, pool: poolFor(stageId), run: resumed ? s.run : null, ui: UI });
+  // 지도가 바뀐 뒤의 옛 저장은 그 층만 새 지도로 다시 시작한다(별·완료 기록은 그대로)
+  const oldMap = !!(s.run && s.run.stageId === stageId && s.run.mapVersion !== MAP_VERSION);
+  const resumed = !!(s.run && s.run.stageId === stageId) && !oldMap;
+  // 과정의 마지막 층은 불이 꺼진다(1시간용 5층, 2시간용 6층)
+  const dark = !s.inTutorial && s.stageIdx === COURSES[s.course].stages.length - 1;
+  S.game = new Game($('cv'), { stageId, band: s.band, diff: s.diff, char: s.char, pool: poolFor(stageId), run: resumed ? s.run : null, ui: UI, dark });
   $('stageName').textContent = st.name;
   $('tutBox').hidden = $('tutFrame').hidden = stageId !== 0;
   $('hud').classList.toggle('tut', stageId === 0);
   if (stageId === 0) UI.tutorial(S.game.run.tut);
   const intro = STAGE_INTRO[stageId];
-  UI.say(resumed ? '이어서 해 보자! 균을 조심해!' : (intro.all || intro[s.band]));
+  const darkLine = dark ? ' <b>그런데 불이 꺼졌어!</b> 내 주변만 보여. 감지기와 균의 <b>!</b> 표시를 잘 봐!' : '';
+  UI.say((resumed ? '이어서 해 보자! 균을 조심해!' : (intro.all || intro[s.band])) + darkLine);
+  if (oldMap) UI.toast('지도가 새로 바뀌어서 이 층은 처음부터 다시 해요. 모은 별은 그대로예요.');
   if (!resumed) { s.run = S.game.serialize(); persist(); }
   updateHud();
   if (stageId === 0) tutorialIntro(resumed);
@@ -235,9 +242,38 @@ addEventListener('keyup', (e) => S.game?.keys.delete(e.code));
 addEventListener('blur', () => S.game?.keys.clear());
 addEventListener('resize', () => S.game?.resize());
 
+// 선생님용: 주인공을 빠르게 7번 누르면 비밀번호를 묻고, 맞으면 다음 층으로 건너뛴다
+let tapN = 0, tapT = 0;
+function tapCharacter(e) {
+  const g = S.game; if (!g || g.paused || g.over) return;
+  const r = $('cv').getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+  // 카메라가 주인공을 화면 가운데에 둔다. 그림은 발 위로 약 1.3칸
+  const inside = Math.abs(x - g.vw / 2) < g.TS * 0.6 && y > g.vh / 2 - g.TS * 1.2 && y < g.vh / 2 + g.TS * 0.5;
+  const now = performance.now();
+  if (!inside) { tapN = 0; return; }
+  tapN = now - tapT < 800 ? tapN + 1 : 1; tapT = now;
+  if (tapN < 7) return;
+  tapN = 0; g.pausedBefore = g.paused; g.paused = true;
+  askPin('👩‍🏫 다음 층으로 건너뛰기', skipStage, () => { g.paused = g.pausedBefore ?? false; });
+}
+function skipStage() {
+  const s = S.save, g = S.game;
+  if (s.inTutorial) { finishTutorial(); return; }
+  const id = currentStageId();
+  // 건너뛴 층은 별 0개로 남긴다(이미 깬 기록이 있으면 그대로 둔다)
+  if (!s.results[id]) s.results[id] = { stars: 0, diff: g ? g.run.diff : s.diff, wrong: 0, correct: 0, at: Date.now(), skipped: true };
+  s.stageIdx++; s.run = null;
+  const last = s.stageIdx >= COURSES[s.course].stages.length;
+  if (last) s.finished = true;
+  persist();
+  UI.toast(`선생님이 ${STAGES[id].name}을(를) 건너뛰었어요.`);
+  if (last) { if (g) { g.destroy(); S.game = null; } showFinal(); } else startPlay();
+}
+
 // 가상 조이스틱: 화면 왼쪽 아무 데나 누르고 끌기
 let joyId = null, joyX = 0, joyY = 0;
 const cv = $('cv');
+cv.addEventListener('pointerdown', tapCharacter);
 cv.addEventListener('pointerdown', (e) => {
   if (!S.game || e.clientX > innerWidth * 0.55) return;
   joyId = e.pointerId; joyX = e.clientX; joyY = e.clientY;
@@ -432,7 +468,7 @@ function onClear(res) {
 }
 function showFinal() {
   const s = S.save, stages = COURSES[s.course].stages;
-  const rows = stages.map(id => { const r = s.results[id]; return `<li>${esc(STAGES[id].name)} — ${r ? '⭐'.repeat(r.stars) + '☆'.repeat(3 - r.stars) + ` <span class="badge ${r.diff}">${DIFFS[r.diff].icon} ${DIFFS[r.diff].name}</span>` : '-'}</li>`; }).join('');
+  const rows = stages.map(id => { const r = s.results[id]; return `<li>${esc(STAGES[id].name)} — ${r?.skipped ? '⏭ 선생님이 건너뜀' : r ? '⭐'.repeat(r.stars) + '☆'.repeat(3 - r.stars) + ` <span class="badge ${r.diff}">${DIFFS[r.diff].icon} ${DIFFS[r.diff].name}</span>` : '-'}</li>`; }).join('');
   const sh = openModal(`<h3>🏆 냠냠 탈출 대작전 완주!</h3><p class="q">${S.cls}반 ${S.num}번, 모든 층을 탈출했어요!<br>모은 별: ⭐ ${totalStars(s)} / ${stages.length * 3}</p><ul class="crit">${rows}</ul>
     <p class="hint">선생님께 이 화면을 보여 주세요!</p><div class="acts"><button class="big" id="go">처음 화면으로</button></div>`);
   sh.querySelector('#go').onclick = () => show('sTitle');
@@ -465,24 +501,27 @@ function openMenu() {
 }
 
 // ---------- 선생님 ----------
-$('teacherBtn').onclick = () => {
+// 선생님 비밀번호 창. 맞으면 onOk, ✕를 누르면 onCancel
+function askPin(title, onOk, onCancel) {
   let pin = '';
   const draw = () => {
-    const sh = openModal(`<h3>👩‍🏫 선생님 비밀번호</h3><div class="pindots">${'●'.repeat(pin.length)}${'○'.repeat(4 - pin.length)}</div>
+    const sh = openModal(`<h3>${title}</h3><div class="pindots">${'●'.repeat(pin.length)}${'○'.repeat(4 - pin.length)}</div>
       <div class="pinpad">${[1, 2, 3, 4, 5, 6, 7, 8, 9, '←', 0, '✕'].map(k => `<button data-k="${k}">${k}</button>`).join('')}</div>`);
     sh.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
       const k = b.dataset.k;
-      if (k === '✕') { closeModal(); return; }
+      if (k === '✕') { closeModal(); onCancel?.(); return; }
       if (k === '←') pin = pin.slice(0, -1); else if (pin.length < 4) pin += k;
       if (pin.length === 4) {
-        if (pin === TEACHER_PIN) { closeModal(); openTeacher(); return; }
+        if (pin === TEACHER_PIN) { closeModal(); onOk(); return; }
         pin = ''; UI.toast('비밀번호가 달라요');
       }
       draw();
     });
   };
   draw();
-};
+}
+$('teacherBtn').onclick = () => askPin('👩‍🏫 선생님 비밀번호', openTeacher);
+
 function openTeacher() {
   show('sTeacher');
   const sel = $('tClass');
@@ -501,7 +540,7 @@ function renderTable() {
     if (!s || !s.course) { rows += `<tr><td>${n}</td><td class="empty" colspan="13">기록 없음</td></tr>`; continue; }
     const cells = [1, 2, 3, 4, 5, 6].map(id => {
       if (!COURSES[s.course].stages.includes(id)) return '<td class="empty">·</td>';
-      const r = s.results[id]; return r ? `<td>${'⭐'.repeat(r.stars)}${r.diff === 'hell' ? '🔥' : r.diff === 'hard' ? '💪' : ''}</td>` : '<td class="empty">-</td>';
+      const r = s.results[id]; return r?.skipped ? '<td title="선생님이 건너뜀">⏭</td>' : r ? `<td>${'⭐'.repeat(r.stars)}${r.diff === 'hell' ? '🔥' : r.diff === 'hard' ? '💪' : ''}</td>` : '<td class="empty">-</td>';
     }).join('');
     rows += `<tr><td>${n}</td><td>${BANDS[s.band]?.name || ''}</td><td>${COURSES[s.course].name}</td><td>${progressText(s)}</td>${cells}<td>⭐ ${totalStars(s)}</td><td>${DIFFS[s.diff]?.icon || ''} ${DIFFS[s.diff]?.name || ''}</td><td>${fmtTime(s.updated)}</td><td><button data-del="${n}">지우기</button></td></tr>`;
   }

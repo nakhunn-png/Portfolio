@@ -82,6 +82,7 @@ export const Sound = {
   bad() { this.tone([300, 220], 0.15, 'square', 0.08); },
   pop() { this.tone([1200, 600], 0.06, 'sine', 0.12); },
   caught() { this.tone([440, 330, 220], 0.16, 'sawtooth', 0.07); },
+  door() { this.tone([294, 392], 0.07, 'triangle', 0.09); },
   open() { this.tone([523, 659, 784, 1047], 0.12, 'triangle'); },
   spotted() { this.tone([700, 900], 0.07, 'square', 0.05); },
 };

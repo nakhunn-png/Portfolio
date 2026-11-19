@@ -37,7 +37,8 @@ export const GERMS = {
   cavity: { name: '충치쟁이', img: 'germ_cavity', walk: 1.5, run: 3.2, sight: 4.5, size: 0.95, tires: true },
 };
 
-export const PLAYER_SPEED = 3.4;
+export const PLAYER_SPEED = 4.08;   // 칸/초 (처음 3.4에서 1.2배)
+export const GERM_SPEED = 1.15;     // 모든 균 속도에 곱한다(난이도 배율과 함께)
 export const SEARCH_LOCK = 6;      // 가구 문제를 틀리면 잠기는 시간(초)
 export const STUN_TIME = 4;        // 비눗방울에 맞으면 멈추는 시간(초)
 export const WATER_TIME = 5;       // 물 한 컵: 빨라지는 시간

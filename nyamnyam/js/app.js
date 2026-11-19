@@ -28,7 +28,8 @@
     mold: { name: "\uACF0\uD321\uB3CC\uC774", img: "germ_mold", walk: 0.9, run: 1.9, sight: 7, size: 1.1 },
     cavity: { name: "\uCDA9\uCE58\uC7C1\uC774", img: "germ_cavity", walk: 1.5, run: 3.2, sight: 4.5, size: 0.95, tires: true }
   };
-  var PLAYER_SPEED = 3.4;
+  var PLAYER_SPEED = 4.08;
+  var GERM_SPEED = 1.15;
   var SEARCH_LOCK = 6;
   var STUN_TIME = 4;
   var WATER_TIME = 5;
@@ -844,6 +845,9 @@
     caught() {
       this.tone([440, 330, 220], 0.16, "sawtooth", 0.07);
     },
+    door() {
+      this.tone([294, 392], 0.07, "triangle", 0.09);
+    },
     open() {
       this.tone([523, 659, 784, 1047], 0.12, "triangle");
     },
@@ -862,6 +866,304 @@
     });
   }
 
+  // js/layouts.js
+  var LAYOUTS = {
+    // 튜토리얼: L자 연습실 → 한 번 꺾이는 복도 → 홈이 파인 연습실
+    0: { W: 36, H: 18, build(b) {
+      b.room(0, 2, 2, 11, 6);
+      b.room(0, 2, 8, 6, 5);
+      b.hall(2, [13, 4], [18, 4], [18, 11], [22, 11]);
+      b.room(1, 23, 7, 10, 8);
+      b.cut(30, 7, 3, 2);
+      b.fix("board", 3, 2, 2, 1);
+      b.fix("desk", 8, 2, 3, 1);
+      b.fix("cabinet", 23, 7, 2, 1);
+      b.fix("crate", 30, 12, 2, 2);
+      b.start(4, 5);
+      b.exit(33, 11);
+    } },
+    // 1층 급식실: 입구 → 손 씻는 곳 → 넓은 식탁 구역. 북쪽 배식 통로와 동쪽 반납대가 조리실 앞에서 다시 만난다
+    1: { W: 52, H: 32, build(b) {
+      b.room(0, 2, 22, 9, 7);
+      b.room(0, 11, 25, 4, 4);
+      b.hall(2, [8, 21], [8, 18], [5, 18], [5, 16]);
+      b.room(3, 3, 9, 8, 7);
+      b.hall(2, [11, 11], [14, 11]);
+      b.room(1, 15, 8, 18, 13);
+      b.cut(29, 17, 4, 4);
+      b.room(2, 17, 3, 16, 3);
+      b.hall(2, [19, 6], [19, 7]);
+      b.hall(2, [29, 6], [29, 7]);
+      b.room(4, 35, 13, 7, 6);
+      b.hall(2, [33, 14], [34, 14]);
+      b.room(5, 38, 2, 11, 8);
+      b.room(5, 43, 10, 6, 3);
+      b.hall(2, [39, 10], [39, 12]);
+      b.hall(2, [33, 3], [37, 3]);
+      b.hall(2, [20, 21], [20, 26], [15, 26]);
+      b.fix("board", 3, 22, 2, 1);
+      b.fix("cabinet", 5, 22, 2, 1);
+      b.fix("bench", 11, 28, 3, 1);
+      b.fix("sink", 4, 9, 2, 1);
+      b.fix("sink", 7, 9, 2, 1);
+      b.fix("table", 17, 10, 3, 2);
+      b.fix("table", 22, 10, 3, 2);
+      b.fix("table", 17, 15, 3, 2);
+      b.fix("table", 22, 15, 3, 2);
+      b.fix("table", 27, 11, 3, 2);
+      b.fix("counter", 21, 3, 3, 1);
+      b.fix("counter", 25, 3, 3, 1);
+      b.fix("sink", 36, 13, 2, 1);
+      b.fix("counter", 39, 18, 3, 1);
+      b.fix("stove", 41, 2, 2, 1);
+      b.fix("stove", 44, 2, 2, 1);
+      b.fix("fridge", 46, 7, 2, 2);
+      b.start(4, 25);
+      b.exit(49, 5);
+    } },
+    // 2층 냉장고 채소칸: 세로로 긴 문 쪽 선반, 계단 모양 잎채소 칸, 선반 줄 사이 좁은 통로, 떨어진 얼음 칸, 넓고 얕은 맨 아래 서랍
+    2: { W: 50, H: 34, build(b) {
+      b.room(0, 2, 2, 6, 22);
+      b.room(1, 10, 2, 14, 8);
+      b.room(1, 10, 10, 9, 4);
+      b.hall(2, [8, 4], [9, 4]);
+      b.hall(2, [8, 11], [9, 11]);
+      b.room(2, 26, 2, 12, 10);
+      b.hall(2, [24, 5], [25, 5]);
+      b.room(4, 42, 2, 6, 7);
+      b.hall(2, [38, 10], [44, 10], [44, 9]);
+      b.hall(2, [44, 12], [44, 29]);
+      b.room(3, 12, 17, 12, 7);
+      b.room(3, 24, 19, 6, 5);
+      b.hall(2, [14, 14], [14, 16]);
+      b.hall(2, [8, 20], [11, 20]);
+      b.room(5, 6, 28, 38, 4);
+      b.hall(2, [26, 24], [26, 27]);
+      b.hall(2, [4, 24], [4, 29]);
+      b.fix("shelf", 2, 7, 1, 4);
+      b.fix("shelf", 2, 14, 1, 4);
+      b.fix("crate", 2, 19, 2, 2);
+      b.fix("crate", 13, 4, 2, 2);
+      b.fix("crate", 17, 4, 2, 2);
+      b.fix("shelf", 20, 2, 4, 1);
+      b.fix("shelf", 28, 4, 8, 1);
+      b.fix("shelf", 28, 7, 8, 1);
+      b.fix("fridge", 42, 2, 2, 2);
+      b.fix("fridge", 46, 2, 2, 2);
+      b.fix("crate", 13, 18, 2, 2);
+      b.fix("shelf", 17, 17, 4, 1);
+      b.fix("crate", 28, 19, 2, 2);
+      b.fix("crate", 10, 30, 2, 2);
+      b.fix("crate", 18, 30, 3, 2);
+      b.fix("crate", 31, 30, 2, 2);
+      b.start(4, 3);
+      b.exit(36, 32);
+    } },
+    // 3층 우유·고기칸: 가운데 큰 냉장 설비를 한 바퀴 도는 통로와, 둘레에 붙은 크기가 다른 보관실
+    3: { W: 48, H: 33, build(b) {
+      b.hall(2, [16, 11], [30, 11], [30, 20], [16, 20], [16, 11]);
+      b.fix("cooler", 18, 13, 12, 7, true);
+      b.room(0, 3, 12, 10, 9);
+      b.cut(3, 12, 3, 2);
+      b.hall(2, [13, 15], [15, 15]);
+      b.room(1, 6, 2, 12, 7);
+      b.cut(6, 7, 4, 2);
+      b.hall(2, [16, 9], [16, 10]);
+      b.room(2, 24, 3, 8, 6);
+      b.hall(2, [26, 9], [26, 10]);
+      b.room(3, 35, 8, 9, 10);
+      b.cut(41, 8, 3, 3);
+      b.hall(2, [32, 14], [34, 14]);
+      b.room(4, 30, 24, 14, 6);
+      b.hall(2, [30, 22], [30, 23]);
+      b.hall(2, [40, 18], [40, 23]);
+      b.room(5, 5, 24, 15, 7);
+      b.cut(5, 28, 4, 3);
+      b.hall(2, [16, 22], [16, 23]);
+      b.hall(2, [6, 21], [6, 23]);
+      b.fix("shelf", 8, 20, 4, 1);
+      b.fix("fridge", 10, 12, 2, 2);
+      b.fix("shelf", 10, 2, 4, 1);
+      b.fix("fridge", 15, 2, 2, 2);
+      b.fix("crate", 7, 4, 2, 2);
+      b.fix("shelf", 27, 3, 4, 1);
+      b.fix("fridge", 42, 15, 2, 2);
+      b.fix("shelf", 36, 8, 4, 1);
+      b.fix("crate", 37, 13, 2, 2);
+      b.fix("counter", 34, 24, 3, 1);
+      b.fix("sink", 32, 29, 2, 1);
+      b.fix("fridge", 36, 28, 2, 2);
+      b.fix("fridge", 9, 24, 2, 2);
+      b.fix("fridge", 12, 24, 2, 2);
+      b.fix("counter", 14, 29, 3, 1);
+      b.start(5, 16);
+      b.exit(44, 27);
+    } },
+    // 4층 텃밭: 울타리 친 밭들 사이를 흙길이 굽이굽이 잇는 바깥 공간. 물 주는 곳에 도구 창고와 물탱크
+    4: { W: 50, H: 34, build(b) {
+      b.room(0, 2, 13, 8, 8);
+      b.room(0, 4, 21, 4, 3);
+      b.hall(2, [10, 15], [20, 15]);
+      b.hall(2, [20, 4], [20, 28]);
+      b.room(1, 8, 2, 10, 8);
+      b.cut(8, 8, 3, 2);
+      b.hall(2, [18, 5], [19, 5]);
+      b.room(2, 24, 2, 12, 9);
+      b.cut(32, 8, 4, 3);
+      b.hall(2, [22, 6], [23, 6]);
+      b.room(3, 24, 19, 10, 9);
+      b.room(3, 34, 22, 4, 6);
+      b.hall(2, [22, 21], [23, 21]);
+      b.room(4, 6, 24, 12, 8);
+      b.cut(6, 24, 3, 2);
+      b.hall(2, [18, 27], [19, 27]);
+      b.room(5, 40, 6, 8, 12);
+      b.cut(46, 6, 2, 3);
+      b.hall(2, [36, 7], [39, 7]);
+      b.hall(2, [42, 18], [42, 24], [38, 24]);
+      b.fix("board", 6, 13, 2, 1);
+      b.fix("bench", 3, 19, 3, 1);
+      b.fix("bed", 9, 3, 3, 2);
+      b.fix("bed", 13, 3, 3, 2);
+      b.fix("bed", 13, 7, 3, 2);
+      b.fix("bed", 25, 3, 3, 2);
+      b.fix("bed", 29, 3, 3, 2);
+      b.fix("bed", 25, 7, 3, 2);
+      b.fix("bed", 29, 7, 2, 2);
+      b.fix("bed", 25, 20, 3, 2);
+      b.fix("bed", 29, 20, 3, 2);
+      b.fix("bed", 25, 24, 3, 2);
+      b.fix("bed", 29, 24, 3, 2);
+      b.fix("bed", 10, 26, 3, 2);
+      b.fix("bed", 14, 26, 3, 2);
+      b.fix("bed", 7, 29, 3, 2);
+      b.fix("bed", 12, 29, 3, 2);
+      b.fix("tank", 44, 9, 2, 2);
+      b.fix("shed", 45, 15, 2, 2);
+      b.fix("bench", 41, 16, 3, 1);
+      b.start(4, 16);
+      b.exit(48, 12);
+    } },
+    // 5층 동네 시장: 한 번 꺾이는 큰길에 크기가 다른 골목이 입을 벌리고 붙어 있다. 뒷길과 뒷창고로 돌아갈 수 있다
+    5: { W: 54, H: 32, build(b) {
+      b.room(0, 2, 11, 8, 9);
+      b.hall(3, [10, 14], [24, 14], [24, 17], [44, 17]);
+      b.room(1, 13, 2, 6, 12);
+      b.room(1, 19, 4, 4, 5);
+      b.room(2, 12, 17, 8, 11);
+      b.room(2, 8, 23, 4, 5);
+      b.room(3, 28, 3, 7, 14);
+      b.room(3, 35, 3, 6, 4);
+      b.room(4, 30, 20, 9, 7);
+      b.room(5, 45, 10, 7, 14);
+      b.hall(2, [41, 4], [47, 4], [47, 9]);
+      b.hall(2, [6, 20], [6, 24], [7, 24]);
+      b.fix("board", 3, 11, 2, 1);
+      b.fix("bench", 2, 19, 3, 1);
+      b.fix("stall", 13, 3, 3, 2);
+      b.fix("stall", 16, 8, 3, 2);
+      b.fix("crate", 20, 5, 2, 2);
+      b.fix("stall", 12, 19, 3, 2);
+      b.fix("stall", 17, 23, 3, 2);
+      b.fix("crate", 9, 25, 2, 2);
+      b.fix("fridge", 28, 4, 2, 2);
+      b.fix("sink", 32, 3, 2, 1);
+      b.fix("stall", 28, 10, 3, 2);
+      b.fix("counter", 37, 3, 3, 1);
+      b.fix("shelf", 31, 26, 4, 1);
+      b.fix("counter", 35, 21, 3, 1);
+      b.fix("desk", 47, 20, 3, 1);
+      b.fix("cabinet", 46, 11, 2, 1);
+      b.start(4, 15);
+      b.exit(52, 16);
+    } },
+    // 6층 우리 집 주방: 좁은 현관 → 복도 → 식탁. 개수대·냉장고·가스레인지가 폭이 다른 통로로 이어지고 찬장 창고가 따로 있다
+    6: { W: 46, H: 32, build(b) {
+      b.room(0, 2, 20, 6, 9);
+      b.hall(2, [8, 22], [13, 22], [13, 14]);
+      b.room(1, 10, 3, 14, 11);
+      b.cut(10, 3, 3, 3);
+      b.room(2, 26, 3, 8, 4);
+      b.hall(2, [24, 4], [25, 4]);
+      b.room(3, 36, 3, 8, 9);
+      b.hall(1, [34, 5], [35, 5]);
+      b.room(4, 26, 10, 8, 8);
+      b.hall(2, [24, 11], [25, 11]);
+      b.hall(2, [36, 12], [36, 15], [34, 15]);
+      b.room(5, 30, 21, 12, 8);
+      b.room(5, 24, 24, 6, 4);
+      b.hall(2, [30, 18], [30, 20]);
+      b.hall(2, [8, 26], [23, 26]);
+      b.fix("cabinet", 2, 20, 2, 1);
+      b.fix("bench", 5, 28, 3, 1);
+      b.fix("table", 14, 6, 3, 2);
+      b.fix("table", 18, 6, 3, 2);
+      b.fix("cabinet", 21, 12, 2, 1);
+      b.fix("sink", 27, 3, 2, 1);
+      b.fix("sink", 31, 3, 2, 1);
+      b.fix("fridge", 42, 3, 2, 2);
+      b.fix("fridge", 39, 3, 2, 2);
+      b.fix("shelf", 40, 10, 3, 1);
+      b.fix("stove", 27, 10, 2, 1);
+      b.fix("stove", 31, 10, 2, 1);
+      b.fix("counter", 30, 16, 3, 1);
+      b.fix("shelf", 34, 21, 3, 1);
+      b.fix("shelf", 38, 21, 3, 1);
+      b.fix("crate", 37, 27, 2, 2);
+      b.fix("cabinet", 24, 24, 2, 1);
+      b.start(4, 26);
+      b.exit(42, 25);
+    } }
+  };
+  function compileLayout(id) {
+    const L = LAYOUTS[id] || LAYOUTS[1], W = L.W, H = L.H;
+    const kind = new Uint8Array(W * H), room = new Int8Array(W * H).fill(-1);
+    const fixtures = [];
+    let start = null, exit = null;
+    const inb = (x, y) => x >= 0 && y >= 0 && x < W && y < H;
+    const rect = (x, y, w, h, f) => {
+      for (let Y = y; Y < y + h; Y++) for (let X = x; X < x + w; X++) if (inb(X, Y)) f(Y * W + X);
+    };
+    const b = {
+      room(rid, x, y, w, h) {
+        rect(x, y, w, h, (i) => {
+          kind[i] = 1;
+          room[i] = rid;
+        });
+      },
+      cut(x, y, w, h) {
+        rect(x, y, w, h, (i) => {
+          kind[i] = 0;
+          room[i] = -1;
+        });
+      },
+      hall(wd, ...pts) {
+        for (let k = 1; k < pts.length; k++) {
+          const [ax, ay] = pts[k - 1], [bx, by] = pts[k];
+          const x0 = Math.min(ax, bx), y0 = Math.min(ay, by);
+          const w = ay === by ? Math.abs(bx - ax) + 1 : wd, h = ay === by ? wd : Math.abs(by - ay) + 1;
+          rect(x0, y0, w, h, (i) => {
+            if (kind[i] === 0) kind[i] = 1;
+          });
+        }
+      },
+      fix(type, x, y, w, h, hallSide) {
+        fixtures.push({ type, x, y, w, h, hallSide: !!hallSide });
+        rect(x, y, w, h, (i) => {
+          kind[i] = 2;
+        });
+      },
+      start(x, y) {
+        start = { x, y };
+      },
+      exit(x, y) {
+        exit = { x, y };
+      }
+    };
+    L.build(b);
+    return { W, H, kind, room, fixtures, start, exit };
+  }
+
   // js/map.js
   function rng(seed) {
     let s = seed >>> 0 || 1;
@@ -874,6 +1176,60 @@
       return s / 4294967296;
     };
   }
+  var ESCAPE_ROOMS = {
+    practice: [
+      ["\uC624\uB9AC\uC5D4\uD14C\uC774\uC158", "wood", ["desk", "cabinet", "board"], ["\uB2E8\uC11C \uC5F0\uC2B5 \uC11C\uB78D", "\uC601\uC591\uC774 \uC548\uB0B4 \uBCF4\uAD00\uD568"]],
+      ["\uD0C8\uCD9C \uC5F0\uC2B5 \uAD6C\uC5ED", "tile", ["cabinet", "desk", "crate"], ["\uCABD\uC9C0 \uC5F0\uC2B5 \uC0C1\uC790", "\uD0C8\uCD9C \uC5F0\uC2B5 \uC11C\uB78D"]]
+    ],
+    cafeteria: [
+      ["\uAE09\uC2DD\uC2E4 \uCD9C\uC785 \uD1B5\uC81C", "tile", ["cabinet", "desk", "board"], ["\uCD9C\uC785 \uAE30\uB85D\uD568", "\uC624\uB298\uC758 \uC2DD\uB2E8 \uC11C\uB78D"]],
+      ["\uC2DD\uD0C1 \uAD6C\uC5ED", "tile", ["table", "table", "table"], ["\uC2DD\uD0C1 \uC544\uB798 \uBCF4\uAD00\uD568", "\uC2DD\uB2E8 \uCE74\uB4DC \uC0C1\uC790"]],
+      ["\uBC30\uC2DD \uAD6C\uC5ED", "tile", ["counter", "counter", "fridge"], ["\uBC30\uC2DD\uB300 \uC11C\uB78D", "\uC218\uC800 \uBCF4\uAD00\uD568"]],
+      ["\uC190 \uC53B\uB294 \uAD6C\uC5ED", "wet", ["sink", "sink", "cabinet"], ["\uC704\uC0DD\uC6A9\uD488 \uC218\uB0A9\uD568", "\uC190 \uC53B\uAE30 \uC548\uB0B4\uD568"]],
+      ["\uC2DD\uD310 \uBC18\uB0A9 \uAD6C\uC5ED", "wet", ["sink", "counter", "crate"], ["\uC2DD\uD310 \uC218\uB808", "\uC138\uCC99 \uAE30\uB85D\uD568"]],
+      ["\uC870\uB9AC \uC900\uBE44\uC2E4", "tile", ["stove", "counter", "fridge"], ["\uC870\uB9AC\uB300 \uC11C\uB78D", "\uC2DD\uC7AC\uB8CC \uB0C9\uC7A5\uACE0"]]
+    ],
+    veggie: [
+      ["\uCC44\uC18C \uBCF4\uAD00 \uAD6C\uC5ED", "cold", ["crate", "crate", "shelf"], ["\uBC30\uCD94 \uBCF4\uAD00 \uC0C1\uC790", "\uCC44\uC18C \uAE30\uB85D\uD568"]],
+      ["\uBFCC\uB9AC\uCC44\uC18C \uC120\uBC18", "cold", ["shelf", "crate", "crate"], ["\uB2F9\uADFC \uBCF4\uAD00 \uC0C1\uC790", "\uBFCC\uB9AC\uCC44\uC18C \uC11C\uB78D"]],
+      ["\uACFC\uC77C \uC800\uC7A5 \uAD6C\uC5ED", "cold", ["crate", "shelf", "crate"], ["\uC0AC\uACFC \uBCF4\uAD00 \uC0C1\uC790", "\uACFC\uC77C \uAE30\uB85D\uD568"]],
+      ["\uB0C9\uAC01 \uC124\uBE44\uC2E4", "wet", ["fridge", "fridge", "cabinet"], ["\uC5BC\uC74C \uD2C0 \uBCF4\uAD00\uD568", "\uC628\uB3C4 \uC810\uAC80\uD568"]],
+      ["\uACFC\uCC44\uB958 \uBCF4\uAD00 \uAD6C\uC5ED", "cold", ["shelf", "crate", "shelf"], ["\uC218\uBC15 \uBCF4\uAD00 \uC0C1\uC790", "\uACFC\uCC44\uB958 \uAE30\uB85D\uD568"]],
+      ["\uC7AC\uACE0 \uC810\uAC80 \uAD6C\uC5ED", "cold", ["desk", "cabinet", "shelf"], ["\uC7AC\uACE0 \uAE30\uB85D \uC11C\uB78D", "\uCC44\uC18C \uBD84\uB958\uD568"]]
+    ],
+    dairy: [
+      ["\uC6B0\uC720 \uB0C9\uC7A5 \uAD6C\uC5ED", "cold", ["fridge", "fridge", "shelf"], ["\uC6B0\uC720 \uBCF4\uAD00\uD568", "\uC6B0\uC720 \uAE30\uB85D\uD568"]],
+      ["\uCE58\uC988 \uC219\uC131 \uAD6C\uC5ED", "cold", ["shelf", "fridge", "crate"], ["\uCE58\uC988 \uBCF4\uAD00\uD568", "\uCE58\uC988 \uBD84\uB958\uD568"]],
+      ["\uB2EC\uAC40 \uBCF4\uAD00 \uAD6C\uC5ED", "cold", ["shelf", "crate", "shelf"], ["\uB2EC\uAC40\uD310 \uBCF4\uAD00\uD568", "\uB2EC\uAC40 \uAE30\uB85D\uD568"]],
+      ["\uCF69\xB7\uB450\uBD80 \uB0C9\uC7A5 \uAD6C\uC5ED", "cold", ["fridge", "shelf", "crate"], ["\uB450\uBD80 \uBCF4\uAD00\uD568", "\uCF69 \uBCF4\uAD00 \uC0C1\uC790"]],
+      ["\uC0DD\uC120 \uB0C9\uC7A5 \uAD6C\uC5ED", "wet", ["fridge", "counter", "sink"], ["\uC0DD\uC120 \uBCF4\uAD00\uD568", "\uC0DD\uC120 \uC810\uAC80\uD568"]],
+      ["\uACE0\uAE30 \uB0C9\uC7A5 \uAD6C\uC5ED", "cold", ["fridge", "counter", "cabinet"], ["\uACE0\uAE30 \uBCF4\uAD00\uD568", "\uB0C9\uC7A5 \uAE30\uB85D\uD568"]]
+    ],
+    garden: [
+      ["\uD143\uBC2D \uAD00\uB9AC\uC18C", "stone", ["shed", "bench", "crate"], ["\uD143\uBC2D \uAD00\uB9AC \uC0C1\uC790", "\uC528\uC557 \uAE30\uB85D\uD568"]],
+      ["\uC0C1\uCD94 \uC7AC\uBC30 \uAD6C\uC5ED", "soil", ["bed", "bed", "bench"], ["\uC0C1\uCD94 \uD45C\uC9C0 \uC0C1\uC790", "\uC7AC\uBC30 \uAE30\uB85D\uD568"]],
+      ["\uAC10\uC790 \uC7AC\uBC30 \uAD6C\uC5ED", "soil", ["bed", "bed", "crate"], ["\uAC10\uC790 \uC218\uD655 \uC0C1\uC790", "\uAC10\uC790 \uAE30\uB85D\uD568"]],
+      ["\uB538\uAE30 \uC7AC\uBC30 \uAD6C\uC5ED", "soil", ["bed", "bed", "bench"], ["\uB538\uAE30 \uC218\uD655 \uC0C1\uC790", "\uB538\uAE30 \uAE30\uB85D\uD568"]],
+      ["\uC625\uC218\uC218 \uC7AC\uBC30 \uAD6C\uC5ED", "soil", ["bed", "bed", "shed"], ["\uC625\uC218\uC218 \uC218\uD655 \uC0C1\uC790", "\uC528\uC557 \uBCF4\uAD00\uD568"]],
+      ["\uAE09\uC218\xB7\uB3C4\uAD6C \uCC3D\uACE0", "stone", ["tank", "shed", "bench"], ["\uBB3C\uBFCC\uB9AC\uAC1C \uBCF4\uAD00\uD568", "\uB3C4\uAD6C \uC815\uB9AC\uD568"]]
+    ],
+    market: [
+      ["\uC2DC\uC7A5 \uC548\uB0B4 \uAD6C\uC5ED", "stone", ["stall", "bench", "board"], ["\uC2DC\uC7A5 \uC548\uB0B4\uD568", "\uC0C1\uC810 \uC9C0\uB3C4 \uC11C\uB78D"]],
+      ["\uACFC\uC77C \uAC00\uAC8C", "stone", ["stall", "crate", "stall"], ["\uACFC\uC77C \uAC00\uAC8C \uC11C\uB78D", "\uACFC\uC77C \uC7AC\uACE0 \uC0C1\uC790"]],
+      ["\uCC44\uC18C \uAC00\uAC8C", "stone", ["stall", "crate", "stall"], ["\uCC44\uC18C \uAC00\uAC8C \uC11C\uB78D", "\uCC44\uC18C \uC7AC\uACE0 \uC0C1\uC790"]],
+      ["\uC0DD\uC120 \uAC00\uAC8C", "wet", ["stall", "sink", "fridge"], ["\uC0DD\uC120 \uAC00\uAC8C \uC11C\uB78D", "\uB0C9\uC7A5 \uC810\uAC80\uD568"]],
+      ["\uBE75 \uAC00\uAC8C", "wood", ["stall", "shelf", "counter"], ["\uBE75 \uAC00\uAC8C \uC11C\uB78D", "\uBE75 \uC7AC\uB8CC \uBCF4\uAD00\uD568"]],
+      ["\uC2DC\uC7A5 \uACC4\uC0B0 \uAD6C\uC5ED", "stone", ["desk", "cabinet", "crate"], ["\uACC4\uC0B0\uB300 \uC11C\uB78D", "\uC601\uC218\uC99D \uBCF4\uAD00\uD568"]]
+    ],
+    kitchen: [
+      ["\uD604\uAD00\xB7\uC2DD\uD488 \uC218\uB0A9", "wood", ["cabinet", "bench", "shelf"], ["\uD604\uAD00 \uC218\uB0A9\uD568", "\uC2DD\uD488 \uBAA9\uB85D \uC11C\uB78D"]],
+      ["\uAC00\uC871 \uC2DD\uD0C1", "wood", ["table", "table", "cabinet"], ["\uC2DD\uD0C1 \uC11C\uB78D", "\uC2DD\uB2E8 \uACC4\uD68D\uD568"]],
+      ["\uC124\uAC70\uC9C0 \uAD6C\uC5ED", "wet", ["sink", "counter", "cabinet"], ["\uAC1C\uC218\uB300 \uC218\uB0A9\uD568", "\uC138\uCC99\uC6A9\uD488 \uBCF4\uAD00\uD568"]],
+      ["\uB0C9\uC7A5\uACE0 \uAD6C\uC5ED", "tile", ["fridge", "fridge", "shelf"], ["\uB0C9\uC7A5\uACE0 \uC2DD\uD488\uCE78", "\uBCF4\uAD00 \uB0A0\uC9DC \uAE30\uB85D\uD568"]],
+      ["\uAC00\uC5F4 \uC870\uB9AC \uAD6C\uC5ED", "tile", ["stove", "counter", "counter"], ["\uC870\uB9AC\uB300 \uC11C\uB78D", "\uC870\uB9AC \uB3C4\uAD6C\uD568"]],
+      ["\uCC2C\uC7A5\xB7\uC2DD\uB8CC\uD488 \uCC3D\uACE0", "wood", ["cabinet", "shelf", "crate"], ["\uCC2C\uC7A5 \uBCF4\uAD00\uD568", "\uC2DD\uB8CC\uD488 \uBC14\uAD6C\uB2C8"]]
+    ]
+  };
   var pick = (r, a) => a[Math.floor(r() * a.length)];
   function shuffle(r, a) {
     for (let i = a.length - 1; i > 0; i--) {
@@ -882,63 +1238,63 @@
     }
     return a;
   }
+  var DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+  var MAP_VERSION = 4;
   function buildStage(stageId) {
     const S2 = STAGES[stageId], T = THEMES[S2.theme], r = rng(S2.seed);
-    const W = S2.cols * (S2.rw + 1) + 1, H = S2.rows * (S2.rh + 1) + 1;
+    const L = compileLayout(stageId), W = L.W, H = L.H;
     const g = new Uint8Array(W * H).fill(1);
-    const room = new Int8Array(W * H).fill(-1);
+    const room = Int8Array.from(L.room);
+    for (let i = 0; i < W * H; i++) if (L.kind[i]) g[i] = L.kind[i] === 1 ? 0 : 2;
     const at = (x, y) => x < 0 || y < 0 || x >= W || y >= H ? 1 : g[y * W + x];
     const set = (x, y, v) => {
-      g[y * W + x] = v;
+      if (x >= 0 && y >= 0 && x < W && y < H) g[y * W + x] = v;
     };
-    const rooms = [];
-    for (let ry = 0; ry < S2.rows; ry++) for (let rx = 0; rx < S2.cols; rx++) {
-      const x0 = rx * (S2.rw + 1) + 1, y0 = ry * (S2.rh + 1) + 1, id = rooms.length;
-      rooms.push({ id, rx, ry, x0, y0, x1: x0 + S2.rw - 1, y1: y0 + S2.rh - 1, name: S2.rooms[id] || `\uBC29 ${id + 1}` });
-      for (let y = y0; y < y0 + S2.rh; y++) for (let x = x0; x < x0 + S2.rw; x++) {
-        set(x, y, 0);
-        room[y * W + x] = id;
+    const rooms = S2.rooms.map((name, id) => {
+      let x0 = W, y0 = H, x1 = -1, y1 = -1;
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (room[y * W + x] === id) {
+        x0 = Math.min(x0, x);
+        y0 = Math.min(y0, y);
+        x1 = Math.max(x1, x);
+        y1 = Math.max(y1, y);
+      }
+      const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+      let cx = x0, cy = y0, bd = 1e9, signX = x0, signY = y0, sd = 1e9;
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+        if (room[y * W + x] !== id || g[y * W + x] !== 0) continue;
+        const d = (x - mx) ** 2 + (y - my) ** 2;
+        if (d < bd) {
+          bd = d;
+          cx = x;
+          cy = y;
+        }
+        if (at(x, y - 1) === 1 && at(x + 1, y) === 0 && y * 100 + x < sd) {
+          sd = y * 100 + x;
+          signX = x;
+          signY = y;
+        }
+      }
+      return { id, x0, y0, x1, y1, cx, cy, name, signX, signY };
+    });
+    const doors = [];
+    for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+      const i = y * W + x;
+      if (g[i] !== 0 || room[i] >= 0) continue;
+      for (const [dx, dy] of DIRS) {
+        const j = (y + dy) * W + x + dx;
+        if (room[j] < 0 || g[j] === 1) continue;
+        const side = dx ? [at(x, y - 1), at(x, y + 1)] : [at(x - 1, y), at(x + 1, y)];
+        if (side.includes(1)) {
+          doors.push({ x, y, dx, dy, roomId: room[j] });
+          break;
+        }
       }
     }
-    const idx = (rx, ry) => ry * S2.cols + rx;
-    const links = [];
-    const seen = /* @__PURE__ */ new Set([0]), stack = [0];
-    while (stack.length) {
-      const cur = stack[stack.length - 1], c = rooms[cur];
-      const nb = [[1, 0], [-1, 0], [0, 1], [0, -1]].map(([dx, dy]) => [c.rx + dx, c.ry + dy]).filter(([x, y]) => x >= 0 && y >= 0 && x < S2.cols && y < S2.rows && !seen.has(idx(x, y)));
-      if (!nb.length) {
-        stack.pop();
-        continue;
-      }
-      const [nx, ny] = pick(r, nb), n = idx(nx, ny);
-      links.push([cur, n]);
-      seen.add(n);
-      stack.push(n);
-    }
-    for (let a = 0; a < rooms.length; a++) for (let b = a + 1; b < rooms.length; b++) {
-      const A = rooms[a], B2 = rooms[b];
-      if (Math.abs(A.rx - B2.rx) + Math.abs(A.ry - B2.ry) !== 1) continue;
-      if (links.some(([p, q]) => p === a && q === b || p === b && q === a)) continue;
-      if (r() < 0.45) links.push([a, b]);
-    }
-    for (const [a, b] of links) {
-      const A = rooms[a], B2 = rooms[b];
-      if (A.ry === B2.ry) {
-        const wx = (A.rx < B2.rx ? A : B2).x1 + 1;
-        const y = A.y0 + 1 + Math.floor(r() * (S2.rh - 3));
-        set(wx, y, 0);
-        set(wx, y + 1, 0);
-      } else {
-        const top = A.ry < B2.ry ? A : B2, wy = top.y1 + 1;
-        const x = A.x0 + 1 + Math.floor(r() * (S2.rw - 3));
-        set(x, wy, 0);
-        set(x + 1, wy, 0);
-      }
-    }
-    const start = { x: rooms[0].x0 + 1.5, y: rooms[0].y0 + 1.5 };
-    const startTile = { x: rooms[0].x0 + 1, y: rooms[0].y0 + 1 };
-    const far = farthestRoom(rooms, links);
-    const exit = exitTile(rooms[far], S2, W, H);
+    const startTile = { x: L.start.x, y: L.start.y };
+    const start = { x: startTile.x + 0.5, y: startTile.y + 0.5 };
+    const ex = L.exit, inner = DIRS.map(([dx, dy]) => ({ ix: ex.x - dx, iy: ex.y - dy, dx, dy })).find((n) => at(n.ix, n.iy) === 0);
+    set(ex.x, ex.y, 1);
+    const exit = { x: ex.x, y: ex.y, ix: inner.ix, iy: inner.iy, dir: inner.dx > 0 ? "e" : inner.dx < 0 ? "w" : inner.dy > 0 ? "s" : "n" };
     const keep = new Uint8Array(W * H);
     const keepAround = (x, y, rad) => {
       for (let dy = -rad; dy <= rad; dy++) for (let dx = -rad; dx <= rad; dx++) {
@@ -950,18 +1306,19 @@
     keepAround(startTile.x, startTile.y, 2);
     keepAround(exit.ix, exit.iy, 1);
     const free = (x, y) => at(x, y) === 0 && !keep[y * W + x];
+    const nearSolid = (x, y) => DIRS.some(([dx, dy]) => at(x + dx, y + dy) !== 0);
     const objects = [];
-    const occupied = /* @__PURE__ */ new Set();
-    const placeIn = (rm, kind, data, tries = 60) => {
+    const reachable = () => objects.every((o) => o.kind === "decor" || DIRS.some(([dx, dy]) => at(o.x + dx, o.y + dy) === 0));
+    const placeIn = (rm, kind, data, tries = 400) => {
       for (let t = 0; t < tries; t++) {
-        const x = rm.x0 + 1 + Math.floor(r() * (S2.rw - 2)), y = rm.y0 + 1 + Math.floor(r() * (S2.rh - 2));
-        if (!free(x, y) || occupied.has(y * W + x)) continue;
+        const x = rm.x0 + Math.floor(r() * (rm.x1 - rm.x0 + 1)), y = rm.y0 + Math.floor(r() * (rm.y1 - rm.y0 + 1));
+        if (room[y * W + x] !== rm.id || !free(x, y)) continue;
+        if (kind !== "decor" && t < tries * 0.6 && !nearSolid(x, y)) continue;
         set(x, y, 2);
-        if (!connected(g, W, H, startTile)) {
+        if (!connected(g, W, H, startTile) || !reachable()) {
           set(x, y, 0);
           continue;
         }
-        occupied.add(y * W + x);
         const o = { kind, x, y, ...data, id: objects.length };
         objects.push(o);
         keepAround(x, y, 0);
@@ -983,8 +1340,19 @@
     if (stageId === 0 && !objects.some((o) => o.kind === "hide")) placeIn(rooms[0], "hide", { emoji: T.hide[0], name: T.hide[1] });
     for (const rm of rooms) {
       const n = stageId === 0 ? 2 : 3;
-      for (let i = 0; i < n; i++) placeIn(rm, "decor", { emoji: pick(r, T.decor), name: "" }, 20);
+      for (let i = 0; i < n; i++) placeIn(rm, "decor", { emoji: pick(r, T.decor), name: "" }, 40);
     }
+    const profiles = ESCAPE_ROOMS[S2.theme] || ESCAPE_ROOMS.practice;
+    for (const rm of rooms) {
+      const profile = profiles[rm.id % profiles.length];
+      rm.scene = profile[0];
+      rm.floorStyle = profile[1];
+      objects.filter((o) => o.kind === "search" && room[o.y * W + o.x] === rm.id).forEach((o, i) => {
+        o.name = profile[3][i % profile[3].length];
+        o.art = /냉장|우유|고기|생선/.test(o.name) ? "fridge" : /상자|바구니/.test(o.name) ? "crate" : "cabinet";
+      });
+    }
+    const fixtures = L.fixtures.map((f) => ({ ...f, roomId: room[f.y * W + f.x] }));
     const pickups = [];
     const floorTiles = [];
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (at(x, y) === 0 && room[y * W + x] >= 0 && !(x === startTile.x && y === startTile.y)) floorTiles.push({ x, y });
@@ -999,9 +1367,9 @@
     const others = rooms.length > 1 ? rooms.slice(1) : rooms;
     for (let i = 0; i < 12; i++) {
       const rm = others[i % others.length];
-      for (let t = 0; t < 40; t++) {
-        const x = rm.x0 + Math.floor(r() * S2.rw), y = rm.y0 + Math.floor(r() * S2.rh);
-        if (at(x, y) === 0) {
+      for (let t = 0; t < 80; t++) {
+        const x = rm.x0 + Math.floor(r() * (rm.x1 - rm.x0 + 1)), y = rm.y0 + Math.floor(r() * (rm.y1 - rm.y0 + 1));
+        if (at(x, y) === 0 && room[y * W + x] === rm.id) {
           germSpots.push({ x: x + 0.5, y: y + 0.5 });
           break;
         }
@@ -1022,6 +1390,9 @@
       objects,
       pickups,
       germSpots,
+      doors,
+      fixtures,
+      layoutVersion: MAP_VERSION,
       at,
       solid: (x, y) => at(x, y) !== 0,
       roomAt(x, y) {
@@ -1042,33 +1413,6 @@
       }
     }
     return best;
-  }
-  function farthestRoom(rooms, links) {
-    const dist = new Array(rooms.length).fill(-1);
-    dist[0] = 0;
-    const q = [0];
-    while (q.length) {
-      const c = q.shift();
-      for (const [a, b] of links) {
-        const n = a === c ? b : b === c ? a : -1;
-        if (n >= 0 && dist[n] < 0) {
-          dist[n] = dist[c] + 1;
-          q.push(n);
-        }
-      }
-    }
-    let best = 0;
-    dist.forEach((d, i) => {
-      if (d > dist[best] || d === dist[best] && i > best) best = i;
-    });
-    return best;
-  }
-  function exitTile(rm, S2, W, H) {
-    const mx = Math.floor((rm.x0 + rm.x1) / 2), my = Math.floor((rm.y0 + rm.y1) / 2);
-    if (rm.rx === S2.cols - 1) return { x: rm.x1 + 1, y: my, ix: rm.x1, iy: my, dir: "e" };
-    if (rm.ry === S2.rows - 1) return { x: mx, y: rm.y1 + 1, ix: mx, iy: rm.y1, dir: "s" };
-    if (rm.ry === 0) return { x: mx, y: rm.y0 - 1, ix: mx, iy: rm.y0, dir: "n" };
-    return { x: rm.x0 - 1, y: my, ix: rm.x0, iy: my, dir: "w" };
   }
   function connected(g, W, H, s) {
     let total = 0;
@@ -1190,6 +1534,7 @@
       this.ui = opts.ui;
       this.map = buildStage(opts.stageId);
       this.tut = opts.stageId === 0;
+      this.dark = !!opts.dark && !this.tut;
       this.input = { x: 0, y: 0 };
       this.keys = /* @__PURE__ */ new Set();
       this.fx = [];
@@ -1200,7 +1545,8 @@
       this.saveT = 0;
       this.dirty = true;
       this.locks = {};
-      this.run = opts.run && opts.run.stageId === opts.stageId ? opts.run : this.newRun();
+      this.doorUnits = groupDoors(this.map.doors);
+      this.run = opts.run && opts.run.stageId === opts.stageId && opts.run.mapVersion === MAP_VERSION ? opts.run : this.newRun();
       this.germs = this.run.germs.map((g) => this.makeGerm(g.type, g.x, g.y));
       this.invuln = opts.run ? 3 : 1.5;
       this.waterT = 0;
@@ -1225,6 +1571,7 @@
         });
       }
       return {
+        mapVersion: MAP_VERSION,
         stageId: m.id,
         diff: this.o.diff,
         lives: DIFFS[this.o.diff].lives === Infinity ? -1 : DIFFS[this.o.diff].lives,
@@ -1322,6 +1669,7 @@
       this.maskT = Math.max(0, this.maskT - dt);
       for (const k in this.locks) if ((this.locks[k] -= dt) <= 0) delete this.locks[k];
       this.movePlayer(dt);
+      this.updateDoors(dt);
       this.pickups();
       for (const g of this.germs) this.updateGerm(g, dt);
       this.updateBubbles(dt);
@@ -1404,7 +1752,7 @@
         g.tired -= dt;
         return;
       }
-      const spd = DIFFS[this.run.diff].speed * (this.tut ? 0.6 : 1);
+      const spd = DIFFS[this.run.diff].speed * GERM_SPEED * (this.tut ? 0.6 : 1);
       if (this.canSee(g)) {
         if (g.state !== "chase") {
           g.alertT = 1;
@@ -1792,7 +2140,7 @@
         if (r.soap < 3) r.soap = 3;
         if (!this.germs.length) {
           const rm = this.map.rooms[1] || this.map.rooms[0];
-          this.germs.push(this.makeGerm("basic", (rm.x0 + rm.x1) / 2 + 0.5, (rm.y0 + rm.y1) / 2 + 0.5));
+          this.germs.push(this.makeGerm("basic", rm.cx + 0.5, rm.cy + 0.5));
         }
       }
       if (step.ev === "water") r.item = "water";
@@ -1805,35 +2153,15 @@
     draw() {
       const c = this.cx, TS = this.TS, m = this.map, T = m.T, r = this.run;
       c.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-      c.fillStyle = T.line;
+      c.fillStyle = this.voidColor();
       c.fillRect(0, 0, this.vw, this.vh);
       const camX = this.px * TS - this.vw / 2, camY = this.py * TS - this.vh / 2;
       c.save();
       c.translate(-Math.round(camX), -Math.round(camY));
       const x0 = Math.max(0, Math.floor(camX / TS)), y0 = Math.max(0, Math.floor(camY / TS));
       const x1 = Math.min(m.W - 1, Math.ceil((camX + this.vw) / TS)), y1 = Math.min(m.H - 1, Math.ceil((camY + this.vh) / TS));
-      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
-        const v = m.at(x, y);
-        if (v === 1) {
-          const front = m.at(x, y + 1) !== 1;
-          c.fillStyle = T.wallTop;
-          c.fillRect(x * TS, y * TS, TS, TS);
-          if (front) {
-            c.fillStyle = T.wall;
-            c.fillRect(x * TS, y * TS + TS * 0.55, TS, TS * 0.45);
-          }
-        } else {
-          c.fillStyle = T.floor[x + y & 1];
-          c.fillRect(x * TS, y * TS, TS, TS);
-        }
-      }
-      c.font = `${Math.round(TS * 0.32)}px "Ssurround",sans-serif`;
-      c.textAlign = "left";
-      c.textBaseline = "top";
-      for (const rm of m.rooms) {
-        c.fillStyle = "rgba(0,0,0,0.18)";
-        c.fillText(rm.name, rm.x0 * TS + 6, rm.y0 * TS + 4);
-      }
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) this.drawSceneTile(c, x, y, m.at(x, y), TS);
+      this.drawArchitecture(c, TS);
       this.drawExit(c, TS);
       for (const p of m.pickups) {
         if (r.picked.includes(p.id)) continue;
@@ -1847,6 +2175,7 @@
         c.drawImage(im, (p.x + 0.5) * TS - im.width / 2, (p.y + 0.5) * TS - im.height / 2 + bob);
       }
       const list = [];
+      for (const f of m.fixtures) list.push({ y: f.h > 2 ? f.y + 1 : f.y + f.h - 0.05, d: () => this.drawFixture(c, f, TS) });
       for (const o of m.objects) list.push({ y: o.y + 0.9, d: () => this.drawObject(c, o, TS) });
       for (const g of this.germs) list.push({ y: g.y, d: () => this.drawGerm(c, g, TS) });
       if (r.hidden == null) list.push({ y: this.py, d: () => this.drawPlayer(c, TS) });
@@ -1864,6 +2193,7 @@
         c.arc(b.x * TS - TS * 0.07, b.y * TS - TS * 0.07, TS * 0.05, 0, 7);
         c.fill();
       }
+      if (this.dark) this.drawDark(c, TS, camX, camY);
       c.textAlign = "center";
       c.textBaseline = "middle";
       for (const f of this.fx) {
@@ -1902,8 +2232,8 @@
     drawObject(c, o, TS) {
       const r = this.run, cx = (o.x + 0.5) * TS, cy = (o.y + 0.5) * TS;
       if (o.kind === "decor") {
-        const im2 = emojiCanvas(o.emoji, TS * 0.75);
-        c.drawImage(im2, cx - im2.width / 2, cy - im2.height / 2);
+        const im = emojiCanvas(o.emoji, TS * 0.75);
+        c.drawImage(im, cx - im.width / 2, cy - im.height / 2);
         return;
       }
       if (o.kind === "hide") {
@@ -1915,8 +2245,8 @@
         c.roundRect(o.x * TS + 2, o.y * TS + 2, TS - 4, TS - 4, TS * 0.2);
         c.fill();
         c.stroke();
-        const im2 = emojiCanvas(o.emoji, TS * 0.85);
-        c.drawImage(im2, cx - im2.width / 2, cy - im2.height / 2);
+        const im = emojiCanvas(o.emoji, TS * 0.85);
+        c.drawImage(im, cx - im.width / 2, cy - im.height / 2);
         this.label(c, hiding ? "\uC228\uB294 \uC911\u2026" : this.hideLabel, cx, o.y * TS - TS * 0.28, Math.round(TS * 0.34), "#fff", "#1f7a36");
         if (hiding) {
           const p = IMG[this.o.char];
@@ -1930,17 +2260,18 @@
         return;
       }
       const st = r.searched[o.id], lock = this.locks[o.id];
-      c.fillStyle = st ? "rgba(255,255,255,0.55)" : "#fff";
-      c.strokeStyle = st === "found" ? "#4cc36a" : lock ? "#e0524a" : "#f0a640";
-      c.lineWidth = 3;
+      this.drawFixture(c, { x: o.x, y: o.y, w: 1, h: 1, type: o.art || "cabinet" }, TS);
+      c.strokeStyle = st === "found" ? "#4cc36a" : lock ? "#e0524a" : "#d9b869";
+      c.lineWidth = 2;
+      c.strokeRect(o.x * TS + 2, o.y * TS + 2, TS - 4, TS - 4);
+      c.fillStyle = st ? "#a7b6aa" : "#f9ecc8";
+      c.fillRect(cx - TS * 0.16, cy - TS * 0.1, TS * 0.32, TS * 0.23);
+      c.strokeStyle = "#9c8052";
       c.beginPath();
-      c.roundRect(o.x * TS + 3, o.y * TS + 3, TS - 6, TS - 6, TS * 0.18);
-      c.fill();
+      c.moveTo(cx - TS * 0.16, cy - TS * 0.1);
+      c.lineTo(cx, cy + TS * 0.02);
+      c.lineTo(cx + TS * 0.16, cy - TS * 0.1);
       c.stroke();
-      c.globalAlpha = st ? 0.5 : 1;
-      const im = emojiCanvas(o.emoji, TS * 0.62);
-      c.drawImage(im, cx - im.width / 2, cy - im.height / 2);
-      c.globalAlpha = 1;
       if (lock) this.label(c, `\u{1F512}${Math.ceil(lock)}`, cx, o.y * TS - TS * 0.25, Math.round(TS * 0.34), "#e0524a");
       else if (!st) {
         const b = Math.sin(this.time * 4 + o.id) * TS * 0.06;
@@ -1950,6 +2281,293 @@
         c.fill();
         this.label(c, "?", cx, o.y * TS - TS * 0.22 + b, Math.round(TS * 0.3), "#fff", "#c97a00");
       } else if (st === "found") this.label(c, "\u2713", cx, o.y * TS - TS * 0.2, Math.round(TS * 0.34), "#2e9a4a");
+    }
+    // 외부 이미지 없이 그리는 테마별 공간과 가구.
+    drawSceneTile(c, x, y, v, TS) {
+      const m = this.map, T = m.T, rm = m.roomAt(x, y), style = m.room[y * m.W + x] < 0 ? m.S.theme === "garden" ? "stone" : m.S.theme === "market" ? "stone" : "wood" : (rm == null ? void 0 : rm.floorStyle) || "tile";
+      const px = x * TS, py = y * TS, garden = m.S.theme === "garden", market = m.S.theme === "market";
+      if (v === 1) {
+        let boundary = false;
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (m.at(x + dx, y + dy) !== 1) boundary = true;
+        if (!boundary) {
+          c.fillStyle = garden ? "#43644b" : market ? "#514b47" : "#25313a";
+          c.fillRect(px, py, TS, TS);
+          if (garden && (x * 7 + y * 3) % 11 === 0) {
+            c.fillStyle = "#628357";
+            c.fillRect(px + TS * 0.25, py + TS * 0.2, TS * 0.2, TS * 0.12);
+            c.fillRect(px + TS * 0.38, py + TS * 0.35, TS * 0.2, TS * 0.12);
+          }
+          return;
+        }
+        c.fillStyle = garden ? "#536b40" : market ? "#80574c" : "#3c4f60";
+        c.fillRect(px, py, TS, TS);
+        c.fillStyle = garden ? "#96b875" : T.wallTop;
+        c.fillRect(px + 1, py + 1, TS - 2, TS * 0.58);
+        c.strokeStyle = garden ? "#607f47" : "rgba(45,62,75,.20)";
+        c.lineWidth = 1;
+        c.strokeRect(px + 1, py + 1, TS - 2, TS * 0.58);
+        if (m.at(x, y + 1) !== 1) {
+          c.fillStyle = garden ? "#7c5b39" : T.wall;
+          c.fillRect(px + 1, py + TS * 0.58, TS - 2, TS * 0.35);
+          c.fillStyle = "rgba(0,0,0,.15)";
+          c.fillRect(px, py + TS * 0.93, TS, TS * 0.07);
+        }
+        if (garden) {
+          c.fillStyle = "#e0c99b";
+          c.fillRect(px + TS * 0.16, py + TS * 0.18, TS * 0.14, TS * 0.72);
+          c.fillRect(px + TS * 0.67, py + TS * 0.18, TS * 0.14, TS * 0.72);
+        } else {
+          c.fillStyle = "rgba(255,255,255,.26)";
+          c.fillRect(px + 2, py + 2, TS - 4, 2);
+        }
+        return;
+      }
+      const palettes = { wood: ["#c7a57b", "#d1b18b"], tile: ["#e0ddd1", "#ebe7da"], wet: ["#b7d5d9", "#c3e0e1"], cold: ["#d0e4e9", "#e0eef1"], soil: ["#82684a", "#8c7050"], stone: ["#b8b7a4", "#c5c1ad"] };
+      const pal = palettes[style] || T.floor;
+      c.fillStyle = pal[x + y & 1];
+      c.fillRect(px, py, TS, TS);
+      c.strokeStyle = style === "soil" ? "#63543d" : "rgba(61,76,82,.14)";
+      c.lineWidth = 1;
+      if (style === "wood") {
+        c.beginPath();
+        c.moveTo(px, py + TS * 0.5);
+        c.lineTo(px + TS, py + TS * 0.5);
+        c.moveTo(px + TS * (y & 1 ? 0.25 : 0.75), py);
+        c.lineTo(px + TS * (y & 1 ? 0.25 : 0.75), py + TS * 0.5);
+        c.stroke();
+        c.fillStyle = "rgba(94,62,28,.10)";
+        c.fillRect(px + TS * 0.16, py + TS * 0.18, TS * 0.46, 1);
+      } else if (style === "soil") {
+        c.fillStyle = "#aa8b63";
+        for (let i = 0; i < 3; i++) c.fillRect(px + TS * 0.12, py + TS * (0.18 + i * 0.28), TS * 0.76, TS * 0.06);
+      } else {
+        c.strokeRect(px + 1, py + 1, TS - 2, TS - 2);
+        if (style === "cold" && (x + y) % 5 === 0) {
+          c.fillStyle = "rgba(255,255,255,.6)";
+          c.fillRect(px + TS * 0.22, py + TS * 0.28, TS * 0.2, 2);
+        }
+        if (style === "wet" && (x * 3 + y) % 7 === 0) {
+          c.fillStyle = "#728e96";
+          c.fillRect(px + TS * 0.35, py + TS * 0.35, TS * 0.3, TS * 0.3);
+          c.fillStyle = "#b7d5d9";
+          for (let j = 0; j < 3; j++) c.fillRect(px + TS * 0.38, py + TS * (0.4 + j * 0.08), TS * 0.24, 1);
+        }
+      }
+      if (rm && m.room[y * m.W + x] >= 0 && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => m.at(x + dx, y + dy) === 1)) {
+        c.fillStyle = "rgba(51,61,57,.10)";
+        c.fillRect(px, py, TS, TS);
+      }
+    }
+    drawArchitecture(c, TS) {
+      var _a, _b, _c, _d;
+      const m = this.map;
+      for (const rm of m.rooms) {
+        const x2 = (((_a = rm.signX) != null ? _a : rm.x0) + 0.15) * TS, y2 = (((_b = rm.signY) != null ? _b : rm.y0) + 0.08) * TS, w = Math.min(rm.name.length * 0.28 + 1.2, rm.x1 - rm.x0) * TS;
+        c.fillStyle = "#334653";
+        c.fillRect(x2, y2, w, TS * 0.55);
+        c.fillStyle = "#d8b76c";
+        c.fillRect(x2, y2, TS * 0.09, TS * 0.55);
+        this.label(c, `${String(rm.id + 1).padStart(2, "0")}  ${rm.name}`, x2 + w / 2, y2 + TS * 0.27, Math.round(TS * 0.23), "#fff", "#334653");
+        const bx = (((_c = rm.signX) != null ? _c : rm.x0) + 0.2) * TS, by = (((_d = rm.signY) != null ? _d : rm.y0) + 0.85) * TS;
+        c.fillStyle = "#765f47";
+        c.fillRect(bx, by, TS * 0.56, TS * 0.67);
+        c.fillStyle = "#f3e5ba";
+        c.fillRect(bx + TS * 0.06, by + TS * 0.06, TS * 0.44, TS * 0.55);
+        c.fillStyle = "#a47a43";
+        for (let i = 0; i < 3; i++) c.fillRect(bx + TS * 0.12, by + TS * (0.2 + i * 0.1), TS * 0.29, TS * 0.025);
+      }
+      const garden = m.S.theme === "garden";
+      for (const d of m.doors) {
+        const x2 = d.x * TS, y2 = d.y * TS;
+        c.fillStyle = garden ? "#8a6a43" : "#9b8259";
+        c.fillRect(x2, y2, TS, TS);
+        c.fillStyle = garden ? "#c9a873" : "#ddc69a";
+        c.fillRect(x2 + TS * 0.1, y2 + TS * 0.1, TS * 0.8, TS * 0.8);
+        c.fillStyle = garden ? "#5e4428" : "#344c58";
+        if (d.dx) c.fillRect(d.dx > 0 ? x2 + TS * 0.86 : x2, y2, TS * 0.14, TS);
+        else c.fillRect(x2, d.dy > 0 ? y2 + TS * 0.86 : y2, TS, TS * 0.14);
+      }
+      for (const u of this.doorUnits || []) this.drawDoorLeaves(c, u, TS, garden);
+      const e = m.exit, x = e.ix * TS, y = e.iy * TS;
+      c.fillStyle = "rgba(222,178,61,.26)";
+      c.fillRect(x, y, TS, TS);
+      c.strokeStyle = "#a58b42";
+      c.lineWidth = 2;
+      c.strokeRect(x + 3, y + 3, TS - 6, TS - 6);
+    }
+    // 주인공이나 균이 가까이 오면 문이 열리고, 멀어지면 닫힌다. 주인공이 열 때만 소리를 낸다
+    updateDoors(dt) {
+      this.doorSndT = Math.max(0, (this.doorSndT || 0) - dt);
+      for (const u of this.doorUnits) {
+        const hidden = this.run.hidden != null;
+        const byPlayer = !hidden && Math.hypot(this.px - u.cx, this.py - u.cy) < 1.9;
+        const byGerm = this.germs.some((g) => Math.hypot(g.x - u.cx, g.y - u.cy) < 1.5);
+        const want = byPlayer || byGerm ? 1 : 0;
+        if (want && !u.opening && u.t < 0.3 && byPlayer && !this.doorSndT) {
+          Sound.door();
+          this.doorSndT = 0.4;
+        }
+        u.opening = !!want;
+        u.t = Math.max(0, Math.min(1, u.t + (want ? 4 : -2.5) * dt));
+      }
+    }
+    drawDoorLeaves(c, u, TS, garden) {
+      if (u.t >= 0.99) return;
+      const k = 1 - u.t, n = u.n, half = n / 2 * k;
+      const band = (dir) => dir > 0 ? 0.52 : 0.16;
+      const leaf = (a0, a1) => {
+        if (a1 - a0 <= 0.01) return;
+        let x, y, w, h;
+        if (u.dx) {
+          x = (u.x + band(u.dx)) * TS;
+          w = TS * 0.32;
+          y = a0 * TS;
+          h = (a1 - a0) * TS;
+        } else {
+          y = (u.y + band(u.dy)) * TS;
+          h = TS * 0.32;
+          x = a0 * TS;
+          w = (a1 - a0) * TS;
+        }
+        c.fillStyle = garden ? "#7a5634" : "#8c5a2e";
+        c.fillRect(x, y, w, h);
+        c.fillStyle = garden ? "#c79a62" : "#d39a5c";
+        c.fillRect(x + 2, y + 2, Math.max(0, w - 4), Math.max(0, h - 4));
+        c.fillStyle = "#5b3a1c";
+        if (u.dx) c.fillRect(x + w / 2 - 2, y + h / 2 - 2, 4, 4);
+        else c.fillRect(x + w / 2 - 2, y + h / 2 - 2, 4, 4);
+      };
+      const a = u.dx ? u.y : u.x, b = a + n;
+      leaf(a, a + half);
+      leaf(b - half, b);
+    }
+    voidColor() {
+      const t = this.map.S.theme;
+      return t === "garden" ? "#43644b" : t === "market" ? "#514b47" : "#25313a";
+    }
+    // 불 꺼진 층: 주인공 둘레만 밝고 나머지는 어둡다. 쫓아오는 균의 '!'와 열린 탈출문은 어둠 위에 다시 그린다
+    drawDark(c, TS, camX, camY) {
+      const x = this.px * TS, y = (this.py - 0.35) * TS, f = Math.sin(this.time * 2.2) * 0.08;
+      const grd = c.createRadialGradient(x, y, TS * (1.9 + f), x, y, TS * (3.7 + f));
+      grd.addColorStop(0, "rgba(6,8,22,0)");
+      grd.addColorStop(0.55, "rgba(6,8,22,0.75)");
+      grd.addColorStop(1, "rgba(6,8,22,0.96)");
+      c.fillStyle = grd;
+      c.fillRect(Math.round(camX) - 2, Math.round(camY) - 2, this.vw + 4, this.vh + 4);
+      for (const g of this.germs) if (g.state === "chase" && g.stun <= 0 && g.tired <= 0) this.label(c, "!", g.x * TS, (g.y - g.def.size * 0.85) * TS, Math.round(TS * 0.5), "#ff6b5e", "#2a0d0d");
+      if (this.run.exitOpen) this.drawExit(c, TS);
+    }
+    drawFixture(c, f, TS) {
+      const x = f.x * TS, y = f.y * TS, w = (f.w || 1) * TS, h = (f.h || 1) * TS, type = f.type || "cabinet", theme = this.map.S.theme;
+      c.save();
+      c.fillStyle = "rgba(22,31,36,.18)";
+      c.fillRect(x + TS * 0.1, y + TS * 0.16, w - TS * 0.04, h - TS * 0.06);
+      const metal = ["fridge", "sink", "stove", "counter", "tank"].includes(type);
+      const base = metal ? "#637f8b" : type === "bed" ? "#65503a" : "#745a43";
+      c.fillStyle = base;
+      c.fillRect(x + 2, y + 2, w - 4, h - 4);
+      c.fillStyle = metal ? "#c2d4d8" : type === "bed" ? "#947552" : "#ba9569";
+      c.fillRect(x + 4, y + 4, w - 8, h - TS * 0.22 - 4);
+      c.strokeStyle = metal ? "#425d68" : "#654a35";
+      c.lineWidth = Math.max(1, TS * 0.035);
+      c.strokeRect(x + 2, y + 2, w - 4, h - 4);
+      if (type === "fridge" || type === "cabinet" || type === "shed") {
+        c.beginPath();
+        c.moveTo(x + w * 0.5, y + 4);
+        c.lineTo(x + w * 0.5, y + h - 4);
+        c.stroke();
+        c.fillStyle = type === "fridge" ? "#557887" : "#e3c991";
+        c.fillRect(x + w * 0.42, y + h * 0.42, TS * 0.06, TS * 0.25);
+        c.fillRect(x + w * 0.55, y + h * 0.42, TS * 0.06, TS * 0.25);
+        if (type === "fridge") {
+          c.fillStyle = "#36545e";
+          c.fillRect(x + w * 0.63, y + h * 0.15, w * 0.23, h * 0.16);
+          c.fillStyle = "#78d3c7";
+          c.fillRect(x + w * 0.67, y + h * 0.19, w * 0.12, h * 0.06);
+        }
+      } else if (type === "table" || type === "desk" || type === "bench") {
+        c.strokeRect(x + TS * 0.13, y + TS * 0.13, w - TS * 0.26, h - TS * 0.35);
+        if (type === "table") {
+          for (let i = 0; i < 2; i++) {
+            c.fillStyle = "#f6eee0";
+            c.beginPath();
+            c.arc(x + w * (0.3 + i * 0.4), y + h * 0.43, TS * 0.2, 0, 7);
+            c.fill();
+            c.stroke();
+          }
+        } else if (type === "desk") {
+          c.fillStyle = "#f3e6c6";
+          c.fillRect(x + w * 0.25, y + h * 0.2, w * 0.35, h * 0.42);
+          c.fillStyle = "#8d6e4b";
+          c.fillRect(x + w * 0.3, y + h * 0.3, w * 0.2, 2);
+        }
+      } else if (type === "sink") {
+        c.fillStyle = "#536e79";
+        c.fillRect(x + w * 0.19, y + h * 0.2, w * 0.62, h * 0.47);
+        c.fillStyle = "#a9dbe5";
+        c.fillRect(x + w * 0.25, y + h * 0.27, w * 0.5, h * 0.3);
+        c.fillStyle = "#e6eff2";
+        c.fillRect(x + w * 0.47, y + h * 0.08, w * 0.06, h * 0.27);
+      } else if (type === "stove") {
+        for (let i = 0; i < 2; i++) {
+          c.fillStyle = "#354b55";
+          c.beginPath();
+          c.arc(x + w * (0.3 + i * 0.4), y + h * 0.42, TS * 0.22, 0, 7);
+          c.fill();
+          c.strokeStyle = "#95a5ad";
+          c.beginPath();
+          c.arc(x + w * (0.3 + i * 0.4), y + h * 0.42, TS * 0.12, 0, 7);
+          c.stroke();
+        }
+      } else if (type === "shelf" || type === "crate" || type === "stall") {
+        for (let i = 1; i < 3; i++) {
+          c.fillStyle = "#795736";
+          c.fillRect(x + 3, y + h * i / 3, w - 6, TS * 0.045);
+        }
+        const colors = theme === "dairy" ? ["#f0eee1", "#d6b459", "#d0d8d1"] : theme === "market" ? ["#ce704c", "#8aa362", "#e1b261"] : ["#89a866", "#d3914b", "#b96157"];
+        for (let i = 0; i < 6; i++) {
+          c.fillStyle = colors[i % 3];
+          c.fillRect(x + w * (0.12 + i % 3 * 0.27), y + h * (0.17 + Math.floor(i / 3) * 0.34), w * 0.17, h * 0.2);
+        }
+        if (type === "stall") {
+          c.fillStyle = "#bd6752";
+          c.fillRect(x + 2, y + 2, w - 4, h * 0.22);
+          for (let i = 0; i < 5; i++) {
+            c.fillStyle = i % 2 ? "#bd6752" : "#f0d7ae";
+            c.fillRect(x + 2 + i * (w - 4) / 5, y + 2, (w - 4) / 5, h * 0.22);
+          }
+        }
+      } else if (type === "bed") {
+        for (let i = 0; i < 6; i++) {
+          const X = x + w * (0.17 + i % 3 * 0.32), Y = y + h * (0.3 + Math.floor(i / 3) * 0.4);
+          c.fillStyle = "#476942";
+          c.fillRect(X - TS * 0.1, Y - TS * 0.04, TS * 0.2, TS * 0.26);
+          c.fillStyle = theme === "garden" && f.roomId === 3 ? "#cf6150" : "#79a05d";
+          c.beginPath();
+          c.ellipse(X, Y, TS * 0.18, TS * 0.1, -0.5, 0, 7);
+          c.fill();
+        }
+      } else if (type === "tank") {
+        c.fillStyle = "#94b7bf";
+        c.beginPath();
+        c.ellipse(x + w / 2, y + h * 0.42, w * 0.35, h * 0.28, 0, 0, 7);
+        c.fill();
+        c.stroke();
+      } else if (type === "cooler") {
+        c.fillStyle = "#9fc3cf";
+        c.fillRect(x + TS * 0.3, y + TS * 0.3, w - TS * 0.6, h - TS * 0.6);
+        c.fillStyle = "#6f95a3";
+        for (let i = 1; i < h / TS - 1; i++) c.fillRect(x + TS * 0.6, y + i * TS + TS * 0.2, w - TS * 1.2, TS * 0.08);
+        c.fillStyle = "#2f4752";
+        c.fillRect(x + w / 2 - TS * 1.3, y + TS * 0.45, TS * 2.6, TS * 0.7);
+        this.label(c, "\u2744 \uB0C9\uC7A5 \uC124\uBE44", x + w / 2, y + TS * 0.8, Math.round(TS * 0.3), "#bff3ff", "#2f4752");
+      } else if (type === "board") {
+        c.fillStyle = "#f0e2bd";
+        c.fillRect(x + w * 0.12, y + h * 0.15, w * 0.76, h * 0.58);
+        c.fillStyle = "#93744b";
+        for (let i = 0; i < 3; i++) c.fillRect(x + w * 0.22, y + h * (0.27 + i * 0.12), w * 0.48, 1);
+      }
+      c.restore();
     }
     drawPlayer(c, TS) {
       const im = IMG[this.o.char];
@@ -2012,6 +2630,29 @@
       else if (g.state === "chase") this.label(c, "!", x, y - sz * 0.85 - (g.alertT > 0 ? TS * 0.15 : 0), Math.round(TS * 0.5), "#e0524a");
     }
   };
+  function groupDoors(doors) {
+    const units = [], used = /* @__PURE__ */ new Set(), key2 = (d) => `${d.x},${d.y}`;
+    const byKey = new Map(doors.map((d) => [key2(d), d]));
+    for (const d of doors) {
+      if (used.has(key2(d))) continue;
+      const cells = [d];
+      used.add(key2(d));
+      for (let i = 0; i < cells.length; i++) {
+        const c = cells[i];
+        for (const [ox, oy] of d.dx ? [[0, 1], [0, -1]] : [[1, 0], [-1, 0]]) {
+          const n = byKey.get(`${c.x + ox},${c.y + oy}`);
+          if (n && !used.has(key2(n)) && n.dx === d.dx && n.dy === d.dy) {
+            used.add(key2(n));
+            cells.push(n);
+          }
+        }
+      }
+      const xs = cells.map((c) => c.x), ys = cells.map((c) => c.y);
+      const x = Math.min(...xs), y = Math.min(...ys);
+      units.push({ x, y, dx: d.dx, dy: d.dy, n: cells.length, cx: (x + Math.max(...xs) + 1) / 2, cy: (y + Math.max(...ys) + 1) / 2, t: 0, opening: false });
+    }
+    return units;
+  }
 
   // js/ui.js
   var $ = (id) => document.getElementById(id);
@@ -2217,14 +2858,18 @@
     }
     show(null);
     const s = S.save, stageId = currentStageId(), st = STAGES[stageId];
-    const resumed = !!(s.run && s.run.stageId === stageId);
-    S.game = new Game($("cv"), { stageId, band: s.band, diff: s.diff, char: s.char, pool: poolFor(stageId), run: resumed ? s.run : null, ui: UI });
+    const oldMap = !!(s.run && s.run.stageId === stageId && s.run.mapVersion !== MAP_VERSION);
+    const resumed = !!(s.run && s.run.stageId === stageId) && !oldMap;
+    const dark = !s.inTutorial && s.stageIdx === COURSES[s.course].stages.length - 1;
+    S.game = new Game($("cv"), { stageId, band: s.band, diff: s.diff, char: s.char, pool: poolFor(stageId), run: resumed ? s.run : null, ui: UI, dark });
     $("stageName").textContent = st.name;
     $("tutBox").hidden = $("tutFrame").hidden = stageId !== 0;
     $("hud").classList.toggle("tut", stageId === 0);
     if (stageId === 0) UI.tutorial(S.game.run.tut);
     const intro = STAGE_INTRO[stageId];
-    UI.say(resumed ? "\uC774\uC5B4\uC11C \uD574 \uBCF4\uC790! \uADE0\uC744 \uC870\uC2EC\uD574!" : intro.all || intro[s.band]);
+    const darkLine = dark ? " <b>\uADF8\uB7F0\uB370 \uBD88\uC774 \uAEBC\uC84C\uC5B4!</b> \uB0B4 \uC8FC\uBCC0\uB9CC \uBCF4\uC5EC. \uAC10\uC9C0\uAE30\uC640 \uADE0\uC758 <b>!</b> \uD45C\uC2DC\uB97C \uC798 \uBD10!" : "";
+    UI.say((resumed ? "\uC774\uC5B4\uC11C \uD574 \uBCF4\uC790! \uADE0\uC744 \uC870\uC2EC\uD574!" : intro.all || intro[s.band]) + darkLine);
+    if (oldMap) UI.toast("\uC9C0\uB3C4\uAC00 \uC0C8\uB85C \uBC14\uB00C\uC5B4\uC11C \uC774 \uCE35\uC740 \uCC98\uC74C\uBD80\uD130 \uB2E4\uC2DC \uD574\uC694. \uBAA8\uC740 \uBCC4\uC740 \uADF8\uB300\uB85C\uC608\uC694.");
     if (!resumed) {
       s.run = S.game.serialize();
       persist();
@@ -2357,10 +3002,56 @@
     var _a;
     return (_a = S.game) == null ? void 0 : _a.resize();
   });
+  var tapN = 0;
+  var tapT = 0;
+  function tapCharacter(e) {
+    const g = S.game;
+    if (!g || g.paused || g.over) return;
+    const r = $("cv").getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    const inside = Math.abs(x - g.vw / 2) < g.TS * 0.6 && y > g.vh / 2 - g.TS * 1.2 && y < g.vh / 2 + g.TS * 0.5;
+    const now = performance.now();
+    if (!inside) {
+      tapN = 0;
+      return;
+    }
+    tapN = now - tapT < 800 ? tapN + 1 : 1;
+    tapT = now;
+    if (tapN < 7) return;
+    tapN = 0;
+    g.pausedBefore = g.paused;
+    g.paused = true;
+    askPin("\u{1F469}\u200D\u{1F3EB} \uB2E4\uC74C \uCE35\uC73C\uB85C \uAC74\uB108\uB6F0\uAE30", skipStage, () => {
+      var _a;
+      g.paused = (_a = g.pausedBefore) != null ? _a : false;
+    });
+  }
+  function skipStage() {
+    const s = S.save, g = S.game;
+    if (s.inTutorial) {
+      finishTutorial();
+      return;
+    }
+    const id = currentStageId();
+    if (!s.results[id]) s.results[id] = { stars: 0, diff: g ? g.run.diff : s.diff, wrong: 0, correct: 0, at: Date.now(), skipped: true };
+    s.stageIdx++;
+    s.run = null;
+    const last = s.stageIdx >= COURSES[s.course].stages.length;
+    if (last) s.finished = true;
+    persist();
+    UI.toast(`\uC120\uC0DD\uB2D8\uC774 ${STAGES[id].name}\uC744(\uB97C) \uAC74\uB108\uB6F0\uC5C8\uC5B4\uC694.`);
+    if (last) {
+      if (g) {
+        g.destroy();
+        S.game = null;
+      }
+      showFinal();
+    } else startPlay();
+  }
   var joyId = null;
   var joyX = 0;
   var joyY = 0;
   var cv = $("cv");
+  cv.addEventListener("pointerdown", tapCharacter);
   cv.addEventListener("pointerdown", (e) => {
     if (!S.game || e.clientX > innerWidth * 0.55) return;
     joyId = e.pointerId;
@@ -2670,7 +3361,7 @@
     const s = S.save, stages = COURSES[s.course].stages;
     const rows = stages.map((id) => {
       const r = s.results[id];
-      return `<li>${esc(STAGES[id].name)} \u2014 ${r ? "\u2B50".repeat(r.stars) + "\u2606".repeat(3 - r.stars) + ` <span class="badge ${r.diff}">${DIFFS[r.diff].icon} ${DIFFS[r.diff].name}</span>` : "-"}</li>`;
+      return `<li>${esc(STAGES[id].name)} \u2014 ${(r == null ? void 0 : r.skipped) ? "\u23ED \uC120\uC0DD\uB2D8\uC774 \uAC74\uB108\uB700" : r ? "\u2B50".repeat(r.stars) + "\u2606".repeat(3 - r.stars) + ` <span class="badge ${r.diff}">${DIFFS[r.diff].icon} ${DIFFS[r.diff].name}</span>` : "-"}</li>`;
     }).join("");
     const sh = openModal(`<h3>\u{1F3C6} \uB0E0\uB0E0 \uD0C8\uCD9C \uB300\uC791\uC804 \uC644\uC8FC!</h3><p class="q">${S.cls}\uBC18 ${S.num}\uBC88, \uBAA8\uB4E0 \uCE35\uC744 \uD0C8\uCD9C\uD588\uC5B4\uC694!<br>\uBAA8\uC740 \uBCC4: \u2B50 ${totalStars(s)} / ${stages.length * 3}</p><ul class="crit">${rows}</ul>
     <p class="hint">\uC120\uC0DD\uB2D8\uAED8 \uC774 \uD654\uBA74\uC744 \uBCF4\uC5EC \uC8FC\uC138\uC694!</p><div class="acts"><button class="big" id="go">\uCC98\uC74C \uD654\uBA74\uC73C\uB85C</button></div>`);
@@ -2713,15 +3404,16 @@
       h.querySelector("#hBack").onclick = () => openMenu();
     };
   }
-  $("teacherBtn").onclick = () => {
+  function askPin(title, onOk, onCancel) {
     let pin = "";
     const draw = () => {
-      const sh = openModal(`<h3>\u{1F469}\u200D\u{1F3EB} \uC120\uC0DD\uB2D8 \uBE44\uBC00\uBC88\uD638</h3><div class="pindots">${"\u25CF".repeat(pin.length)}${"\u25CB".repeat(4 - pin.length)}</div>
+      const sh = openModal(`<h3>${title}</h3><div class="pindots">${"\u25CF".repeat(pin.length)}${"\u25CB".repeat(4 - pin.length)}</div>
       <div class="pinpad">${[1, 2, 3, 4, 5, 6, 7, 8, 9, "\u2190", 0, "\u2715"].map((k) => `<button data-k="${k}">${k}</button>`).join("")}</div>`);
       sh.querySelectorAll("[data-k]").forEach((b) => b.onclick = () => {
         const k = b.dataset.k;
         if (k === "\u2715") {
           closeModal();
+          onCancel == null ? void 0 : onCancel();
           return;
         }
         if (k === "\u2190") pin = pin.slice(0, -1);
@@ -2729,7 +3421,7 @@
         if (pin.length === 4) {
           if (pin === TEACHER_PIN) {
             closeModal();
-            openTeacher();
+            onOk();
             return;
           }
           pin = "";
@@ -2739,7 +3431,8 @@
       });
     };
     draw();
-  };
+  }
+  $("teacherBtn").onclick = () => askPin("\u{1F469}\u200D\u{1F3EB} \uC120\uC0DD\uB2D8 \uBE44\uBC00\uBC88\uD638", openTeacher);
   function openTeacher() {
     show("sTeacher");
     const sel = $("tClass");
@@ -2767,7 +3460,7 @@
       const cells = [1, 2, 3, 4, 5, 6].map((id) => {
         if (!COURSES[s.course].stages.includes(id)) return '<td class="empty">\xB7</td>';
         const r = s.results[id];
-        return r ? `<td>${"\u2B50".repeat(r.stars)}${r.diff === "hell" ? "\u{1F525}" : r.diff === "hard" ? "\u{1F4AA}" : ""}</td>` : '<td class="empty">-</td>';
+        return (r == null ? void 0 : r.skipped) ? '<td title="\uC120\uC0DD\uB2D8\uC774 \uAC74\uB108\uB700">\u23ED</td>' : r ? `<td>${"\u2B50".repeat(r.stars)}${r.diff === "hell" ? "\u{1F525}" : r.diff === "hard" ? "\u{1F4AA}" : ""}</td>` : '<td class="empty">-</td>';
       }).join("");
       rows += `<tr><td>${n}</td><td>${((_a = BANDS[s.band]) == null ? void 0 : _a.name) || ""}</td><td>${COURSES[s.course].name}</td><td>${progressText(s)}</td>${cells}<td>\u2B50 ${totalStars(s)}</td><td>${((_b = DIFFS[s.diff]) == null ? void 0 : _b.icon) || ""} ${((_c = DIFFS[s.diff]) == null ? void 0 : _c.name) || ""}</td><td>${fmtTime(s.updated)}</td><td><button data-del="${n}">\uC9C0\uC6B0\uAE30</button></td></tr>`;
     }
