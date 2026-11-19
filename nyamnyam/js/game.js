@@ -153,7 +153,7 @@ export class Game {
     if (len < 0.15) { this.walkT = 0; return; }
     if (len > 1) { dx /= len; dy /= len; }
     if (Math.abs(dx) > 0.2) this.face = dx > 0 ? 1 : -1;
-    const sp = PLAYER_SPEED * (this.waterT > 0 ? 1.6 : 1) * dt;
+    const sp = PLAYER_SPEED * (DIFFS[this.run.diff].player || 1) * (this.waterT > 0 ? 1.6 : 1) * dt;
     this.walkT += dt;
     this.slide(dx * sp, dy * sp);
   }
@@ -197,7 +197,7 @@ export class Game {
     }
     if (g.state === 'chase') {
       g.seen += dt; g.chaseT += dt;
-      if (g.def.tires && g.chaseT > 4) { g.tired = 3; g.chaseT = 0; g.state = 'wander'; g.path = null; this.float('헥헥…', g.x, g.y - 0.8, '#8a5cc7'); return; }
+      if (g.def.tires && g.chaseT > 4) { g.tired = 3 * (DIFFS[this.run.diff].tired || 1); g.chaseT = 0; g.state = 'wander'; g.path = null; this.float('헥헥…', g.x, g.y - 0.8, '#8a5cc7'); return; }
       if (g.seen > 3) { g.state = 'wander'; g.path = null; g.chaseT = 0; }
       if ((g.repath -= dt) <= 0) { g.repath = 0.35; g.path = findPath(this.map, g.x, g.y, g.lx, g.ly); }
       // 같은 칸이거나 막힘 없이 보이면 곧장 다가간다

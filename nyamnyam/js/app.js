@@ -13,7 +13,8 @@
     long: { name: "2\uC2DC\uAC04\uC6A9", stages: [1, 2, 3, 4, 5, 6], sub: "6\uAC1C \uCE35 \xB7 \uC57D 80\uBD84" }
   };
   var DIFFS = {
-    easy: { name: "\uC26C\uC6C0", icon: "\u{1F642}", lives: Infinity, speed: 0.75, extraGerms: 0, desc: "\uBAA9\uC228 \uBB34\uD55C \xB7 \uADE0\uC774 \uB290\uB824\uC694" },
+    gentle: { name: "\uC26C\uC6C0", icon: "\u{1F331}", lives: Infinity, speed: 0.6, player: 1.15, tired: 1.3, extraGerms: 0, desc: "\uBAA9\uC228 \uBB34\uD55C \xB7 \uADE0\uC774 \uC544\uC8FC \uB290\uB824\uC694" },
+    easy: { name: "\uC911\uAC04", icon: "\u{1F642}", lives: Infinity, speed: 0.75, extraGerms: 0, desc: "\uBAA9\uC228 \uBB34\uD55C \xB7 \uADE0\uC774 \uB290\uB824\uC694" },
     hard: { name: "\uC5B4\uB824\uC6C0", icon: "\u{1F4AA}", lives: 3, speed: 1, extraGerms: 2, desc: "\uBAA9\uC228 3\uAC1C \xB7 \uADE0\uC774 \uBE60\uB974\uACE0 \uB9CE\uC544\uC694" },
     hell: { name: "\uBD88\uC9C0\uC625", icon: "\u{1F525}", lives: 1, speed: 1, extraGerms: 2, desc: "\uBAA9\uC228 1\uAC1C \xB7 \uCABD\uC9C0 \uBB38\uC81C\uB97C \uD2C0\uB9AC\uBA74 \uC870\uAC01\uC774 \uD769\uC5B4\uC838\uC694" }
   };
@@ -1729,7 +1730,7 @@
         dy /= len;
       }
       if (Math.abs(dx) > 0.2) this.face = dx > 0 ? 1 : -1;
-      const sp = PLAYER_SPEED * (this.waterT > 0 ? 1.6 : 1) * dt;
+      const sp = PLAYER_SPEED * (DIFFS[this.run.diff].player || 1) * (this.waterT > 0 ? 1.6 : 1) * dt;
       this.walkT += dt;
       this.slide(dx * sp, dy * sp);
     }
@@ -1798,7 +1799,7 @@
         g.seen += dt;
         g.chaseT += dt;
         if (g.def.tires && g.chaseT > 4) {
-          g.tired = 3;
+          g.tired = 3 * (DIFFS[this.run.diff].tired || 1);
           g.chaseT = 0;
           g.state = "wander";
           g.path = null;

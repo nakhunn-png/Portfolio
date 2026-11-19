@@ -55,7 +55,7 @@ button { font-family: inherit; cursor: pointer; border: 0; color: inherit; }
 .kicker { margin: 0; font-size: clamp(15px, min(1.7vw, 3vh), 32px); font-weight: 800; color: #2a5d8a; }
 .diffs { display: flex; gap: clamp(8px, 0.8vw, 16px); }
 .diffs button { flex: 1; background: rgba(255,255,255,.92); border-radius: 16px; padding: clamp(10px, 1.4vh, 20px) 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; box-shadow: 0 3px 0 #b9d4ea; border: 3px solid transparent; }
-.diffs button b { font-size: clamp(18px, min(1.6vw, 3vh), 32px); }
+.diffs button b { font-size: clamp(15px, min(1.35vw, 2.7vh), 30px); white-space: nowrap; } /* 난이도 4개가 한 줄에 들어가게 */
 .diffs button small { font-size: clamp(12px, min(0.85vw, 1.6vh), 17px); color: var(--sub); line-height: 1.25; text-align: center; }
 .diffs button.on { border-color: var(--orange); background: #fff4e8; }
 .diffs button.on.hell { border-color: var(--red); background: #ffecea; }
@@ -143,6 +143,7 @@ button { font-family: inherit; cursor: pointer; border: 0; color: inherit; }
 .crit { list-style: none; padding: 0; margin: 8px 0; font-size: 18px; line-height: 1.8; }
 .badge { display: inline-block; border-radius: 999px; padding: 4px 12px; font-weight: 900; font-size: 15px; background: #eef4ff; color: var(--blue); }
 .badge.hell { background: #ffe5e2; color: var(--red); }
+.badge.gentle { background: #e6f6e0; color: #3d8a2a; }
 .badge.hard { background: #fff0dc; color: #c76a00; }
 .diffrow { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
 .diffrow button { background: #f3f7fc; border-radius: 14px; padding: 10px 14px; font-size: 17px; font-weight: 800; border: 3px solid transparent; }

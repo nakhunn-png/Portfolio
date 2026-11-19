@@ -17,8 +17,11 @@ export const COURSES = {
   long:  { name: '2시간용', stages: [1, 2, 3, 4, 5, 6], sub: '6개 층 · 약 80분' },
 };
 
+// speed: 균 속도 배율, player: 주인공 속도 배율, tired: 충치쟁이가 지쳐 쉬는 시간 배율
+// 키 'easy'는 예전 저장과 맞추려고 그대로 두고 이름만 '중간'으로 바꿨다. 새 '쉬움'은 키 'gentle'
 export const DIFFS = {
-  easy: { name: '쉬움', icon: '🙂', lives: Infinity, speed: 0.75, extraGerms: 0, desc: '목숨 무한 · 균이 느려요' },
+  gentle: { name: '쉬움', icon: '🌱', lives: Infinity, speed: 0.6, player: 1.15, tired: 1.3, extraGerms: 0, desc: '목숨 무한 · 균이 아주 느려요' },
+  easy: { name: '중간', icon: '🙂', lives: Infinity, speed: 0.75, extraGerms: 0, desc: '목숨 무한 · 균이 느려요' },
   hard: { name: '어려움', icon: '💪', lives: 3, speed: 1, extraGerms: 2, desc: '목숨 3개 · 균이 빠르고 많아요' },
   hell: { name: '불지옥', icon: '🔥', lives: 1, speed: 1, extraGerms: 2, desc: '목숨 1개 · 쪽지 문제를 틀리면 조각이 흩어져요' },
 };
