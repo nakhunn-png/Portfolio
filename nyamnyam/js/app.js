@@ -13,6 +13,7 @@
     long: { name: "2\uC2DC\uAC04\uC6A9", stages: [1, 2, 3, 4, 5, 6], sub: "6\uAC1C \uCE35 \xB7 \uC57D 80\uBD84" }
   };
   var DIFFS = {
+    veryeasy: { name: "\uB9E4\uC6B0 \uC26C\uC6C0", icon: "\u{1F423}", lives: Infinity, speed: 0.54, player: 1.725, tired: 1.3, guide: true, extraGerms: 0, desc: "\uBAA9\uC228 \uBB34\uD55C \xB7 \uD654\uC0B4\uD45C\uAC00 \uCABD\uC9C0 \uC548\uB0B4" },
     gentle: { name: "\uC26C\uC6C0", icon: "\u{1F331}", lives: Infinity, speed: 0.6, player: 1.15, tired: 1.3, extraGerms: 0, desc: "\uBAA9\uC228 \uBB34\uD55C \xB7 \uADE0\uC774 \uC544\uC8FC \uB290\uB824\uC694" },
     easy: { name: "\uC911\uAC04", icon: "\u{1F642}", lives: Infinity, speed: 0.75, extraGerms: 0, desc: "\uBAA9\uC228 \uBB34\uD55C \xB7 \uADE0\uC774 \uB290\uB824\uC694" },
     hard: { name: "\uC5B4\uB824\uC6C0", icon: "\u{1F4AA}", lives: 3, speed: 1, extraGerms: 2, desc: "\uBAA9\uC228 3\uAC1C \xB7 \uADE0\uC774 \uBE60\uB974\uACE0 \uB9CE\uC544\uC694" },
@@ -2145,6 +2146,61 @@
       var _a;
       return ((_a = this.map.roomAt(this.px, this.py)) == null ? void 0 : _a.name) || "";
     }
+    // 안내 화살표: 탈출문이 열렸으면 탈출문, '매우 쉬움'이면 가장 가까운 남은 진짜 쪽지.
+    // 벽을 뚫고 가리키지 않게 실제 길을 따라간다. 주인공이 다른 칸에 들어가거나 0.3초가 지나면 길을 다시 찾는다
+    guide() {
+      const r = this.run, m = this.map;
+      let tx, ty, label;
+      if (r.exitOpen) {
+        tx = m.exit.ix;
+        ty = m.exit.iy;
+        label = "\uD0C8\uCD9C\uBB38";
+      } else if (DIFFS[r.diff].guide && !this.tut && this.found < this.need) {
+        let best = null, bd = 1e9;
+        for (const id of r.realIds) {
+          if (r.searched[id] === "found") continue;
+          const o = m.objects[id], d = Math.hypot(o.x + 0.5 - this.px, o.y + 0.5 - this.py);
+          if (d < bd) {
+            bd = d;
+            best = o;
+          }
+        }
+        if (!best) return null;
+        const prev = this._guideId != null && r.searched[this._guideId] !== "found" && r.realIds.includes(this._guideId) ? m.objects[this._guideId] : null;
+        if (prev && Math.hypot(prev.x + 0.5 - this.px, prev.y + 0.5 - this.py) < bd + 3) best = prev;
+        this._guideId = best.id;
+        const n = [[0, 1], [1, 0], [-1, 0], [0, -1]].map(([dx, dy]) => [best.x + dx, best.y + dy]).find(([x, y]) => !m.solid(x, y));
+        if (!n) return null;
+        [tx, ty] = n;
+        label = "\uCABD\uC9C0";
+      } else return null;
+      const now = this.time, c = this._guide;
+      const cx = Math.floor(this.px), cy = Math.floor(this.py);
+      if (!c || c.tx !== tx || c.ty !== ty || c.cx !== cx || c.cy !== cy || now - c.t > 0.3) {
+        const path = findPath(m, this.px, this.py, tx, ty, 600) || [];
+        this._guide = { tx, ty, cx, cy, t: now, path, left: path.length };
+      }
+      const g = this._guide;
+      const clear = (bx, by) => {
+        const d = Math.hypot(bx - this.px, by - this.py), n = Math.ceil(d / 0.1);
+        for (let i = 1; i <= n; i++) {
+          const x = this.px + (bx - this.px) * i / n, y = this.py + (by - this.py) * i / n;
+          if (m.solid(Math.floor(x - 0.3), Math.floor(y - 0.3)) || m.solid(Math.floor(x + 0.3), Math.floor(y - 0.3)) || m.solid(Math.floor(x - 0.3), Math.floor(y + 0.3)) || m.solid(Math.floor(x + 0.3), Math.floor(y + 0.3))) return false;
+        }
+        return true;
+      };
+      let aim = null;
+      for (let k = Math.min(2, g.path.length - 1); k >= 0; k--) if (clear(g.path[k].x, g.path[k].y)) {
+        aim = g.path[k];
+        break;
+      }
+      if (!aim) {
+        const mx = cx + 0.5, my = cy + 0.5;
+        aim = Math.hypot(mx - this.px, my - this.py) < 0.3 && g.path.length ? g.path[0] : { x: mx, y: my };
+      }
+      if (!g.path.length) aim = { x: tx + 0.5, y: ty + 0.5 };
+      return { a: Math.atan2(aim.y - this.py, aim.x - this.px), label, near: g.left <= 1 };
+    }
     exitAngle() {
       const e = this.map.exit;
       return { a: Math.atan2(e.y + 0.5 - this.py, e.x + 0.5 - this.px), d: Math.hypot(e.x + 0.5 - this.px, e.y + 0.5 - this.py) };
@@ -2226,6 +2282,27 @@
         c.fill();
       }
       if (this.dark) this.drawDark(c, TS, camX, camY);
+      if (DIFFS[r.diff].guide && r.hidden == null) {
+        const gd = this.guide();
+        if (gd && !gd.near) {
+          const bob = Math.sin(this.time * 6) * TS * 0.08, R = TS * 1.05 + bob;
+          c.save();
+          c.translate(this.px * TS + Math.cos(gd.a) * R, (this.py - 0.4) * TS + Math.sin(gd.a) * R);
+          c.rotate(gd.a);
+          c.beginPath();
+          c.moveTo(TS * 0.32, 0);
+          c.lineTo(-TS * 0.18, -TS * 0.24);
+          c.lineTo(-TS * 0.06, 0);
+          c.lineTo(-TS * 0.18, TS * 0.24);
+          c.closePath();
+          c.lineWidth = Math.max(3, TS * 0.07);
+          c.strokeStyle = "#fff";
+          c.stroke();
+          c.fillStyle = gd.label === "\uD0C8\uCD9C\uBB38" ? "#2e9a4a" : "#ff8a1f";
+          c.fill();
+          c.restore();
+        }
+      }
       c.textAlign = "center";
       c.textBaseline = "middle";
       for (const f of this.fx) {
@@ -2946,8 +3023,8 @@
       persist();
     }
     if (!$("compass").hidden) {
-      const e = g.exitAngle();
-      $("arrow").style.transform = `rotate(${e.a}rad)`;
+      const e = g.guide();
+      if (e) $("arrow").style.transform = `rotate(${e.a}rad)`;
     }
   }
   requestAnimationFrame(hudLoop);
@@ -2961,7 +3038,9 @@
     const det = $("detector");
     det.dataset.l = d ? d.level : 0;
     $("detText").textContent = d ? d.text : "";
-    $("compass").hidden = !r.exitOpen;
+    const gd = g.guide();
+    $("compass").hidden = !gd;
+    if (gd) $("compass").querySelector("b").textContent = gd.label;
     $("noteN").textContent = `${g.found}/${g.need}`;
     $("noteBtn").classList.toggle("ready", g.found >= g.need && !r.noteSolved);
     $("soapN").textContent = r.soap;

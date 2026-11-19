@@ -411,6 +411,46 @@ export class Game {
     return { level: 5, text: '바로 여기예요!', room };
   }
   currentRoom() { return this.map.roomAt(this.px, this.py)?.name || ''; }
+  // 안내 화살표: 탈출문이 열렸으면 탈출문, '매우 쉬움'이면 가장 가까운 남은 진짜 쪽지.
+  // 벽을 뚫고 가리키지 않게 실제 길을 따라간다. 주인공이 다른 칸에 들어가거나 0.3초가 지나면 길을 다시 찾는다
+  guide() {
+    const r = this.run, m = this.map;
+    let tx, ty, label;
+    if (r.exitOpen) { tx = m.exit.ix; ty = m.exit.iy; label = '탈출문'; }
+    else if (DIFFS[r.diff].guide && !this.tut && this.found < this.need) {
+      let best = null, bd = 1e9;
+      for (const id of r.realIds) { if (r.searched[id] === 'found') continue; const o = m.objects[id], d = Math.hypot(o.x + 0.5 - this.px, o.y + 0.5 - this.py); if (d < bd) { bd = d; best = o; } }
+      if (!best) return null;
+      // 거리가 비슷한 쪽지 둘 사이에서 화살표가 왔다 갔다 하지 않게, 다른 쪽지가 3칸 넘게 더 가깝지 않으면 고른 쪽지를 유지한다
+      const prev = this._guideId != null && r.searched[this._guideId] !== 'found' && r.realIds.includes(this._guideId) ? m.objects[this._guideId] : null;
+      if (prev && Math.hypot(prev.x + 0.5 - this.px, prev.y + 0.5 - this.py) < bd + 3) best = prev;
+      this._guideId = best.id;
+      const n = [[0, 1], [1, 0], [-1, 0], [0, -1]].map(([dx, dy]) => [best.x + dx, best.y + dy]).find(([x, y]) => !m.solid(x, y));
+      if (!n) return null; [tx, ty] = n; label = '쪽지';
+    } else return null;
+    const now = this.time, c = this._guide;
+    const cx = Math.floor(this.px), cy = Math.floor(this.py);
+    if (!c || c.tx !== tx || c.ty !== ty || c.cx !== cx || c.cy !== cy || now - c.t > 0.3) {
+      const path = findPath(m, this.px, this.py, tx, ty, 600) || [];
+      this._guide = { tx, ty, cx, cy, t: now, path, left: path.length };
+    }
+    const g = this._guide;
+    // 주인공 몸 폭(반지름 0.3)으로 곧장 갈 수 있는 가장 먼 길 칸(최대 3칸 앞)을 가리킨다. 모서리를 깎다 걸리지 않게
+    const clear = (bx, by) => {
+      const d = Math.hypot(bx - this.px, by - this.py), n = Math.ceil(d / 0.1);
+      for (let i = 1; i <= n; i++) {
+        const x = this.px + (bx - this.px) * i / n, y = this.py + (by - this.py) * i / n;
+        if (m.solid(Math.floor(x - 0.3), Math.floor(y - 0.3)) || m.solid(Math.floor(x + 0.3), Math.floor(y - 0.3)) || m.solid(Math.floor(x - 0.3), Math.floor(y + 0.3)) || m.solid(Math.floor(x + 0.3), Math.floor(y + 0.3))) return false;
+      }
+      return true;
+    };
+    // 곧장 갈 수 있는 칸이 없으면 먼저 지금 칸 가운데로 간다. 가운데에 거의 왔으면(0.3칸 안) 다음 칸을 가리킨다
+    let aim = null;
+    for (let k = Math.min(2, g.path.length - 1); k >= 0; k--) if (clear(g.path[k].x, g.path[k].y)) { aim = g.path[k]; break; }
+    if (!aim) { const mx = cx + 0.5, my = cy + 0.5; aim = Math.hypot(mx - this.px, my - this.py) < 0.3 && g.path.length ? g.path[0] : { x: mx, y: my }; }
+    if (!g.path.length) aim = { x: tx + 0.5, y: ty + 0.5 };
+    return { a: Math.atan2(aim.y - this.py, aim.x - this.px), label, near: g.left <= 1 };
+  }
   exitAngle() {
     const e = this.map.exit;
     return { a: Math.atan2(e.y + 0.5 - this.py, e.x + 0.5 - this.px), d: Math.hypot(e.x + 0.5 - this.px, e.y + 0.5 - this.py) };
@@ -481,6 +521,17 @@ export class Game {
       c.fillStyle = '#fff'; c.beginPath(); c.arc(b.x * TS - TS * 0.07, b.y * TS - TS * 0.07, TS * 0.05, 0, 7); c.fill();
     }
     if (this.dark) this.drawDark(c, TS, camX, camY);
+    // '매우 쉬움': 주인공 옆에 길 안내 화살표(어둠 위에도 보이게 맨 나중에 그린다)
+    if (DIFFS[r.diff].guide && r.hidden == null) {
+      const gd = this.guide();
+      if (gd && !gd.near) {
+        const bob = Math.sin(this.time * 6) * TS * 0.08, R = TS * 1.05 + bob;
+        c.save(); c.translate(this.px * TS + Math.cos(gd.a) * R, (this.py - 0.4) * TS + Math.sin(gd.a) * R); c.rotate(gd.a);
+        c.beginPath(); c.moveTo(TS * 0.32, 0); c.lineTo(-TS * 0.18, -TS * 0.24); c.lineTo(-TS * 0.06, 0); c.lineTo(-TS * 0.18, TS * 0.24); c.closePath();
+        c.lineWidth = Math.max(3, TS * 0.07); c.strokeStyle = '#fff'; c.stroke(); c.fillStyle = gd.label === '탈출문' ? '#2e9a4a' : '#ff8a1f'; c.fill();
+        c.restore();
+      }
+    }
     // 이펙트 글자
     c.textAlign = 'center'; c.textBaseline = 'middle';
     for (const f of this.fx) {

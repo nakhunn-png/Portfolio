@@ -143,6 +143,7 @@ button { font-family: inherit; cursor: pointer; border: 0; color: inherit; }
 .crit { list-style: none; padding: 0; margin: 8px 0; font-size: 18px; line-height: 1.8; }
 .badge { display: inline-block; border-radius: 999px; padding: 4px 12px; font-weight: 900; font-size: 15px; background: #eef4ff; color: var(--blue); }
 .badge.hell { background: #ffe5e2; color: var(--red); }
+.badge.veryeasy { background: #fff6d6; color: #a07a00; }
 .badge.gentle { background: #e6f6e0; color: #3d8a2a; }
 .badge.hard { background: #fff0dc; color: #c76a00; }
 .diffrow { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }

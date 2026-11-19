@@ -188,7 +188,7 @@ function hudLoop(t) {
   const g = S.game; if (!g) return;
   if (t - hudT > 120) { hudT = t; updateHud(); }
   if (g.dirty && !g.over) { g.dirty = false; S.save.run = g.serialize(); persist(); }
-  if (!$('compass').hidden) { const e = g.exitAngle(); $('arrow').style.transform = `rotate(${e.a}rad)`; }
+  if (!$('compass').hidden) { const e = g.guide(); if (e) $('arrow').style.transform = `rotate(${e.a}rad)`; }
 }
 requestAnimationFrame(hudLoop);
 
@@ -199,7 +199,7 @@ function updateHud() {
   $('lives').textContent = g.tut ? '🎓 연습이라 잡혀도 괜찮아요' : g.lives === Infinity ? `${DIFFS[r.diff].icon} ${DIFFS[r.diff].name} · ❤️ 무한` : `${DIFFS[r.diff].icon} ${DIFFS[r.diff].name} · ${'❤️'.repeat(g.lives)}${'🤍'.repeat(Math.max(0, DIFFS[r.diff].lives - g.lives))}`;
   const d = g.detector();
   const det = $('detector'); det.dataset.l = d ? d.level : 0; $('detText').textContent = d ? d.text : '';
-  $('compass').hidden = !r.exitOpen;
+  const gd = g.guide(); $('compass').hidden = !gd; if (gd) $('compass').querySelector('b').textContent = gd.label;
   $('noteN').textContent = `${g.found}/${g.need}`;
   $('noteBtn').classList.toggle('ready', g.found >= g.need && !r.noteSolved);
   $('soapN').textContent = r.soap;
