@@ -340,3 +340,16 @@ for (const band of Object.keys(B)) {
   QUESTIONS[band] = {};
   for (const st of Object.keys(B[band])) QUESTIONS[band][st] = B[band][st].map(([q, a, b, c, d, h]) => ({ q, c: [a, b, c, d], h }));
 }
+
+// 저학년 2층 김치 문제: 학교 급식 김치 목록(한국농협김치 2026년 2학기 학교공급 19품목) 중 3개 + 김치가 아닌 반찬 1개.
+// 게임을 열 때마다 보기가 새로 뽑힌다. 포기김치(찌개용)·포기(배추)김치는 이름이 같아 하나로 친다.
+export const SCHOOL_KIMCHI = ['포기김치', '총각김치', '오이소박이', '오이김치', '열무김치', '석박지', '보쌈김치', '백김치', '맛김치',
+  '동치미', '나박김치', '깻잎김치', '깍두기', '겉절이', '파김치', '갓김치', '무말랭이', '묵은지'];
+export const NOT_KIMCHI = ['단무지', '피클'];
+function kimchiQuestion() {
+  const pool = SCHOOL_KIMCHI.slice();
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  const answer = NOT_KIMCHI[Math.floor(Math.random() * NOT_KIMCHI.length)];
+  return { q: '학교 급식에 나오는 김치가 아닌 것은 무엇일까요?', c: [answer, ...pool.slice(0, 3)], h: '김치는 우리나라 음식이에요. 다른 나라에서 온 절임 반찬을 찾아봐요.' };
+}
+QUESTIONS.low[2].push(kimchiQuestion());

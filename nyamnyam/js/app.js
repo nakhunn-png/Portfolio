@@ -553,6 +553,37 @@
     QUESTIONS[band] = {};
     for (const st of Object.keys(B[band])) QUESTIONS[band][st] = B[band][st].map(([q, a, b, c, d, h]) => ({ q, c: [a, b, c, d], h }));
   }
+  var SCHOOL_KIMCHI = [
+    "\uD3EC\uAE30\uAE40\uCE58",
+    "\uCD1D\uAC01\uAE40\uCE58",
+    "\uC624\uC774\uC18C\uBC15\uC774",
+    "\uC624\uC774\uAE40\uCE58",
+    "\uC5F4\uBB34\uAE40\uCE58",
+    "\uC11D\uBC15\uC9C0",
+    "\uBCF4\uC308\uAE40\uCE58",
+    "\uBC31\uAE40\uCE58",
+    "\uB9DB\uAE40\uCE58",
+    "\uB3D9\uCE58\uBBF8",
+    "\uB098\uBC15\uAE40\uCE58",
+    "\uAE7B\uC78E\uAE40\uCE58",
+    "\uAE4D\uB450\uAE30",
+    "\uAC89\uC808\uC774",
+    "\uD30C\uAE40\uCE58",
+    "\uAC13\uAE40\uCE58",
+    "\uBB34\uB9D0\uB7AD\uC774",
+    "\uBB35\uC740\uC9C0"
+  ];
+  var NOT_KIMCHI = ["\uB2E8\uBB34\uC9C0", "\uD53C\uD074"];
+  function kimchiQuestion() {
+    const pool = SCHOOL_KIMCHI.slice();
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    const answer = NOT_KIMCHI[Math.floor(Math.random() * NOT_KIMCHI.length)];
+    return { q: "\uD559\uAD50 \uAE09\uC2DD\uC5D0 \uB098\uC624\uB294 \uAE40\uCE58\uAC00 \uC544\uB2CC \uAC83\uC740 \uBB34\uC5C7\uC77C\uAE4C\uC694?", c: [answer, ...pool.slice(0, 3)], h: "\uAE40\uCE58\uB294 \uC6B0\uB9AC\uB098\uB77C \uC74C\uC2DD\uC774\uC5D0\uC694. \uB2E4\uB978 \uB098\uB77C\uC5D0\uC11C \uC628 \uC808\uC784 \uBC18\uCC2C\uC744 \uCC3E\uC544\uBD10\uC694." };
+  }
+  QUESTIONS.low[2].push(kimchiQuestion());
 
   // js/save.js
   var PREFIX = "nyam1:";
