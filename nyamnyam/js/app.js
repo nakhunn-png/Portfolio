@@ -1582,6 +1582,7 @@
       this.locks = {};
       this.doorUnits = groupDoors(this.map.doors);
       this.run = opts.run && opts.run.stageId === opts.stageId && opts.run.mapVersion === MAP_VERSION ? opts.run : this.newRun();
+      if (this.run.diff !== opts.diff && DIFFS[opts.diff]) this.changeDiff(opts.diff);
       this.germs = this.run.germs.map((g) => this.makeGerm(g.type, g.x, g.y));
       this.invuln = opts.run ? 3 : 1.5;
       this.waterT = 0;
@@ -1634,6 +1635,17 @@
         tutSeen: [],
         scattered: 0
       };
+    }
+    // 이어 하던 층의 난이도가 바뀌었을 때: 모은 조각·위치·비누는 그대로, 목숨은 새 난이도 최대로, 균 수는 새 난이도에 맞춘다
+    changeDiff(diff) {
+      const r = this.run, m = this.map;
+      r.diff = diff;
+      r.lives = DIFFS[diff].lives === Infinity ? -1 : DIFFS[diff].lives;
+      if (!this.tut) {
+        const want = this.stageGermList(), have = r.germs || [];
+        r.germs = want.map((type, i) => have[i] && have[i].type === type ? have[i] : { type, ...m.germSpots[i % m.germSpots.length] });
+      }
+      this.dirty = true;
     }
     stageGermList() {
       const list = this.map.S.germs.slice();
@@ -2888,13 +2900,17 @@
     }
   }
   function renderResume() {
-    const s = S.save, d = DIFFS[s.diff] || DIFFS.easy;
+    const s = S.save, d = DIFFS[S.diff] || DIFFS.easy, changed = s.diff !== S.diff && DIFFS[s.diff];
     $("resumeTitle").textContent = `${S.cls}\uBC18 ${S.num}\uBC88, \uC774\uC5B4 \uD560\uAE4C\uC694?`;
     $("resumeInfo").innerHTML = `\uD559\uB144: <b>${BANDS[s.band].name}</b> \xB7 ${COURSES[s.course].name}<br>
     \uC9C4\uD589: <b>${s.finished ? "\u{1F3C6} \uBAA8\uB450 \uD0C8\uCD9C!" : s.inTutorial ? "\u{1F393} \uD29C\uD1A0\uB9AC\uC5BC" : esc(STAGES[COURSES[s.course].stages[s.stageIdx]].name)}</b><br>
-    \uB09C\uC774\uB3C4: <b>${d.icon} ${d.name}</b> \xB7 \uBAA8\uC740 \uBCC4 \u2B50 <b>${totalStars(s)}</b>`;
+    \uB09C\uC774\uB3C4: <b>${d.icon} ${d.name}</b>${changed ? ` <small>(${DIFFS[s.diff].icon} ${DIFFS[s.diff].name}\uC5D0\uC11C \uBC14\uB01C)</small>` : ""} \xB7 \uBAA8\uC740 \uBCC4 \u2B50 <b>${totalStars(s)}</b>`;
     $("contBtn").disabled = !!s.finished;
-    $("contBtn").onclick = () => startPlay();
+    $("contBtn").onclick = () => {
+      if (DIFFS[S.diff]) s.diff = S.diff;
+      persist();
+      startPlay();
+    };
     $("newBtn").onclick = () => confirmBox("\uCC98\uC74C\uBD80\uD130 \uC0C8\uB85C \uD560\uAE4C\uC694? \uC9C0\uAE08\uAE4C\uC9C0\uC758 \uAE30\uB85D\uC774 \uC9C0\uC6CC\uC838\uC694.", "\uC0C8\uB85C \uD558\uAE30", () => {
       Save.remove(S.cls, S.num);
       S.save = { results: {} };

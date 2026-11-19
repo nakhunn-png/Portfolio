@@ -86,13 +86,14 @@ function pickStudent(n) {
   else { S.save = { results: {} }; renderBand(); show('sBand'); }
 }
 function renderResume() {
-  const s = S.save, d = DIFFS[s.diff] || DIFFS.easy;
+  // 이어 하기에는 처음 화면에서 지금 고른 난이도가 적용된다(예전 저장의 난이도가 아니라)
+  const s = S.save, d = DIFFS[S.diff] || DIFFS.easy, changed = s.diff !== S.diff && DIFFS[s.diff];
   $('resumeTitle').textContent = `${S.cls}반 ${S.num}번, 이어 할까요?`;
   $('resumeInfo').innerHTML = `학년: <b>${BANDS[s.band].name}</b> · ${COURSES[s.course].name}<br>
     진행: <b>${s.finished ? '🏆 모두 탈출!' : s.inTutorial ? '🎓 튜토리얼' : esc(STAGES[COURSES[s.course].stages[s.stageIdx]].name)}</b><br>
-    난이도: <b>${d.icon} ${d.name}</b> · 모은 별 ⭐ <b>${totalStars(s)}</b>`;
+    난이도: <b>${d.icon} ${d.name}</b>${changed ? ` <small>(${DIFFS[s.diff].icon} ${DIFFS[s.diff].name}에서 바뀜)</small>` : ''} · 모은 별 ⭐ <b>${totalStars(s)}</b>`;
   $('contBtn').disabled = !!s.finished;
-  $('contBtn').onclick = () => startPlay();
+  $('contBtn').onclick = () => { if (DIFFS[S.diff]) s.diff = S.diff; persist(); startPlay(); };
   $('newBtn').onclick = () => confirmBox('처음부터 새로 할까요? 지금까지의 기록이 지워져요.', '새로 하기', () => { Save.remove(S.cls, S.num); S.save = { results: {} }; renderBand(); show('sBand'); });
 }
 

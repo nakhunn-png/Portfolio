@@ -57,6 +57,7 @@ export class Game {
     this.locks = {};
     this.doorUnits = groupDoors(this.map.doors);
     this.run = opts.run && opts.run.stageId === opts.stageId && opts.run.mapVersion === MAP_VERSION ? opts.run : this.newRun();
+    if (this.run.diff !== opts.diff && DIFFS[opts.diff]) this.changeDiff(opts.diff);
     this.germs = this.run.germs.map(g => this.makeGerm(g.type, g.x, g.y));
     this.invuln = opts.run ? 3 : 1.5;
     this.waterT = 0; this.maskT = 0;
@@ -83,6 +84,17 @@ export class Game {
       disabled: [], noteSolved: false, exitOpen: false, wrong: 0, correct: 0, hidden: null, hideFrom: null,
       germs, tut: 0, tutSeen: [], scattered: 0,
     };
+  }
+  // 이어 하던 층의 난이도가 바뀌었을 때: 모은 조각·위치·비누는 그대로, 목숨은 새 난이도 최대로, 균 수는 새 난이도에 맞춘다
+  changeDiff(diff) {
+    const r = this.run, m = this.map;
+    r.diff = diff;
+    r.lives = DIFFS[diff].lives === Infinity ? -1 : DIFFS[diff].lives;
+    if (!this.tut) {
+      const want = this.stageGermList(), have = r.germs || [];
+      r.germs = want.map((type, i) => have[i] && have[i].type === type ? have[i] : { type, ...(m.germSpots[i % m.germSpots.length]) });
+    }
+    this.dirty = true;
   }
   stageGermList() {
     const list = this.map.S.germs.slice();
