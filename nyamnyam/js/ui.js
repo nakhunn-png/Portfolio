@@ -228,7 +228,7 @@ press($('detector'), () => {
 $('tutSkip').onclick = () => { if (S.game) { S.game.pausedBefore = S.game.paused; S.game.paused = true; } confirmBox('튜토리얼을 건너뛰고 바로 1층으로 갈까요?', '건너뛰기', () => finishTutorial()); };
 
 addEventListener('keydown', (e) => {
-  const g = S.game; if (!g || !$('modal').hidden) { if (e.code === 'Escape') closeModal(); return; }
+  const g = S.game; if (!g || !$('modal').hidden) { if (pinKeys && !$('modal').hidden && pinKeys(e)) return; if (e.code === 'Escape') closeModal(); return; }
   if (['Tab', 'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
   if (e.repeat) return;
   g.keys.add(e.code);
@@ -242,7 +242,7 @@ addEventListener('keyup', (e) => S.game?.keys.delete(e.code));
 addEventListener('blur', () => S.game?.keys.clear());
 addEventListener('resize', () => S.game?.resize());
 
-// 선생님용: 주인공을 빠르게 7번 누르면 비밀번호를 묻고, 맞으면 다음 층으로 건너뛴다
+// 선생님용: 주인공을 빠르게 7번 누르면 비밀번호를 묻고, 맞으면 갈 층을 고르는 창을 띄운다
 let tapN = 0, tapT = 0;
 function tapCharacter(e) {
   const g = S.game; if (!g || g.paused || g.over) return;
@@ -254,20 +254,34 @@ function tapCharacter(e) {
   tapN = now - tapT < 1200 ? tapN + 1 : 1; tapT = now; // 누르는 사이가 1.2초를 넘으면 처음부터 센다
   if (tapN < 7) return;
   tapN = 0; g.pausedBefore = g.paused; g.paused = true;
-  askPin('👩‍🏫 다음 층으로 건너뛰기', skipStage, () => { g.paused = g.pausedBefore ?? false; });
+  askPin('👩‍🏫 선생님 비밀번호', openStagePicker, () => { g.paused = g.pausedBefore ?? false; });
 }
-function skipStage() {
-  const s = S.save, g = S.game;
-  if (s.inTutorial) { finishTutorial(); return; }
-  const id = currentStageId();
-  // 건너뛴 층은 별 0개로 남긴다(이미 깬 기록이 있으면 그대로 둔다)
-  if (!s.results[id]) s.results[id] = { stars: 0, diff: g ? g.run.diff : s.diff, wrong: 0, correct: 0, at: Date.now(), skipped: true };
-  s.stageIdx++; s.run = null;
-  const last = s.stageIdx >= COURSES[s.course].stages.length;
-  if (last) s.finished = true;
-  persist();
-  UI.toast(`선생님이 ${STAGES[id].name}을(를) 건너뛰었어요.`);
-  if (last) { if (g) { g.destroy(); S.game = null; } showFinal(); } else startPlay();
+// 선생님 층 고르기: 이 학생 과정의 층(튜토리얼 포함) 중 하나로 바로 보낸다
+function openStagePicker() {
+  const s = S.save, g = S.game, stages = COURSES[s.course].stages;
+  const cur = s.inTutorial ? -1 : s.stageIdx;
+  const items = [{ idx: -1, name: '🎓 튜토리얼' }, ...stages.map((id, i) => ({ idx: i, name: STAGES[id].name, done: s.results[id] }))];
+  const sh = openModal(`<h3>👩‍🏫 몇 층으로 갈까요?</h3>
+    <p class="hint" style="text-align:center">${esc(COURSES[s.course].name)} · 지금: <b>${esc(items.find(it => it.idx === cur)?.name || '')}</b></p>
+    <div class="stagepick">${items.map(it => `<button class="big ${it.idx === cur ? '' : 'alt'}" data-i="${it.idx}" ${it.idx === cur ? 'disabled' : ''}>${esc(it.name)}${it.idx === cur ? '<small>지금 여기</small>' : it.done ? `<small>${it.done.skipped ? '⏭ 건너뜀' : '⭐'.repeat(it.done.stars) || '탈출함'}</small>` : ''}</button>`).join('')}</div>
+    <p class="hint">앞쪽 층으로 건너뛰면 지나친 층은 '건너뜀'(별 0개)으로 남아요. 이미 깬 층의 별은 그대로예요.</p>
+    <div class="acts"><button class="big alt" id="spCancel">취소</button></div>`);
+  sh.querySelectorAll('[data-i]').forEach(b => b.onclick = () => jumpToStage(+b.dataset.i));
+  sh.querySelector('#spCancel').onclick = () => { closeModal(); if (g) g.paused = g.pausedBefore ?? false; };
+}
+function jumpToStage(idx) {
+  const s = S.save, g = S.game, stages = COURSES[s.course].stages;
+  const from = s.inTutorial ? 0 : s.stageIdx;
+  for (let i = from; i < idx; i++) {
+    const id = stages[i];
+    if (!s.results[id]) s.results[id] = { stars: 0, diff: g ? g.run.diff : s.diff, wrong: 0, correct: 0, at: Date.now(), skipped: true };
+  }
+  if (idx < 0) Object.assign(s, { inTutorial: true, stageIdx: 0 });
+  else Object.assign(s, { inTutorial: false, tutorialDone: true, stageIdx: idx });
+  s.run = null; s.finished = false;
+  persist(); closeModal();
+  UI.toast(`선생님이 ${idx < 0 ? '튜토리얼' : STAGES[stages[idx]].name}(으)로 보냈어요.`);
+  startPlay();
 }
 
 // 가상 조이스틱: 화면 왼쪽 아무 데나 누르고 끌기
@@ -502,21 +516,31 @@ function openMenu() {
 
 // ---------- 선생님 ----------
 // 선생님 비밀번호 창. 맞으면 onOk, ✕를 누르면 onCancel
+// 키보드로도 비밀번호를 넣을 수 있게(숫자, 백스페이스, Esc). 비밀번호 창이 떠 있을 때만 쓴다
+let pinKeys = null;
 function askPin(title, onOk, onCancel) {
   let pin = '';
+  const PAD_LABEL = { '←': '⌫<small>지우기</small>', '✕': '✕<small>닫기</small>' };
+  const press = (k) => {
+    if (k === '✕') { pinKeys = null; closeModal(); onCancel?.(); return; }
+    if (k === '←') pin = pin.slice(0, -1); else if (pin.length < 4) pin += k;
+    if (pin.length === 4) {
+      if (pin === TEACHER_PIN) { pinKeys = null; closeModal(); onOk(); return; }
+      pin = ''; UI.toast('비밀번호가 달라요');
+    }
+    draw();
+  };
   const draw = () => {
     const sh = openModal(`<h3>${title}</h3><div class="pindots">${'●'.repeat(pin.length)}${'○'.repeat(4 - pin.length)}</div>
-      <div class="pinpad">${[1, 2, 3, 4, 5, 6, 7, 8, 9, '←', 0, '✕'].map(k => `<button data-k="${k}">${k}</button>`).join('')}</div>`);
-    sh.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
-      const k = b.dataset.k;
-      if (k === '✕') { closeModal(); onCancel?.(); return; }
-      if (k === '←') pin = pin.slice(0, -1); else if (pin.length < 4) pin += k;
-      if (pin.length === 4) {
-        if (pin === TEACHER_PIN) { closeModal(); onOk(); return; }
-        pin = ''; UI.toast('비밀번호가 달라요');
-      }
-      draw();
-    });
+      <div class="pinpad">${[1, 2, 3, 4, 5, 6, 7, 8, 9, '←', 0, '✕'].map(k => `<button data-k="${k}"${PAD_LABEL[k] ? ' class="pk-tool"' : ''}>${PAD_LABEL[k] || k}</button>`).join('')}</div>`);
+    sh.querySelectorAll('[data-k]').forEach(b => b.onclick = () => press(b.dataset.k));
+  };
+  pinKeys = (e) => {
+    if (/^[0-9]$/.test(e.key)) press(e.key);
+    else if (e.key === 'Backspace') { e.preventDefault(); press('←'); }
+    else if (e.key === 'Escape') press('✕');
+    else return false;
+    return true;
   };
   draw();
 }

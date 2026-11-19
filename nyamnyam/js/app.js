@@ -3089,6 +3089,7 @@
   addEventListener("keydown", (e) => {
     const g = S.game;
     if (!g || !$("modal").hidden) {
+      if (pinKeys && !$("modal").hidden && pinKeys(e)) return;
       if (e.code === "Escape") closeModal();
       return;
     }
@@ -3131,32 +3132,43 @@
     tapN = 0;
     g.pausedBefore = g.paused;
     g.paused = true;
-    askPin("\u{1F469}\u200D\u{1F3EB} \uB2E4\uC74C \uCE35\uC73C\uB85C \uAC74\uB108\uB6F0\uAE30", skipStage, () => {
+    askPin("\u{1F469}\u200D\u{1F3EB} \uC120\uC0DD\uB2D8 \uBE44\uBC00\uBC88\uD638", openStagePicker, () => {
       var _a;
       g.paused = (_a = g.pausedBefore) != null ? _a : false;
     });
   }
-  function skipStage() {
-    const s = S.save, g = S.game;
-    if (s.inTutorial) {
-      finishTutorial();
-      return;
+  function openStagePicker() {
+    var _a;
+    const s = S.save, g = S.game, stages = COURSES[s.course].stages;
+    const cur = s.inTutorial ? -1 : s.stageIdx;
+    const items = [{ idx: -1, name: "\u{1F393} \uD29C\uD1A0\uB9AC\uC5BC" }, ...stages.map((id, i) => ({ idx: i, name: STAGES[id].name, done: s.results[id] }))];
+    const sh = openModal(`<h3>\u{1F469}\u200D\u{1F3EB} \uBA87 \uCE35\uC73C\uB85C \uAC08\uAE4C\uC694?</h3>
+    <p class="hint" style="text-align:center">${esc(COURSES[s.course].name)} \xB7 \uC9C0\uAE08: <b>${esc(((_a = items.find((it) => it.idx === cur)) == null ? void 0 : _a.name) || "")}</b></p>
+    <div class="stagepick">${items.map((it) => `<button class="big ${it.idx === cur ? "" : "alt"}" data-i="${it.idx}" ${it.idx === cur ? "disabled" : ""}>${esc(it.name)}${it.idx === cur ? "<small>\uC9C0\uAE08 \uC5EC\uAE30</small>" : it.done ? `<small>${it.done.skipped ? "\u23ED \uAC74\uB108\uB700" : "\u2B50".repeat(it.done.stars) || "\uD0C8\uCD9C\uD568"}</small>` : ""}</button>`).join("")}</div>
+    <p class="hint">\uC55E\uCABD \uCE35\uC73C\uB85C \uAC74\uB108\uB6F0\uBA74 \uC9C0\uB098\uCE5C \uCE35\uC740 '\uAC74\uB108\uB700'(\uBCC4 0\uAC1C)\uC73C\uB85C \uB0A8\uC544\uC694. \uC774\uBBF8 \uAE6C \uCE35\uC758 \uBCC4\uC740 \uADF8\uB300\uB85C\uC608\uC694.</p>
+    <div class="acts"><button class="big alt" id="spCancel">\uCDE8\uC18C</button></div>`);
+    sh.querySelectorAll("[data-i]").forEach((b) => b.onclick = () => jumpToStage(+b.dataset.i));
+    sh.querySelector("#spCancel").onclick = () => {
+      var _a2;
+      closeModal();
+      if (g) g.paused = (_a2 = g.pausedBefore) != null ? _a2 : false;
+    };
+  }
+  function jumpToStage(idx) {
+    const s = S.save, g = S.game, stages = COURSES[s.course].stages;
+    const from = s.inTutorial ? 0 : s.stageIdx;
+    for (let i = from; i < idx; i++) {
+      const id = stages[i];
+      if (!s.results[id]) s.results[id] = { stars: 0, diff: g ? g.run.diff : s.diff, wrong: 0, correct: 0, at: Date.now(), skipped: true };
     }
-    const id = currentStageId();
-    if (!s.results[id]) s.results[id] = { stars: 0, diff: g ? g.run.diff : s.diff, wrong: 0, correct: 0, at: Date.now(), skipped: true };
-    s.stageIdx++;
+    if (idx < 0) Object.assign(s, { inTutorial: true, stageIdx: 0 });
+    else Object.assign(s, { inTutorial: false, tutorialDone: true, stageIdx: idx });
     s.run = null;
-    const last = s.stageIdx >= COURSES[s.course].stages.length;
-    if (last) s.finished = true;
+    s.finished = false;
     persist();
-    UI.toast(`\uC120\uC0DD\uB2D8\uC774 ${STAGES[id].name}\uC744(\uB97C) \uAC74\uB108\uB6F0\uC5C8\uC5B4\uC694.`);
-    if (last) {
-      if (g) {
-        g.destroy();
-        S.game = null;
-      }
-      showFinal();
-    } else startPlay();
+    closeModal();
+    UI.toast(`\uC120\uC0DD\uB2D8\uC774 ${idx < 0 ? "\uD29C\uD1A0\uB9AC\uC5BC" : STAGES[stages[idx]].name}(\uC73C)\uB85C \uBCF4\uB0C8\uC5B4\uC694.`);
+    startPlay();
   }
   var joyId = null;
   var joyX = 0;
@@ -3515,31 +3527,44 @@
       h.querySelector("#hBack").onclick = () => openMenu();
     };
   }
+  var pinKeys = null;
   function askPin(title, onOk, onCancel) {
     let pin = "";
-    const draw = () => {
-      const sh = openModal(`<h3>${title}</h3><div class="pindots">${"\u25CF".repeat(pin.length)}${"\u25CB".repeat(4 - pin.length)}</div>
-      <div class="pinpad">${[1, 2, 3, 4, 5, 6, 7, 8, 9, "\u2190", 0, "\u2715"].map((k) => `<button data-k="${k}">${k}</button>`).join("")}</div>`);
-      sh.querySelectorAll("[data-k]").forEach((b) => b.onclick = () => {
-        const k = b.dataset.k;
-        if (k === "\u2715") {
+    const PAD_LABEL = { "\u2190": "\u232B<small>\uC9C0\uC6B0\uAE30</small>", "\u2715": "\u2715<small>\uB2EB\uAE30</small>" };
+    const press2 = (k) => {
+      if (k === "\u2715") {
+        pinKeys = null;
+        closeModal();
+        onCancel == null ? void 0 : onCancel();
+        return;
+      }
+      if (k === "\u2190") pin = pin.slice(0, -1);
+      else if (pin.length < 4) pin += k;
+      if (pin.length === 4) {
+        if (pin === TEACHER_PIN) {
+          pinKeys = null;
           closeModal();
-          onCancel == null ? void 0 : onCancel();
+          onOk();
           return;
         }
-        if (k === "\u2190") pin = pin.slice(0, -1);
-        else if (pin.length < 4) pin += k;
-        if (pin.length === 4) {
-          if (pin === TEACHER_PIN) {
-            closeModal();
-            onOk();
-            return;
-          }
-          pin = "";
-          UI.toast("\uBE44\uBC00\uBC88\uD638\uAC00 \uB2EC\uB77C\uC694");
-        }
-        draw();
-      });
+        pin = "";
+        UI.toast("\uBE44\uBC00\uBC88\uD638\uAC00 \uB2EC\uB77C\uC694");
+      }
+      draw();
+    };
+    const draw = () => {
+      const sh = openModal(`<h3>${title}</h3><div class="pindots">${"\u25CF".repeat(pin.length)}${"\u25CB".repeat(4 - pin.length)}</div>
+      <div class="pinpad">${[1, 2, 3, 4, 5, 6, 7, 8, 9, "\u2190", 0, "\u2715"].map((k) => `<button data-k="${k}"${PAD_LABEL[k] ? ' class="pk-tool"' : ""}>${PAD_LABEL[k] || k}</button>`).join("")}</div>`);
+      sh.querySelectorAll("[data-k]").forEach((b) => b.onclick = () => press2(b.dataset.k));
+    };
+    pinKeys = (e) => {
+      if (/^[0-9]$/.test(e.key)) press2(e.key);
+      else if (e.key === "Backspace") {
+        e.preventDefault();
+        press2("\u2190");
+      } else if (e.key === "Escape") press2("\u2715");
+      else return false;
+      return true;
     };
     draw();
   }

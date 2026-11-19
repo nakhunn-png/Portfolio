@@ -151,6 +151,12 @@ button { font-family: inherit; cursor: pointer; border: 0; color: inherit; }
 .diffrow button.on { border-color: var(--orange); }
 .pinpad { display: grid; grid-template-columns: repeat(3, 72px); gap: 10px; justify-content: center; margin-top: 12px; }
 .pinpad button { height: 64px; border-radius: 16px; background: #f3f7fc; font-size: 26px; font-weight: 900; }
+.pinpad button.pk-tool { font-size: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; gap: 2px; }
+.pinpad button.pk-tool small { font-size: 12px; color: var(--sub); }
+.stagepick { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 12px 0; }
+.stagepick button { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 20px; padding: 12px 8px; }
+.stagepick button small { font-size: 13px; opacity: .8; }
+.stagepick button:disabled { opacity: .55; cursor: default; }
 .pindots { text-align: center; font-size: 34px; letter-spacing: 12px; min-height: 44px; }
 
 /* ---------- 선생님 표 ---------- */
