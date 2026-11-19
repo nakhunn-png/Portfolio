@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>층별 지도 미리보기</title>
+<style>
+  @font-face { font-family: "Ssurround"; src: url("fonts/Cafe24Ssurround.woff") format("woff"); font-display: swap; }
+  :root { --bg: #f6f1e7; --ink: #2d2a26; --sub: #6b645a; --card: #fffdf8; --line: #e3d9c6; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Ssurround", "Malgun Gothic", sans-serif; }
+  header { padding: 20px 16px 8px; max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 24px; margin: 0 0 6px; }
+  header p { margin: 4px 0; color: var(--sub); font-size: 15px; line-height: 1.5; }
+  main { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin: 16px 0; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  .meta, .rooms { margin: 4px 0; font-size: 14px; color: var(--sub); }
+  .rooms b { color: #fff; background: #334653; border-radius: 4px; padding: 0 4px; font-size: 12px; }
+  .tag { display: inline-block; background: #fbe6c8; color: #8a4b12; border-radius: 99px; padding: 1px 8px; margin-right: 4px; font-size: 13px; }
+  .tag.dark { background: #1d2333; color: #f3e6b0; }
+  .cv { overflow-x: auto; margin-top: 8px; }
+  .cv canvas { display: block; max-width: 100%; height: auto; border-radius: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>냠냠 탈출 대작전 · 층별 지도</h1>
+  <p>게임과 같은 그리기 코드로 각 층 전체를 한 장에 그렸어요. ★ = 출발 자리, 빨간 점 = 균이 처음 나타나는 자리, 🔒 = 탈출문.</p>
+  <p>주소 끝에 <code>?id=3</code>처럼 층 번호를 붙이면 그 층만 크게 보여요. ?가구 10개 중 진짜 쪽지 4개는 게임을 시작할 때마다 무작위로 정해져서 여기서는 구별하지 않아요.</p>
+</header>
+<main id="maps"></main>
+<script src="maptest/preview.js"></script>
+</body>
+</html>
