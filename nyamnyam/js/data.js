@@ -50,8 +50,8 @@ export const SEARCH_LOCK = 6;      // 가구 문제를 틀리면 잠기는 시�
 export const STUN_TIME = 4;        // 비눗방울에 맞으면 멈추는 시간(초)
 export const WATER_TIME = 5;       // 물 한 컵: 빨라지는 시간
 export const MASK_TIME = 6;
-export const WEB_TIME = 5;         // 거미줄: 느려지는 시간(초)
-export const WEB_SLOW = 0.8;        // 거미줄에 걸렸을 때 이동 속도 배율(20% 감속)
+export const WEB_TIME = 4.5;       // 거미줄: 느려지는 시간(초)
+export const WEB_SLOW = 0.6;        // 거미줄에 걸렸을 때 이동 속도 배율(40% 감속)
 export const WEB_COUNT = 8;         // 층마다 거미줄 수        // 마스크: 균이 못 알아채는 시간
 export const THROW_RANGE = 7;
 

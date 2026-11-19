@@ -38,8 +38,8 @@
   var STUN_TIME = 4;
   var WATER_TIME = 5;
   var MASK_TIME = 6;
-  var WEB_TIME = 5;
-  var WEB_SLOW = 0.8;
+  var WEB_TIME = 4.5;
+  var WEB_SLOW = 0.6;
   var WEB_COUNT = 8;
   var THROW_RANGE = 7;
   var THEMES = {
