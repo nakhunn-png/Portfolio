@@ -161,6 +161,8 @@ button { font-family: inherit; cursor: pointer; border: 0; color: inherit; }
 .stagepick { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 12px 0; }
 .stagepick button { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 20px; padding: 12px 8px; }
 .stagepick button small { font-size: 13px; opacity: .8; }
+.stagepick.tp { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+.stagepick.tp button { font-size: 17px; padding: 10px 6px; }
 .stagepick button:disabled { opacity: .55; cursor: default; }
 .pindots { text-align: center; font-size: 34px; letter-spacing: 12px; min-height: 44px; }
 

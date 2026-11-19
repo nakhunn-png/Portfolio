@@ -58,6 +58,7 @@ export class Game {
     this.doorUnits = groupDoors(this.map.doors);
     this.run = opts.run && opts.run.stageId === opts.stageId && opts.run.mapVersion === MAP_VERSION ? opts.run : this.newRun();
     if (this.run.diff !== opts.diff && DIFFS[opts.diff]) this.changeDiff(opts.diff);
+    if (this.run.hidden == null) this.unstick(); // 예전 저장 위치가 벽에 박혀 있으면 바로 빼낸다
     this.germs = this.run.germs.map(g => this.makeGerm(g.type, g.x, g.y));
     this.invuln = opts.run ? 3 : 1.5;
     this.waterT = 0; this.maskT = 0;
@@ -122,7 +123,7 @@ export class Game {
   serialize() {
     const r = this.run;
     r.germs = this.germs.map(g => ({ type: g.type, x: +g.x.toFixed(2), y: +g.y.toFixed(2) }));
-    r.px = +this.px.toFixed(2); r.py = +this.py.toFixed(2);
+    // 주인공 위치는 반올림하지 않는다. 벽에 붙어 있을 때 반올림하면 몸이 벽에 0.00몇 칸 박혀서 끼었다
     return r;
   }
   get px() { return this.run.px; } set px(v) { this.run.px = v; }
@@ -155,6 +156,7 @@ export class Game {
 
   movePlayer(dt) {
     if (this.run.hidden != null) return;
+    this.unstick();
     let dx = this.input.x, dy = this.input.y;
     const K = this.keys;
     if (K.has('ArrowLeft') || K.has('KeyA')) dx -= 1;
@@ -169,11 +171,44 @@ export class Game {
     this.walkT += dt;
     this.slide(dx * sp, dy * sp);
   }
-  slide(mx, my) {
+  // 주인공 몸(반지름 0.3칸)이 벽·가구와 겹치는지
+  bodyBlocked(x, y) {
     const r = 0.3, m = this.map;
-    const blocked = (x, y) => m.solid(Math.floor(x - r), Math.floor(y - r)) || m.solid(Math.floor(x + r), Math.floor(y - r)) || m.solid(Math.floor(x - r), Math.floor(y + r)) || m.solid(Math.floor(x + r), Math.floor(y + r));
-    if (!blocked(this.px + mx, this.py)) this.px += mx;
-    if (!blocked(this.px, this.py + my)) this.py += my;
+    return m.solid(Math.floor(x - r), Math.floor(y - r)) || m.solid(Math.floor(x + r), Math.floor(y - r)) || m.solid(Math.floor(x - r), Math.floor(y + r)) || m.solid(Math.floor(x + r), Math.floor(y + r));
+  }
+  slide(mx, my) {
+    if (!this.bodyBlocked(this.px + mx, this.py)) this.px += mx;
+    if (!this.bodyBlocked(this.px, this.py + my)) this.py += my;
+  }
+  // 몸이 벽·가구에 박혀 있으면(예전 저장, 숨는 곳에서 나올 때 등) 가장 가까운 빈 자리로 살짝 옮긴다
+  unstick() {
+    if (!this.bodyBlocked(this.px, this.py)) return false;
+    for (let d = 0.02; d <= 1.0; d += 0.02) for (let k = 0; k < 16; k++) {
+      const a = k * Math.PI / 8, x = this.px + Math.cos(a) * d, y = this.py + Math.sin(a) * d;
+      if (!this.bodyBlocked(x, y)) { this.px = x; this.py = y; this.dirty = true; return true; }
+    }
+    const t = this.nearestFree(this.px, this.py); this.px = t.x + 0.5; this.py = t.y + 0.5; this.dirty = true;
+    return true;
+  }
+  // (x, y)에서 가장 가까운 바닥 칸(칸 가운데에 서면 몸이 어디에도 닿지 않는다)
+  nearestFree(x, y) {
+    const m = this.map, W = m.W, sx = Math.max(0, Math.min(W - 1, Math.floor(x))), sy = Math.max(0, Math.min(m.H - 1, Math.floor(y)));
+    const seen = new Uint8Array(W * m.H), q = [[sx, sy]]; seen[sy * W + sx] = 1;
+    for (let h = 0; h < q.length; h++) {
+      const [cx, cy] = q[h];
+      if (!m.solid(cx, cy)) return { x: cx, y: cy };
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const X = cx + dx, Y = cy + dy; if (X < 0 || Y < 0 || X >= W || Y >= m.H || seen[Y * W + X]) continue; seen[Y * W + X] = 1; q.push([X, Y]); }
+    }
+    return { x: m.startTile.x, y: m.startTile.y };
+  }
+  // 선생님 순간이동: 고른 곳에서 가장 가까운 빈 칸으로 옮기고 잠깐 무적
+  teleport(x, y) {
+    const t = this.nearestFree(x, y);
+    this.px = t.x + 0.5; this.py = t.y + 0.5;
+    this.run.hidden = null; this.input.x = this.input.y = 0; this.keys.clear();
+    this.invuln = Math.max(this.invuln, 2.5);
+    for (const g of this.germs) if (g.state === 'chase') { g.state = 'wander'; g.path = null; }
+    this.dirty = true;
   }
 
   pickups() {

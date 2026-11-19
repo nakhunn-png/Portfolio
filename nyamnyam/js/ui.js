@@ -263,12 +263,21 @@ function openStagePicker() {
   const s = S.save, g = S.game, stages = COURSES[s.course].stages;
   const cur = s.inTutorial ? -1 : s.stageIdx;
   const items = [{ idx: -1, name: '🎓 튜토리얼' }, ...stages.map((id, i) => ({ idx: i, name: STAGES[id].name, done: s.results[id] }))];
-  const sh = openModal(`<h3>👩‍🏫 몇 층으로 갈까요?</h3>
-    <p class="hint" style="text-align:center">${esc(COURSES[s.course].name)} · 지금: <b>${esc(items.find(it => it.idx === cur)?.name || '')}</b></p>
+  // 순간이동: 출발 자리와 이 층의 방들(캐릭터가 끼었을 때 빼내기)
+  const spots = g ? [{ name: '★ 출발 자리', x: g.map.start.x, y: g.map.start.y }, ...g.map.rooms.map(rm => ({ name: rm.name, x: rm.cx + 0.5, y: rm.cy + 0.5 }))] : [];
+  const sh = openModal(`<h3>👩‍🏫 선생님 메뉴</h3>
+    ${spots.length ? `<p class="hint"><b>📍 순간이동</b> · 캐릭터가 끼었을 때 이 층 안의 다른 곳으로 옮겨요. 진행은 그대로예요.</p>
+    <div class="stagepick tp">${spots.map((p, i) => `<button class="big alt" data-tp="${i}">${esc(p.name)}</button>`).join('')}</div>` : ''}
+    <p class="hint"><b>🪜 층 옮기기</b> · ${esc(COURSES[s.course].name)} · 지금: <b>${esc(items.find(it => it.idx === cur)?.name || '')}</b></p>
     <div class="stagepick">${items.map(it => `<button class="big ${it.idx === cur ? '' : 'alt'}" data-i="${it.idx}" ${it.idx === cur ? 'disabled' : ''}>${esc(it.name)}${it.idx === cur ? '<small>지금 여기</small>' : it.done ? `<small>${it.done.skipped ? '⏭ 건너뜀' : '⭐'.repeat(it.done.stars) || '탈출함'}</small>` : ''}</button>`).join('')}</div>
     <p class="hint">앞쪽 층으로 건너뛰면 지나친 층은 '건너뜀'(별 0개)으로 남아요. 이미 깬 층의 별은 그대로예요.</p>
     <div class="acts"><button class="big alt" id="spCancel">취소</button></div>`);
   sh.querySelectorAll('[data-i]').forEach(b => b.onclick = () => jumpToStage(+b.dataset.i));
+  sh.querySelectorAll('[data-tp]').forEach(b => b.onclick = () => {
+    const p = spots[+b.dataset.tp]; closeModal();
+    g.teleport(p.x, p.y); g.paused = false;
+    UI.toast(`선생님이 ${p.name.replace('★ ', '')}(으)로 옮겼어요.`);
+  });
   sh.querySelector('#spCancel').onclick = () => { closeModal(); if (g) g.paused = g.pausedBefore ?? false; };
 }
 function jumpToStage(idx) {
