@@ -810,6 +810,16 @@ G.UI = (function () {
       if (act === 'book-close') { sound('click'); closeBook(); }
       if (act === 'settings-close') { sound('click'); goTitle(); }
     });
+    // 휴대폰을 세로로 들면 "가로로 돌려 주세요" 안내 (전투 중이면 멈춤). 안내를 닫으면 이번에는 다시 띄우지 않는다
+    var portrait = window.matchMedia('(orientation: portrait) and (max-width: 600px)'), rotateOff = false;
+    function checkRotate() {
+      var show = portrait.matches && !rotateOff;
+      $('rotate-note').classList.toggle('hidden', !show);
+      if (show && A.mode === 'battle' && !A.paused) pause();
+    }
+    $('rotate-ok').onclick = function () { rotateOff = true; sound('click'); checkRotate(); };
+    if (portrait.addEventListener) portrait.addEventListener('change', checkRotate); else portrait.addListener(checkRotate);
+    checkRotate();
     // 다른 창으로 넘어가면 전투를 자동으로 멈춘다
     document.addEventListener('visibilitychange', function () { if (document.hidden && A.mode === 'battle' && !A.paused) pause(); });
     // 키보드 도움: 스페이스·Esc = 멈춤
