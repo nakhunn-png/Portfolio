@@ -49,6 +49,7 @@ G.UI = (function () {
 
   /* ───────── 화면 전환 ───────── */
   function show(id) {
+    $('game').classList.toggle('night', id === 'scr-battle' && !!A.run && !!G.difficulty(A.run.difficulty).night);
     ['scr-title', 'scr-prep', 'scr-battle', 'scr-book', 'scr-settings', 'scr-result'].forEach(function (s) { $(s).classList.toggle('on', s === id); });
   }
   function setBackground(stageIdx) {
@@ -98,6 +99,9 @@ G.UI = (function () {
     });
   }
   // 문제 묶음 규칙 안내: 예) "새 문제 3개 (모두 맞히면 뽑기권 1개)"
+  function lifeMax() { return A.run ? G.lifeMax(A.run.difficulty) : C.lifePerStage; }
+  // 7단계(숨은 난이도)는 6단계를 클리어하면 열린다
+  function legendOpen() { return !!load('냠냠_전설해금', false); }
   function isUnlimited() { return G.difficulty(A.run.difficulty).unlimited; }
   function ruleText(kind) {
     if (isUnlimited()) return '';
@@ -111,6 +115,7 @@ G.UI = (function () {
     d.appendChild(el('h2', '', '난이도를 골라요'));
     var grid = el('div', 'level-grid');
     C.difficulties.forEach(function (D) {
+      if (D.hidden && !legendOpen()) return;
       var b = el('button', 'level-btn lv' + D.level, '<b>' + D.level + '단계</b><span class="lv-name">' + D.name + '</span><span class="lv-desc">' + D.desc + '</span>');
       b.onclick = function () { sound('click'); A.settings.lastLevel = D.level; saveSettings(); closeOverlay(); newGame(D.level); };
       if ((A.settings.lastLevel || C.defaultDifficulty) === D.level) b.classList.add('picked');
@@ -122,7 +127,7 @@ G.UI = (function () {
     openOverlay(d);
   }
   function newGame(level) {
-    A.run = G.Collection.newRun(level || A.settings.lastLevel || C.defaultDifficulty); A.stageIdx = 0; A.waveIdx = 0; A.life = C.lifePerStage;
+    A.run = G.Collection.newRun(level || A.settings.lastLevel || C.defaultDifficulty); A.stageIdx = 0; A.waveIdx = 0; A.life = lifeMax();
     drop('냠냠_모험');
     goPrep();
     var D = G.difficulty(A.run.difficulty);
@@ -147,7 +152,7 @@ G.UI = (function () {
   /* ───────── 위쪽 정보 ───────── */
   function hearts(node, life) {
     node.innerHTML = '생명 ';
-    for (var i = 0; i < C.lifePerStage; i++) node.appendChild(img(G.Pixel.toURL('기타/생명' + (i < life ? '' : '빈'), G.MiscArt.heart(i < life))));
+    for (var i = 0; i < lifeMax(); i++) node.appendChild(img(G.Pixel.toURL('기타/생명' + (i < life ? '' : '빈'), G.MiscArt.heart(i < life))));
   }
   function hud(prefix, life) {
     var st = C.stages[A.stageIdx];
@@ -597,9 +602,9 @@ G.UI = (function () {
         sound('stage'); confetti(70);
         A.mode = 'stageclear';
         giveRound('stageClear');
-        A.stageIdx++; A.waveIdx = 0; A.life = C.lifePerStage; saveRun(); A.stageIdx--;
+        A.stageIdx++; A.waveIdx = 0; A.life = lifeMax(); saveRun(); A.stageIdx--;
         dialog(st.name + ' 완료!', '우두머리 「' + G.MONSTERS[st.boss].name + '」' + eul(G.MONSTERS[st.boss].name) + ' 물리쳤어요!<br>다음 지역은 「' + C.stages[A.stageIdx + 1].name + '」' + ieyo(C.stages[A.stageIdx + 1].name) + '.',
-          [{ text: '다음 지역으로', cls: 'green big', fn: function () { A.stageIdx++; A.waveIdx = 0; A.life = C.lifePerStage; goPrep(); if (!isUnlimited()) toast(ruleText('stageClear') + '가 생겼어요!', 2800); } }]);
+          [{ text: '다음 지역으로', cls: 'green big', fn: function () { A.stageIdx++; A.waveIdx = 0; A.life = lifeMax(); goPrep(); if (!isUnlimited()) toast(ruleText('stageClear') + '가 생겼어요!', 2800); } }]);
       } else {
         A.waveIdx++;
         giveRound('wave');
@@ -667,10 +672,10 @@ G.UI = (function () {
     p.appendChild(el('p', '', (isUnlimited() ? '문제를 더 풀어서 ' : '다시 도전하면 ' + ruleText('retry') + '를 풀 수 있어요. ') + '친구를 더 모으고 합성하면 훨씬 강해져요!'));
     p.appendChild(el('p', '', '「' + C.stages[A.stageIdx].name + '」 첫 번째 무리부터 다시 도전해요. 모은 친구들은 그대로 함께해요.'));
     var b = el('div', 'btns');
-    var again = el('button', 'btn big green', '다시 도전하기'); again.onclick = function () { sound('click'); A.waveIdx = 0; A.life = C.lifePerStage; goPrep(); };
+    var again = el('button', 'btn big green', '다시 도전하기'); again.onclick = function () { sound('click'); A.waveIdx = 0; A.life = lifeMax(); goPrep(); };
     var home = el('button', 'btn big sky', '처음으로'); home.onclick = function () { sound('click'); A.run = null; goTitle(); };
     b.appendChild(again); b.appendChild(home); p.appendChild(b);
-    A.waveIdx = 0; A.life = C.lifePerStage; giveRound('retry'); saveRun();
+    A.waveIdx = 0; A.life = lifeMax(); giveRound('retry'); saveRun();
     show('scr-result');
   }
   function victory() {
@@ -679,6 +684,11 @@ G.UI = (function () {
     var p = $('result-panel'); p.innerHTML = '';
     p.appendChild(el('h2', '', '최종 승리! 축하해요!'));
     p.appendChild(el('p', '', '난이도 ' + A.run.difficulty + ' 「' + G.difficulty(A.run.difficulty).name + '」 완료!'));
+    if (A.run.difficulty === 6 && !legendOpen()) {
+      save('냠냠_전설해금', true);
+      var un = el('p', 'legend-open', '숨겨진 난이도 7단계 「전설의 레전드」가 열렸어요!'); p.appendChild(un);
+      setTimeout(function () { sound('legend'); }, 900);
+    }
     var art = el('div', 'result-art');
     G.Collection.lineup(A.run).slice(0, 5).forEach(function (u, i) { var x = img(sprURL(u.id), '', 100, 100); x.style.animationDelay = i * 0.12 + 's'; art.appendChild(x); });
     var dk = img(G.Pixel.toURL('몬스터/demonKing', G.MonsterArt.sprite('demonKing')), '', 110, 110); dk.style.transform = 'rotate(-12deg)'; dk.style.opacity = '.75'; art.appendChild(dk);

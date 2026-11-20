@@ -94,12 +94,20 @@ G.CONFIG = {
     { level: 6, name: '도전', desc: '답을 직접 쓰고, 식이 1초 뒤에 사라져요. 뽑기권도 적어요!',
       input: 'type', flashSec: 1, monster: { count: 1.2, speed: 1.1, hp: 1.25, atk: 1.2 },
       rounds: { first: { count: 5, need: 5, reward: 2 }, wave: { count: 3, need: 3, reward: 1 }, stageClear: { count: 5, need: 5, reward: 2 },
-                retry: { count: 6, need: 2, reward: 1 }, rescue: { count: 5, need: 5, reward: 2 } } }
+                retry: { count: 6, need: 2, reward: 1 }, rescue: { count: 5, need: 5, reward: 2 } } },
+    // 7단계: 6단계를 클리어해야 보인다 (hidden). 6단계보다 문제가 많고, 몬스터 수 1.5배·빠르기 1.2배, 목숨 1개, 밤 전투
+    { level: 7, name: '전설의 레전드', desc: '목숨은 단 1개! 밤에 더 많고 빠른 몬스터가 몰려와요. 식은 1초 뒤에 사라져요.',
+      hidden: true, input: 'type', flashSec: 1, life: 1, night: true,
+      monster: { count: 1.8, speed: 1.32, hp: 0.7, atk: 0.8 },   // 수·빠르기는 6단계의 1.5배·1.2배. 목숨이 1개라 체력·공격은 낮춤
+      rounds: { first: { count: 8, need: 4, reward: 1 }, wave: { count: 4, need: 4, reward: 1 }, stageClear: { count: 8, need: 4, reward: 1 },
+                retry: { count: 3, need: 3, reward: 1 }, rescue: { count: 8, need: 4, reward: 1 } } }
   ],
   defaultDifficulty: 2
 };
 
 G.difficulty = function (level) { return G.CONFIG.difficulties[(level || G.CONFIG.defaultDifficulty) - 1]; };
+// 난이도별 목숨 수 (따로 정하지 않으면 lifePerStage)
+G.lifeMax = function (level) { return G.difficulty(level).life || G.CONFIG.lifePerStage; };
 // 난이도의 문제 묶음 규칙 하나 (kind: first / wave / stageClear / retry / rescue)
 G.roundRule = function (level, kind) { var D = G.difficulty(level); return (D.rounds && D.rounds[kind]) || G.CONFIG.rounds[kind]; };
 

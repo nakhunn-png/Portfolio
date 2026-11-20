@@ -383,3 +383,23 @@ canvas { position: absolute; left: 0; top: 0; width: 960px; height: 540px; image
 .rotate-phone { width: 46px; height: 76px; margin: 6px auto 0; border: 5px solid var(--ink); border-radius: 10px; background: #bfe6ff; position: relative; animation: turnPhone 2.2s ease-in-out infinite; }
 .rotate-phone i { position: absolute; left: 50%; bottom: 4px; width: 10px; height: 4px; margin-left: -5px; border-radius: 2px; background: var(--ink); }
 @keyframes turnPhone { 0%, 25% { transform: rotate(0); } 55%, 85% { transform: rotate(-90deg); } 100% { transform: rotate(0); } }
+
+/* 7단계 「전설의 레전드」 */
+.level-btn.lv7 { grid-column: 1 / -1; min-height: 96px; background: linear-gradient(135deg, #2b1e4f, #5a2a8e 60%, #1f7f2c); color: #ffe27a; border-color: #1a1030; }
+.level-btn.lv7 .lv-name { font-size: 24px; color: #fff; }
+.level-btn.lv7 .lv-desc { color: #e9dcff; }
+.legend-open { font-size: 24px !important; color: #5a2a8e; background: #fff3c4; border: 3px solid #ffd23f; border-radius: 12px; padding: 4px 14px; animation: pulse 1s infinite; }
+/* 밤 전투: 배경과 캐릭터를 살짝 어둡게 */
+#game.night #bg { filter: brightness(.5) saturate(.8) hue-rotate(-12deg); }
+#game.night #field { filter: brightness(.88); }
+#game.night::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 4; background: radial-gradient(ellipse at 50% 55%, rgba(20,10,60,0) 45%, rgba(20,10,60,.45) 100%); }
+/* 난이도 고르기: 7단계까지 한 화면에 들어가게 */
+.level-dialog { padding: 12px 22px 14px; }
+.level-dialog h2 { margin: 0 0 8px; font-size: 30px; }
+.level-grid { gap: 10px; margin-bottom: 10px; }
+.level-btn { min-height: 108px; padding: 6px 8px 8px; }
+.level-btn b { font-size: 24px; }
+.level-btn .lv-name { font-size: 18px; }
+.level-btn .lv-desc { font-size: 14px; line-height: 1.3; }
+.level-btn.lv7 { min-height: 0; padding: 8px; flex-direction: row; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.level-btn.lv7 .lv-desc { flex-basis: 100%; }

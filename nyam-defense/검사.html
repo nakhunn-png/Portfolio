@@ -67,7 +67,7 @@
   var u = G.Collection.newRun(1), ut = 0; [1, 0, 1, 1].forEach(function (a) { ut += G.Collection.answer(u, !!a).tickets; });
   line('1단계는 제한 없이 1문제 맞힐 때마다 뽑기권 1개 (' + ut + '개)', ut === 3 && G.Collection.problemsLeft(u) === Infinity);
   var inputs = G.CONFIG.difficulties.map(function (d) { return d.input; });
-  line('계산 문제 답: 1~3단계 보기 고르기 / 4~6단계 직접 쓰기, 그림 보고 식 만들기는 모든 단계 보기 고르기 (' + inputs.map(function (x, i) { return (i + 1) + '단계 ' + (x === 'type' ? '쓰기' : '고르기'); }).join(', ') + ')', inputs.join() === 'choice,choice,choice,type,type,type');
+  line('계산 문제 답: 1~3단계 보기 고르기 / 4~6단계 직접 쓰기, 그림 보고 식 만들기는 모든 단계 보기 고르기 (' + inputs.map(function (x, i) { return (i + 1) + '단계 ' + (x === 'type' ? '쓰기' : '고르기'); }).join(', ') + ')', inputs.join() === 'choice,choice,choice,type,type,type,type');
   html += '</ul>';
 
   html += '<h2>2. 뽑기와 합성</h2><ul>';
@@ -93,7 +93,13 @@
   line('레전더리 없이(유니크 4 + 에픽 4) 7단계 전체 도전: 8번 중 ' + wins + '번 승리 (난이도 2 기준, 우두머리가 강해져 70% 안팎이 정상)', wins >= 4);
   var D = G.CONFIG.difficulties, up = true;
   for (var k = 2; k < 5; k++) ['count', 'speed', 'hp', 'atk'].forEach(function (f) { if (!(D[k].monster[f] > D[k - 1].monster[f])) up = false; });
-  line('난이도 6개, 2→5단계로 갈수록 몬스터 수·빠르기·체력·공격력이 모두 늘어남', D.length === 6 && up);
+  line('난이도 6개 + 숨은 7단계, 2→5단계로 갈수록 몬스터 수·빠르기·체력·공격력이 모두 늘어남', D.length === 7 && up);
+  var L7 = D[6], L6 = D[5];
+  line('7단계 「' + L7.name + '」: 6단계를 깨야 보임, 목숨 ' + G.lifeMax(7) + '개, 몬스터 수 ' + (L7.monster.count / L6.monster.count).toFixed(2) + '배·빠르기 ' + (L7.monster.speed / L6.monster.speed).toFixed(2) + '배 (6단계 대비), 밤 전투',
+    L7.hidden && G.lifeMax(7) === 1 && Math.abs(L7.monster.count / L6.monster.count - 1.5) < 0.01 && Math.abs(L7.monster.speed / L6.monster.speed - 1.2) < 0.01 && L7.night);
+  var r7 = G.roundRule(7, 'retry'), f7 = G.roundRule(7, 'first'), f6 = G.roundRule(6, 'first');
+  line('7단계 문제 수가 6단계보다 많음 (처음 ' + f7.count + '문제 vs ' + f6.count + '문제), 져서 다시 도전하면 3문제 모두 맞혀 뽑기권 1개',
+    f7.count > f6.count && r7.count === 3 && r7.need === 3 && r7.reward === 1);
   line('1단계는 문제 수 제한 없음, 2~6단계는 제한 있음, 6단계는 1초 뒤 식이 사라지고 뽑기권이 더 적음',
     D[0].unlimited && D.slice(1).every(function (d) { return !d.unlimited && G.roundRule(d.level, 'first').count > 0; }) && D[5].flashSec === 1 &&
     G.roundRule(6, 'first').reward < G.roundRule(2, 'first').reward);
