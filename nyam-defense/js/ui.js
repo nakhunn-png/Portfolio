@@ -567,8 +567,11 @@ G.UI = (function () {
   function refreshBattleBottom() {
     gradeCounts($('bt-grade-counts'));
     $('bt-tickets').textContent = A.run.tickets;
+    document.querySelector('#scr-battle .auto-tag').textContent = '자동 전투 중 · ' + SPEEDS[speedIdx()].name;
   }
-  var SPEEDS = [{ name: '보통', v: 1 }, { name: '빠르게', v: 1.6 }];
+  // 전투 속도 (멈춤 메뉴에서 고름). 빨라져도 전투 결과(난이도)는 같고 시간만 줄어든다
+  var SPEEDS = [{ name: '1배속', v: 1 }, { name: '1.3배속', v: 1.3 }, { name: '1.5배속', v: 1.5 }];
+  function speedIdx() { var i = A.settings.speed || 0; return i < SPEEDS.length ? i : 0; }
   function frame(now) {
     requestAnimationFrame(frame);
     var dt = Math.min(0.05, (now - (A.lastFrame || now)) / 1000); A.lastFrame = now;
@@ -576,7 +579,7 @@ G.UI = (function () {
     if (A.mode !== 'battle' || !s) return;
     if (!A.paused && !A.busy) {
       // 멈춤이 아닐 때만 전투 시간이 흐른다
-      A.acc += dt * SPEEDS[A.settings.speed || 0].v;
+      A.acc += dt * SPEEDS[speedIdx()].v;
       var step = 1 / 60;
       while (A.acc >= step) { G.Battle.update(s, step); A.acc -= step; }
       s.events.forEach(function (e) { sound(e); });
@@ -627,7 +630,21 @@ G.UI = (function () {
       { text: '수학 문제 보기', cls: 'yellow', fn: openMathDialog },
       { text: '처음으로', cls: 'red', fn: askHome }
     ], 'pause-dialog');
-    if (A.mode === 'battle') d.appendChild(el('div', 'pause-note', '멈춘 동안에는 전투가 완전히 멈춰 있어요. 천천히 생각해요!'));
+    if (A.mode === 'battle') {
+      var speed = el('div', 'pause-speed');
+      speed.appendChild(el('div', 'pause-speed-label', '전투 속도'));
+      var options = el('div', 'pause-speed-options');
+      SPEEDS.forEach(function (item, i) {
+        var b = el('button', 'btn pause-speed-btn' + (speedIdx() === i ? ' selected' : ''), item.name);
+        b.onclick = function () {
+          A.settings.speed = i; saveSettings(); sound('click'); refreshBattleBottom(); pauseMenu();
+        };
+        options.appendChild(b);
+      });
+      speed.appendChild(options);
+      d.insertBefore(speed, d.querySelector('.btns'));
+      d.appendChild(el('div', 'pause-note', '멈춘 동안에는 전투가 완전히 멈춰 있어요. 천천히 생각해요!'));
+    }
   }
   function resume() {
     closeOverlay(); A.paused = false; A.mathDialogRefresh = null;
@@ -776,7 +793,6 @@ G.UI = (function () {
   function renderSettings() {
     function tg(id, on) { var b = $(id); b.textContent = on ? '켜짐' : '꺼짐'; b.className = 'toggle ' + (on ? 'on' : 'off'); }
     tg('set-merge', A.settings.autoMerge); tg('set-sound', A.settings.sound); tg('set-hint', A.settings.hintAlways);
-    $('set-speed').textContent = SPEEDS[A.settings.speed || 0].name; $('set-speed').className = 'toggle wide';
   }
 
   /* ───────── 시작 ───────── */
@@ -806,7 +822,6 @@ G.UI = (function () {
     $('set-merge').onclick = function () { A.settings.autoMerge = !A.settings.autoMerge; saveSettings(); renderSettings(); sound('click'); };
     $('set-sound').onclick = function () { A.settings.sound = !A.settings.sound; G.Sound.setOn(A.settings.sound); saveSettings(); renderSettings(); sound('click'); };
     $('set-hint').onclick = function () { A.settings.hintAlways = !A.settings.hintAlways; saveSettings(); renderSettings(); sound('click'); };
-    $('set-speed').onclick = function () { A.settings.speed = ((A.settings.speed || 0) + 1) % SPEEDS.length; saveSettings(); renderSettings(); sound('click'); };
     $('set-reset').onclick = function () {
       dialog('모아보기 기록을 지울까요?', '발견한 캐릭터 기록이 모두 사라져요.', [
         { text: '네, 지울래요', cls: 'red', fn: function () { A.book = G.Collection.newBook(); saveBook(); closeOverlay(); toast('기록을 지웠어요.'); } },

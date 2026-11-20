@@ -142,6 +142,11 @@ canvas { position: absolute; left: 0; top: 0; width: 960px; height: 540px; image
 .pause-dialog { background: #4a3a6e; color: #fff; border-color: var(--ink); }
 .pause-dialog h2 { color: #fff; }
 .pause-dialog .btn { width: 280px; font-size: 30px; }
+.pause-speed { margin: 0 0 14px; }
+.pause-speed-label { font-size: 21px; margin-bottom: 7px; color: #ffe27a; }
+.pause-speed-options { display: flex; justify-content: center; gap: 8px; }
+.pause-dialog .pause-speed-btn { width: 126px; padding: 8px 4px; font-size: 22px; }
+.pause-dialog .pause-speed-btn.selected { outline: 4px solid #ffe27a; outline-offset: 1px; }
 .pause-note { font-size: 18px; color: #ffe27a; margin-top: 6px; }
 .math-dialog { width: 680px; height: 430px; padding: 14px 18px; display: flex; flex-direction: column; align-items: center; }
 .math-dialog .math-inner { position: relative; width: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; }
