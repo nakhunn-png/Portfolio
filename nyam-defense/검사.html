@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>냠냠 랜덤 디펜스 — 규칙 자동 검사</title>
+<style>
+  body { font-family: '맑은 고딕', sans-serif; background: #fff8ec; color: #3a2a3f; margin: 20px; }
+  h1 { margin: 0 0 10px; } h2 { margin: 22px 0 8px; }
+  .ok { color: #1f8a2f; font-weight: bold; } .bad { color: #d32f2f; font-weight: bold; }
+  li { margin: 3px 0; }
+  .sheet { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cell { background: #fff; border: 3px solid #3a2a3f; border-radius: 10px; padding: 6px; text-align: center; width: 120px; font-size: 13px; }
+  .cell img { width: 96px; height: 96px; image-rendering: pixelated; display: block; margin: 0 auto; }
+  .bgs img { width: 320px; height: 180px; image-rendering: pixelated; border: 3px solid #3a2a3f; border-radius: 8px; }
+  .bgs { display: flex; flex-wrap: wrap; gap: 8px; }
+</style>
+</head>
+<body>
+<h1>규칙 자동 검사</h1>
+<p>게임의 핵심 규칙(문제 출제, 뽑기 확률, 합성, 멈춤)을 자동으로 확인하는 화면입니다. 학생용 화면이 아닙니다.</p>
+<div id="out"></div>
+<h2>캐릭터 그림 모아 보기 (23명)</h2><div class="sheet" id="chars"></div>
+<h2>몬스터 그림 모아 보기</h2><div class="sheet" id="mons"></div>
+<h2>배경 그림 (7개 지역)</h2><div class="bgs" id="bgs"></div>
+
+<script src="js/config.js"></script>
+<script src="js/mathgen.js"></script>
+<script src="js/picture.js"></script>
+<script src="js/collection.js"></script>
+<script src="js/battle.js"></script>
+<script src="js/art/pixel.js"></script>
+<script src="js/art/characters.js"></script>
+<script src="js/art/monsters.js"></script>
+<script src="js/art/backgrounds.js"></script>
+<script>
+(function () {
+  var out = document.getElementById('out'), html = '';
+  function line(name, pass) { html += '<li>' + (pass ? '<span class="ok">통과</span> ' : '<span class="bad">실패</span> ') + name + '</li>'; }
+
+  html += '<h2>1. 수학 문제 출제 규칙</h2><ul>';
+  var m = G.MathGen.selfTest(30000);
+  line('문제 ' + m.total + '개를 만들어 모두 검사 — 규칙 위반 ' + m.bad + '개', m.bad === 0);
+  line('가장 큰 정답: ' + m.maxAnswer + ' (19 이하)', m.maxAnswer <= 19);
+  line('뺄셈 앞의 수 가장 큰 값: ' + m.maxMinuend + ' (18 이하)', m.maxMinuend <= 18);
+  line('같은 문제가 연달아 나온 횟수: ' + m.repeat, m.repeat === 0);
+  line('기획서 출제 가능·출제 금지 예시 판정', m.examplesOk);
+  line('네 가지 유형 모두 출제: ' + Object.keys(m.typeCount).map(function (k) { return k + ' ' + m.typeCount[k] + '개'; }).join(', '), Object.keys(m.typeCount).length === 4);
+  html += '</ul>';
+
+  var pt = G.MathGen.pictureSelfTest(20000);
+  line('그림 보고 식 만들기 문제 ' + pt.total + '개 검사 — 규칙 위반 ' + pt.bad + '개 (그림 4종: ' + Object.keys(pt.tplCount).map(function (k) { return ({ cubeDiff: '블록 비교', beadTake: '구슬 덜어 내기', cubeJoin: '블록 합치기', beadAdd: '구슬 더하기' })[k] + ' ' + pt.tplCount[k]; }).join(', ') + ')', pt.bad === 0 && Object.keys(pt.tplCount).length === 4);
+  line('보내 주신 예시: 블록 12와 7 비교 → 12 − 7, 구슬 13개에서 5개 덜어 냄 → 13 − 5', pt.examplesOk);
+  html += '</ul>';
+
+  html += '<h2>1-2. 준비 시간 문제와 뽑기권</h2><ul>';
+  function play(level, kinds, answers) {
+    var run = G.Collection.newRun(level); run.rounds = []; kinds.forEach(function (k) { G.Collection.addRound(run, k); });
+    var t = 0; answers.forEach(function (a) { t += G.Collection.answer(run, !!a).tickets; });
+    return { tickets: t, left: G.Collection.problemsLeft(run) };
+  }
+  var r1 = play(2, ['first'], [1, 1, 1, 1, 1]), r2 = play(2, ['first'], [1, 1, 1, 1, 0]);
+  line('처음 5문제를 모두 맞히면 뽑기권 3개 (' + r1.tickets + '개), 하나라도 틀리면 0개 (' + r2.tickets + '개)', r1.tickets === 3 && r2.tickets === 0 && r1.left === 0);
+  var w1 = play(2, ['wave'], [1, 1, 1]), w2 = play(2, ['wave'], [0, 1, 1]);
+  line('무리 사이 3문제를 모두 맞히면 뽑기권 1개 (' + w1.tickets + '개), 틀린 문제가 있으면 0개 (' + w2.tickets + '개)', w1.tickets === 1 && w2.tickets === 0);
+  var t1 = play(2, ['retry'], [1, 0, 1]);
+  line('다시 도전: 3문제, 맞힐 때마다 뽑기권 1개 (2개 맞힘 → ' + t1.tickets + '개)', t1.tickets === 2);
+  var u = G.Collection.newRun(1), ut = 0; [1, 0, 1, 1].forEach(function (a) { ut += G.Collection.answer(u, !!a).tickets; });
+  line('1단계는 제한 없이 1문제 맞힐 때마다 뽑기권 1개 (' + ut + '개)', ut === 3 && G.Collection.problemsLeft(u) === Infinity);
+  var inputs = G.CONFIG.difficulties.map(function (d) { return d.input; });
+  line('계산 문제 답: 1~3단계 보기 고르기 / 4~6단계 직접 쓰기, 그림 보고 식 만들기는 모든 단계 보기 고르기 (' + inputs.map(function (x, i) { return (i + 1) + '단계 ' + (x === 'type' ? '쓰기' : '고르기'); }).join(', ') + ')', inputs.join() === 'choice,choice,choice,type,type,type');
+  html += '</ul>';
+
+  html += '<h2>2. 뽑기와 합성</h2><ul>';
+  G.Collection.selfTest().forEach(function (r) { line(r.name, r.pass); });
+  html += '</ul>';
+
+  html += '<h2>3. 전투와 멈춤</h2><ul>';
+  var s = G.Battle.create(0, 0, ['n1', 'n3', 'n5', 'n7'], 5);
+  for (var i = 0; i < 300; i++) G.Battle.update(s, 1 / 60);
+  var snap = JSON.stringify({ t: s.time, u: s.units.map(function (u) { return [u.x, u.y, u.hp, u.cd]; }), m: s.monsters.map(function (x) { return [x.x, x.y, x.hp, x.cd]; }), p: s.projectiles.length, q: s.queue.length });
+  // 멈춤 = update를 부르지 않음. 실제 시간이 지나도 전투 상태가 바뀌지 않아야 한다.
+  var same = snap === JSON.stringify({ t: s.time, u: s.units.map(function (u) { return [u.x, u.y, u.hp, u.cd]; }), m: s.monsters.map(function (x) { return [x.x, x.y, x.hp, x.cd]; }), p: s.projectiles.length, q: s.queue.length });
+  line('멈춘 동안 전투 시간·이동·체력·공격 대기 시간·무리 진행이 변하지 않음', same);
+  var total = 0; G.CONFIG.stages.forEach(function (st) { total += st.waves; });
+  line('스테이지 7개, 전체 무리 수 ' + total + '개', G.CONFIG.stages.length === 7 && total === 28);
+  line('모든 스테이지 마지막 무리에 우두머리 등장, 7단계는 최종 마왕', G.CONFIG.stages.every(function (st, k) { var w = G.Battle.buildWave(k, st.waves - 1); return w.isBossWave && w.list.some(function (q) { return q.boss; }); }) && G.CONFIG.stages[6].boss === 'demonKing');
+  var noLegend = ['u1', 'u2', 'u3', 'u4', 'e1', 'e2', 'e3', 'e4'], wins = 0;
+  for (var r = 0; r < 8; r++) {
+    var life = 5, ok = true;
+    for (var w = 0; w < 5 && ok; w++) { var b = G.Battle.create(6, w, noLegend, life); var t = 0; while (!b.outcome && t < 600) { G.Battle.update(b, 1 / 30); t += 1 / 30; } life = b.life; ok = b.outcome === 'win'; }
+    if (ok) wins++;
+  }
+  line('레전더리 없이(유니크 4 + 에픽 4) 7단계 전체 도전: 8번 중 ' + wins + '번 승리 (난이도 2 기준, 우두머리가 강해져 70% 안팎이 정상)', wins >= 4);
+  var D = G.CONFIG.difficulties, up = true;
+  for (var k = 2; k < 5; k++) ['count', 'speed', 'hp', 'atk'].forEach(function (f) { if (!(D[k].monster[f] > D[k - 1].monster[f])) up = false; });
+  line('난이도 6개, 2→5단계로 갈수록 몬스터 수·빠르기·체력·공격력이 모두 늘어남', D.length === 6 && up);
+  line('1단계는 문제 수 제한 없음, 2~6단계는 제한 있음, 6단계는 1초 뒤 식이 사라지고 뽑기권이 더 적음',
+    D[0].unlimited && D.slice(1).every(function (d) { return !d.unlimited && G.roundRule(d.level, 'first').count > 0; }) && D[5].flashSec === 1 &&
+    G.roundRule(6, 'first').reward < G.roundRule(2, 'first').reward);
+  var b0 = G.Battle.create(6, 4, ['n1'], 5, 2); var bossAtk = 0; for (var q = 0; q < 2000 && !bossAtk; q++) { G.Battle.update(b0, 1 / 30); b0.monsters.forEach(function (m) { if (m.boss) bossAtk = m.atk; }); }
+  line('우두머리 공격력 강화 (공격 배율 ' + G.CONFIG.wave.bossAtkMult + '배, 주변 친구도 맞는 땅 쿵) — 최종 마왕 공격력 ' + bossAtk, G.CONFIG.wave.bossAtkMult >= 4 && !!G.CONFIG.bossSlam && bossAtk > 0);
+  html += '</ul>';
+  out.innerHTML = html;
+
+  function cell(box, imgEl, text) { var d = document.createElement('div'); d.className = 'cell'; var i = document.createElement('img'); i.src = imgEl.toDataURL ? imgEl.toDataURL() : imgEl.src; d.appendChild(i); d.appendChild(document.createTextNode(text)); box.appendChild(d); }
+  G.CHARACTERS.forEach(function (c) { cell(document.getElementById('chars'), G.CharArt.sprite(c.id), c.id + ' ' + c.name + ' (' + G.grade(c.grade).name + ')'); });
+  Object.keys(G.MONSTERS).forEach(function (k) { cell(document.getElementById('mons'), G.MonsterArt.sprite(k), G.MONSTERS[k].name); });
+  for (var k = 0; k < 7; k++) { var im = document.createElement('img'); im.src = G.BgArt.background(k).toDataURL(); im.title = G.CONFIG.stages[k].name; document.getElementById('bgs').appendChild(im); }
+})();
+</script>
+</body>
+</html>

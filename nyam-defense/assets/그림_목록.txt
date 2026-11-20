@@ -1,0 +1,68 @@
+그림 교체 목록 — 이 폴더에 아래 이름의 png 파일을 넣으면 게임이 자동으로 그 그림을 씁니다.
+파일이 없으면 게임 안의 임시 도트 그림을 씁니다. (그림 제작 지시는 기획서 부록 A 참고)
+캐릭터와 몬스터 그림은 배경이 투명한 png, 발이 그림 아래쪽 가운데에 오게 해 주세요. 그림 안에 글자는 넣지 않습니다.
+
+[캐릭터]  assets/캐릭터/번호.png
+  - 노말
+    n1.png  : 갈색 머리 검사 (검사)
+    n2.png  : 토끼 귀 검사 (검사)
+    n3.png  : 초록 모자 궁수 (궁수)
+    n4.png  : 꼬마 궁수 (궁수)
+    n5.png  : 꼬마 마법사 (마법사)
+    n6.png  : 파란 망토 마법사 (마법사)
+    n7.png  : 작은 갑옷 기사 (기사)
+    n8.png  : 냄비 투구 기사 (기사)
+  - 에픽
+    e1.png  : 강아지 귀 검사 (검사)
+    e2.png  : 꽃 장식 궁수 (궁수)
+    e3.png  : 고양이 마법사 (마법사)
+    e4.png  : 별 방패 기사 (기사)
+    e5.png  : 보라 모자 마법사 (마법사)
+    e6.png  : 토끼 궁수 (궁수)
+  - 유니크
+    u1.png  : 불꽃 칼 검사 (검사)
+    u2.png  : 주황 깃털 궁수 (궁수)
+    u3.png  : 아기 용 마법사 (마법사)
+    u4.png  : 작은 요정 기사 (기사)
+    u5.png  : 얼음 공주 마법사 (마법사)
+  - 레전더리
+    l1.png  : 왕관 검사 (검사)
+    l2.png  : 전설의 왕관 기사 (기사)
+    l3.png  : 별빛 대마법사 (마법사)
+    l4.png  : 숲의 수호 궁수 (궁수)
+
+[몬스터]  assets/몬스터/이름.png
+    pinkSlime.png  : 분홍 슬라임
+    greenSlime.png  : 초록 슬라임
+    mushroom.png  : 버섯 요정
+    bat.png  : 작은 박쥐
+    golem.png  : 수정 골렘
+    gemBug.png  : 보석 벌레
+    cloudBird.png  : 구름 새
+    windSpirit.png  : 바람 정령
+    fireSlime.png  : 불꽃 슬라임
+    babyDragon.png  : 작은 용
+    skeleton.png  : 갑옷 해골
+    darkKnight.png  : 어둠 기사
+    minion.png  : 마왕의 부하
+    minion2.png  : 마왕의 박쥐 부하
+    kingSlime.png  : 왕관 슬라임 대장 (우두머리)
+    mushroomKing.png  : 버섯 대왕 (우두머리)
+    crystalGiant.png  : 수정 거인 (우두머리)
+    stormBird.png  : 폭풍 새 대장 (우두머리)
+    lavaDragon.png  : 용암 용 (우두머리)
+    darkCaptain.png  : 어둠 기사 대장 (우두머리)
+    demonKing.png  : 최종 마왕 (우두머리)
+
+[배경]  assets/배경/번호.png  (가로형, 960×540 권장, 가운데 아래쪽은 넓고 평평하게)
+    1.png  : 초록 들판
+    2.png  : 버섯 숲
+    3.png  : 수정 동굴
+    4.png  : 구름 언덕
+    5.png  : 용암 지대
+    6.png  : 마왕의 성
+    7.png  : 마왕의 왕좌
+
+[기타]  assets/기타/
+    뽑기상자.png  : 뽑기 화면의 보물 상자
+    뽑기권.png    : 뽑기권 모양
