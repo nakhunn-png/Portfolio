@@ -113,6 +113,6 @@ G.Pixel = (function () {
   return { Grid: Grid, shade: shade, get: get, loadOverrides: loadOverrides, drawSprite: drawSprite, toURL: toURL, OUTLINE: OUTLINE, files: files };
 })();
 
-// 그림 파일 사용 설정: 실제 그림을 assets 폴더에 넣었다면 true 로 둔다.
-// (파일이 없으면 자동으로 임시 도트 그림을 쓰므로 true로 두어도 안전하다)
-G.ASSET_SETTINGS = { useFiles: true };
+// 그림 파일 사용 설정: 실제 그림을 assets 폴더에 넣었다면 useFiles 를 true 로 바꾼다.
+// 지금은 넣은 그림이 없으므로 false (true 이면 없는 파일 50여 개를 찾느라 콘솔에 404 오류가 쌓이고 시작이 조금 느려진다)
+G.ASSET_SETTINGS = { useFiles: false };
