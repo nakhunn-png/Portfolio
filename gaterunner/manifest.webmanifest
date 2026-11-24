@@ -1,0 +1,9 @@
+{
+  "name": "덧뺄셈 복습 게이트러너",
+  "short_name": "게이트러너",
+  "start_url": "./",
+  "display": "fullscreen",
+  "background_color": "#8fd0ff",
+  "theme_color": "#8fd0ff",
+  "icons": [{ "src": "img/kid1.png", "sizes": "199x300", "type": "image/png" }]
+}

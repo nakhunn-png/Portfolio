@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#8fd0ff">
+<title>덧뺄셈 복습 게이트러너</title>
+<link rel="icon" href="img/kid1.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="cv"></canvas>
+
+  <!-- 달리기 HUD -->
+  <div id="hud" hidden>
+    <div class="hud-top">
+      <div id="prog" class="chip">1 / 10</div>
+      <div id="qbox" class="qbox"><span id="qtext">8 + 5</span> = <b>?</b></div>
+      <button id="pauseBtn" class="round" aria-label="멈춤">⏸</button>
+    </div>
+    <div id="stats" class="stats"></div>
+    <div id="tip" class="tip">엽전으로 균을 맞히고, 정답 문으로 가요!</div>
+  </div>
+
+  <!-- 보스 등장 글씨 -->
+  <div id="banner" class="banner" hidden></div>
+
+  <!-- 보스 문제 -->
+  <div id="bossPanel" class="bossPanel" hidden>
+    <div class="bq"><span id="bossNo" class="chip">1 / 3</span><span id="bossQ">8 + 5</span> = <b>?</b></div>
+    <div id="bossBtns" class="bbtns"></div>
+  </div>
+
+  <!-- 처음 화면 -->
+  <section id="sTitle" class="screen title">
+    <div class="tcard">
+      <h1>덧뺄셈 복습<br><b>게이트러너</b></h1>
+      <div class="tkids"><img src="img/kid1.png" alt=""><img src="img/kid2.png" alt=""><img src="img/kid3.png" alt=""><img src="img/kid4.png" alt=""></div>
+      <button id="goStart" class="big">시작하기</button>
+    </div>
+    <button id="goTeacher" class="corner">👩‍🏫 선생님</button>
+  </section>
+
+  <!-- 반·번호 -->
+  <section id="sWho" class="screen pick" hidden>
+    <button class="back" data-back="sTitle">처음으로</button>
+    <h2 id="whoTitle">몇 반이에요?</h2>
+    <div id="whoGrid" class="grid g6"></div>
+  </section>
+
+  <!-- 캐릭터 -->
+  <section id="sKid" class="screen pick" hidden>
+    <button class="back" data-back="sWho">반·번호</button>
+    <h2>누구랑 달릴까요?</h2>
+    <div id="kidGrid" class="kids"></div>
+  </section>
+
+  <!-- 단계 -->
+  <section id="sStage" class="screen pick" hidden>
+    <div class="who-bar"><span id="whoLabel">1반 1번</span><button id="changeWho" class="small">바꾸기</button><button class="small" data-back="sTitle" style="margin-left:auto">처음으로</button></div>
+    <h2>단계를 골라요</h2>
+    <div id="stageGrid" class="stages"></div>
+    <div class="wardrobe"><b>옷장</b><span class="wsub">옷 문을 지나면 옷을 모아요. 누르면 입고 벗어요</span><div id="wardrobe" class="wgrid"></div></div>
+  </section>
+
+  <!-- 힌트(틀렸을 때) -->
+  <div id="hint" class="overlay" hidden>
+    <div class="hcard">
+      <div class="hhead">아쉬워요! 정답은</div>
+      <div id="hEq" class="heq">13 − 5 = <b>8</b></div>
+      <div id="hPicked" class="hpicked"></div>
+      <div id="hFrames" class="frames"></div>
+      <div id="hSay" class="hsay"></div>
+      <button id="hOk" class="big green">알겠어요!</button>
+    </div>
+  </div>
+
+  <!-- 멈춤 -->
+  <div id="pause" class="overlay" hidden>
+    <div class="hcard menu">
+      <div class="hhead">잠깐 멈춤</div>
+      <button id="pResume" class="big green">계속 달리기</button>
+      <button id="pQuit" class="big alt">그만하기</button>
+    </div>
+  </div>
+
+  <!-- 결과 -->
+  <div id="result" class="overlay" hidden>
+    <div class="hcard">
+      <div id="rHead" class="hhead">이겼어요!</div>
+      <div id="rStars" class="rstars">★★★</div>
+      <div id="rText" class="rtext"></div>
+      <div id="rUnlock" class="runlock" hidden></div>
+      <div class="rbtns">
+        <button id="rNext" class="big green">다음 단계</button>
+        <button id="rAgain" class="big">다시 하기</button>
+        <button id="rList" class="big alt">단계 고르기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 선생님 비밀번호 -->
+  <section id="sPin" class="screen pick" hidden>
+    <button class="back" data-back="sTitle">처음으로</button>
+    <h2>선생님 비밀번호</h2>
+    <div id="pinDots" class="pindots"><i></i><i></i><i></i><i></i></div>
+    <div id="pinPad" class="pinpad"></div>
+  </section>
+
+  <!-- 선생님 화면 -->
+  <section id="sTeacher" class="screen teacher" hidden>
+    <div class="tbar">
+      <button class="back" data-back="sTitle">처음으로</button>
+      <h2>선생님 화면</h2>
+    </div>
+    <div class="tset">
+      <div class="trow"><b>문 속도</b><span id="setSpeed" class="seg"></span></div>
+      <div class="trow"><b>효과음</b><button id="setSound" class="small"></button></div>
+      <div class="trow"><b>모든 단계 열기</b><button id="setUnlock" class="small"></button></div>
+    </div>
+    <div class="trow"><b>반</b><span id="tClasses" class="seg"></span></div>
+    <div id="tBody"></div>
+  </section>
+</div>
+<script src="js/questions.js"></script>
+<script src="js/data.js"></script>
+<script src="js/save.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
