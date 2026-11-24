@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "교육용 게임/yeolmae-village/css/style.css"
+        ],
+        "createdAt": "2026-11-24T14:58:50.344Z",
+        "reason": "Claude decided: L133 is the speech-bubble tail, a CSS triangle drawn with transparent borders, not an accent border on a card"
+      }
+    ]
+  }
+}
