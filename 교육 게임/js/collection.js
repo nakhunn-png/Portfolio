@@ -53,7 +53,18 @@ G.Collection = (function () {
     fillSlots(run);
     return { charId: id, grade: grade, isNew: r.isNew, uid: r.unit.uid };
   }
-  function drawAll(run, book) { var out = [], d; while ((d = draw(run, book))) out.push(d); return out; }
+  /* 모두 뽑기: 출전 칸이 가득 차면 멈춘다 (2026-11-26). 칸이 차면 먼저 합성해 보고, 그래도 차 있으면 그만 뽑는다. 남은 코인은 다음에 쓴다 */
+  function full(run) { return run.roster.length >= run.slots.length; }
+  function drawAll(run, book) {
+    var out = [], merges = [], d;
+    while (canDraw(run)) {
+      if (full(run)) { merges = merges.concat(autoMerge(run, book)); if (full(run)) break; }
+      if (!(d = draw(run, book))) break;
+      out.push(d);
+    }
+    out.merges = merges.concat(autoMerge(run, book)); out.full = full(run);
+    return out;
+  }
 
   function gradeOf(u) { return G.charById(u.id).grade; }
   function nextGrade(g) { var i = ORDER.indexOf(g); return i >= 0 && i < 3 ? ORDER[i + 1] : null; }
@@ -70,12 +81,12 @@ G.Collection = (function () {
     var mats = run.roster.filter(function (u) { return gradeOf(u) === grade; });
     if (mats.length < need) return null;
     mats.sort(function (a, b) { return (run.slots.indexOf(a.uid) >= 0) - (run.slots.indexOf(b.uid) >= 0); });
-    var used = mats.slice(0, need).map(function (u) { return u.uid; });
+    var used = mats.slice(0, need).map(function (u) { return u.uid; }), usedIds = mats.slice(0, need).map(function (u) { return u.id; });
     run.roster = run.roster.filter(function (u) { return used.indexOf(u.uid) < 0; });
     run.slots = run.slots.map(function (s) { return used.indexOf(s) >= 0 ? null : s; });
     var id = mergeResult(book, up), r = addUnit(run, book, id);
     fillSlots(run);
-    return { from: grade, to: up, result: id, isNew: r.isNew };
+    return { from: grade, to: up, result: id, isNew: r.isNew, mats: usedIds };
   }
   function autoMerge(run, book) {
     var ev = [], e;
@@ -110,7 +121,7 @@ G.Collection = (function () {
   }
 
   return { newBook: newBook, newRun: newRun, addCoins: addCoins, answer: answer, rollGrade: rollGrade, canDraw: canDraw,
-    draw: draw, drawAll: drawAll, mergeOnce: mergeOnce, autoMerge: autoMerge, fillSlots: fillSlots, swapSlots: swapSlots,
+    draw: draw, drawAll: drawAll, full: full, mergeOnce: mergeOnce, autoMerge: autoMerge, fillSlots: fillSlots, swapSlots: swapSlots,
     lineup: lineup, countByGrade: countByGrade, addFriend: addFriend };
 })();
 

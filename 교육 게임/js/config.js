@@ -35,7 +35,7 @@ G.CONFIG = {
   speeds: [
     { name: '1배속',   v: 1,   count: 1.0, unlock: null },
     { name: '1.5배속', v: 1.5, count: 1.1, unlock: null },
-    { name: '2배속',   v: 2,   count: 1.2, unlock: 3 },   // 스테이지 3을 깨면
+    { name: '2배속',   v: 2,   count: 1.2, unlock: 1 },   // 과자 숲(스테이지 1)을 깨면 (2026-11-26, 전에는 스테이지 3)
     { name: '2.5배속', v: 2.5, count: 1.3, unlock: 6 }    // 스테이지 6을 깨면
   ],
   /* 웨이브 수는 미리 정하지 않고 실제 전투 시간으로 정한다 (9-3 원칙 2).
@@ -55,7 +55,7 @@ G.CONFIG = {
    * gimmick: bubble(거품 적) / blizzard(눈보라) / storm(모래폭풍·갈림길) / dark(어둠·조명)
    * hp: 적 체력 배율. 뒤 스테이지일수록 조금씩 세진다. speed: 적 빠르기 배율 (우주 정거장은 길이 아주 길어서 빠르게) */
   stages: [
-    { no: 1, name: '과자 숲',     unit: 1, hp: 1.25, path: 'loop',    enemies: ['jellyBear', 'cookieSoldier'], types: ['A1', 'A2'], format: 'choice', ready: true,
+    { no: 1, name: '과자 숲',     unit: 1, hp: 1.15, path: 'loop',    enemies: ['jellyBear', 'cookieSoldier'], types: ['A1', 'A2'], format: 'choice', ready: true,
       tip: '처음이에요! 문제를 풀고 친구를 뽑아요.' },
     { no: 2, name: '바닷속',      unit: 1, hp: 1.55, path: 'eight',   enemies: ['puffer', 'jellyfish'], types: ['A3', 'A4', 'A5'], format: 'choice', ready: true, gimmick: 'bubble',
       tip: '해파리는 거품 갑옷을 입었어요. 세 번 맞혀야 거품이 터져요!' },
@@ -109,7 +109,7 @@ G.CONFIG = {
   difficulties: [
     { key: 'tutorial', word: { setup: 0, story: 0 }, bossHp: 0.4, bossSpeed: 0.75, name: '튜토리얼',   hp: 0.5,  count: 0.7,  speed: 0.8,  life: 5, coins: 120, tutorial: true,
       desc: '처음이라면 여기부터! 답을 알려 주고 2분이면 끝나요.' },
-    { key: 'easy', word: { setup: 0.15, story: 0 }, bossHp: 0.85, bossSpeed: 0.95,     name: '쉬움',       hp: 0.95, count: 0.95, speed: 0.92,  life: 5, coins: 90, desc: '처음 하는 친구에게 딱!' },
+    { key: 'easy', word: { setup: 0.15, story: 0 }, bossHp: 0.9, bossSpeed: 0.95,     name: '쉬움',       hp: 0.95, count: 0.95, speed: 0.92,  life: 5, coins: 90, desc: '처음 하는 친구에게 딱!' },
     { key: 'normal', word: { setup: 0.25, story: 0 }, bossHp: 1.0, bossSpeed: 1.06,   name: '보통',       hp: 1.0,  count: 1.0,  speed: 1.0,  life: 5, coins: 60, desc: '기본 난이도예요.' },
     { key: 'hard', word: { setup: 0.2, story: 0.25 }, bossHp: 1.25, bossSpeed: 1.08,     name: '어려움',     hp: 1.12, count: 1.05, speed: 1.05,  life: 4, coins: 60, keypad: true, desc: '답을 숫자 자판으로 직접 써요.' },
     { key: 'veryhard', word: { setup: 0.2, story: 0.35 }, bossHp: 1.7, bossSpeed: 1.2, name: '아주 어려움', hp: 1.32, count: 1.12, speed: 1.12,  life: 3, coins: 60, keypad: true, desc: '생명 3개, 적이 훨씬 강해요.' },
@@ -159,7 +159,7 @@ G.CONFIG = {
    * 진행 정도 = 그 웨이브 전까지의 계획 실제 시간 ÷ targetRealSec (0 ~ 약 0.9). 배속과 상관없이 마지막 웨이브 세기가 같다 */
   /* 2026-11-26 「나오자마자 5초도 안 돼서 죽는다」 → 적을 적게, 훨씬 단단하게. 첫 웨이브부터 길을 꽤 돌게 하고, 뒤로 갈수록 덜 가파르게 센다
    * (전: base 16 · countGrowth 13 · hp 66 · hpGrowth 1.2. 첫 웨이브 적이 길의 5% 만에 죽었다) */
-  wave: { base: 9, countGrowth: 6, spawnPortion: 0.9, hp: 275, hpGrowth: 0.45, speed: 70 }
+  wave: { base: 13, countGrowth: 8, spawnPortion: 0.9, hp: 210, hpGrowth: 0.45, speed: 70 }   // 2026-11-26 「몹이 더 자주」: 웨이브 길이는 그대로, 적 수 ×1.4(9+6 → 13+8), 한 마리 체력 ×0.76(275 → 210). 나오는 간격이 약 0.7배
 };
 
 // 적 종류 (hp·speed 는 wave 기본값에 곱하는 배율)

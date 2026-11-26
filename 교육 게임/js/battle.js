@@ -183,7 +183,7 @@ G.Battle = (function () {
     var n = Math.max(3, Math.round((w.base + w.countGrowth * p) * speedCount * B.diff.count * wm));
     B.spawnLeft = n; B.spawnTotal = n;
     // 적이 많아진 만큼 웨이브도 길어진다 (적이 나오는 간격은 그대로)
-    B.spawnGap = (C.battleTime.waveGameSec * wm * speedCount * w.spawnPortion) / n;
+    B.spawnGap = (C.battleTime.waveGameSec * wm * speedCount * w.spawnPortion) / n * (w.spawnGapMul || 1);
     B.spawnTimer = 0; B.waveRunning = true; B.turbo = !!turbo;
     if (B.gimmick === 'dark') B.lightT = 8;   // 웨이브가 시작할 때 잠깐 조명이 켜진다
   }
