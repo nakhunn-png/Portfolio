@@ -141,7 +141,8 @@ G.UI = (function () {
   function goDiffSelect(no) {
     A.mode = 'diff'; A.pendingStage = no; show('scr-diff'); closeOverlay();
     $('diff-stage').textContent = stageLabel(no);
-    if (!A.settings.diffChosen && !Object.keys(A.progress.stars).length) A.settings.diff = 'tutorial';
+    if (!A.progress.tutorialDone && !Object.keys(A.progress.stars).length && G.stageByNo(no).unit === 1) A.settings.diff = 'tutorial';
+    if (A.settings.diff === 'tutorial' && G.stageByNo(no).unit !== 1) A.settings.diff = C.defaultDifficulty;   // 튜토리얼은 덧뺄셈 (1) 섬의 과자 숲에서만
     if (!A.settings.diff || !diffOpen(A.settings.diff)) A.settings.diff = C.defaultDifficulty;
     renderDiffs();
   }
@@ -151,6 +152,12 @@ G.UI = (function () {
     var top = el('div', 'dsel-row top'), mid = el('div', 'dsel-row mid'), bot = el('div', 'dsel-row bot');
     C.difficulties.forEach(function (D) {
       var row = D.tutorial ? top : D.hidden ? bot : mid;
+      if (D.tutorial && G.stageByNo(A.pendingStage).unit !== 1) {   // 튜토리얼은 덧뺄셈 (1) 섬에서만
+        var tl = el('button', 'diff-card wide d-locked');
+        tl.appendChild(el('div', 'dc-title', '🎓 튜토리얼')); tl.appendChild(el('div', 'dc-desc', '덧뺄셈 (1) 섬의 과자 숲에서 해요'));
+        tl.onclick = function () { toast('튜토리얼은 덧뺄셈 (1) 섬에서 해요!'); };
+        row.appendChild(tl); return;
+      }
       if (D.hidden && !diffOpen(D.key)) {
         var lk = el('button', 'diff-card wide d-locked');
         lk.appendChild(el('div', 'dc-title', '🔒 ? ? ?'));
@@ -169,6 +176,7 @@ G.UI = (function () {
       info.appendChild(el('div', 'dc-hearts', '♥'.repeat(D.life)));
       info.appendChild(el('div', '', D.keypad ? '답: 숫자로 직접 써요' : '답: 보기에서 골라요'));
       if (row !== mid) info.appendChild(el('div', 'dc-desc', D.desc));
+      if (D.tutorial) info.appendChild(el('div', 'dc-tag', A.progress.tutorialDone ? '✔ 끝냈어요 · 또 해도 돼요' : '과자 숲 1판'));
       b.appendChild(info);
       b.onclick = function () { A.settings.diff = D.key; A.settings.diffChosen = true; saveAll(); renderDiffs(); };
       row.appendChild(b);
@@ -304,6 +312,13 @@ G.UI = (function () {
     var st = G.stageByNo(A.stageNo);
     var types = A.tower ? Ch.towerTypes(A.wavesDone + 1) : st.types;
     q.p = stageFormat() === 'pickExpr' ? G.MathGen.makePick(types) : G.MathGen.make(types, 3);
+    // 식 세우기·문장제 (2026-11-26): 준비·웨이브 사이·마무리 문제에서 난이도마다 정한 비율로 섞는다. 풍선·보스·탑은 빨리 풀어야 해서 뺀다
+    var W = A.B && A.B.diff.word, r = Math.random();
+    if (W && !A.tower && (q.kind === 'prep' || q.kind === 'wave' || q.kind === 'final' || q.kind === 'boss' || q.kind === 'retry')) {
+      var unit = st.boss === 'demon' ? 1 + Math.floor(Math.random() * 3) : st.unit;
+      if (r < W.story) q.p = G.MathGen.makeWord(unit, 'story');
+      else if (r < W.story + W.setup) q.p = G.MathGen.makeWord(unit, 'setup');
+    }
     q.tries = 0; q.input = '';
   }
   // 10칸 그림 (스테이지 4): 앞 수를 먼저 채우고, 뒤 수로 10을 채운 다음 남은 것을 둘째 칸에
@@ -349,6 +364,25 @@ G.UI = (function () {
   }
 
   /* 문제 칸 그리기. container 안을 새로 채운다. onAnswer(correct) 는 답 하나마다, onDone 은 묶음이 끝났을 때 */
+  /* 식 세우기 그림: 수가 작을 때(단원 1·2)만 그림으로 보여 준다. 덜어 낸 것은 흐리게 X */
+  function wordPicture(p) {
+    if (p.unit === 3) return null;
+    var box = el('div', 'q-pic'), n = p.nums;
+    function group(cnt, icon, crossFrom, cls) {
+      var g = el('div', 'pic-group' + (cls ? ' ' + cls : ''));
+      for (var i = 0; i < cnt; i++) { var c = el('span', 'pic' + (crossFrom !== undefined && i >= crossFrom ? ' gone' : ''), icon); g.appendChild(c); }
+      return g;
+    }
+    function sep(t) { return el('span', 'pic-sep', t); }
+    var k = p.kind;
+    if (k === 'add' || k === 'join') { box.appendChild(group(n[0], p.icon)); box.appendChild(sep(k === 'add' ? '더 가져옴 →' : '와')); box.appendChild(group(n[1], p.icon2 || p.icon, undefined, 'more')); }
+    else if (k === 'three') { box.appendChild(group(n[0], p.icon)); box.appendChild(sep('·')); box.appendChild(group(n[1], p.icon)); box.appendChild(sep('·')); box.appendChild(group(n[2], p.icon)); }
+    else if (k === 'take' || k === 'three-') { var off = k === 'take' ? n[1] : n[1] + n[2]; box.appendChild(group(n[0], p.icon, n[0] - off)); }
+    else if (k === 'from10') box.appendChild(group(10, p.icon, 10 - n[1]));
+    else if (k === 'ten') { box.appendChild(group(n[0], p.icon)); var e = el('div', 'pic-group empty'); for (var j = n[0]; j < 10; j++) e.appendChild(el('span', 'pic hole', '')); box.appendChild(e); }
+    else if (k === 'cmp') { var c2 = el('div', 'pic-cmp'); c2.appendChild(group(n[0], p.icon)); c2.appendChild(group(n[1], p.icon2 || p.icon)); box.appendChild(c2); }
+    return box;
+  }
   function renderQuiz(container, q, onDone) {
     container.innerHTML = '';
     if (quizFinished(q)) {
@@ -365,9 +399,10 @@ G.UI = (function () {
     if (fmt === 'tenframe' && !(p.type === 'B1' || p.type === 'B2')) fmt = 'choice';
     if (fmt === 'column' && !(p.type === 'C1' || p.type === 'C2')) fmt = 'keypad';
     var D = A.B ? A.B.diff : null;
+    if (p.word === 'story') fmt = 'choice';   // 문장제는 스테이지 형식(10칸 그림·세로셈)을 쓰지 않는다
     if (D && D.keypad && fmt === 'choice' && !p.pick) fmt = 'keypad';   // 어려움부터: 답을 직접 쓴다
     // 형식마다 문제 칸 배치를 바꾼다 (css 의 .fmt-…)
-    container.className = container.className.replace(/\s*fmt-\S+/g, '') + ' fmt-' + (p.pick ? 'pick' : fmt);
+    container.className = container.className.replace(/\s*fmt-\S+/g, '') + ' fmt-' + (p.word ? 'word' + (p.word === 'story' && fmt === 'keypad' ? ' fmt-wordkey' : '') : p.pick ? 'pick' : fmt);
     var head = el('div', 'q-label');
     head.textContent = q.kind === 'final' ? '마무리 문제 · 정답 ' + A.run.correct + ' / ' + minCorrect()
       : q.kind === 'bubble' ? '보너스 문제!' + (A.B && A.B.gimmick === 'dark' ? ' 맞히면 조명이 켜져요' : '')
@@ -376,7 +411,15 @@ G.UI = (function () {
     var msg2 = el('div', 'q-msg'), hintSlot = el('div', 'hint-slot'), row = el('div', 'choices'), display = null;
 
     // 문제 모양
-    if (p.pick) {
+    if (p.word) {   // 식 세우기: 그림 + 글 → 알맞은 식 고르기 / 문장제: 글 → 답
+      var wb = el('div', 'q-word');
+      if (p.word === 'setup') { var pic = wordPicture(p); if (pic) wb.appendChild(pic); }
+      wb.appendChild(el('div', 'q-story', p.story));
+      var askT = el('div', 'q-ask'); askT.innerHTML = p.word === 'setup' ? p.ask + ' <span class="qm">알맞은 식을 골라요</span>' : p.ask;
+      wb.appendChild(askT);
+      if (fmt === 'keypad' && p.word === 'story') { var qin2 = el('div', 'q-ans-line'); qin2.innerHTML = '답: <span class="qin">?</span>'; wb.appendChild(qin2); display = function () { var x = qin2.querySelector('.qin'); x.textContent = q.input || '?'; x.classList.toggle('empty', !q.input); }; }
+      container.appendChild(wb);
+    } else if (p.pick) {
       var t0 = el('div', 'q-text small'); t0.innerHTML = '답이 <span class="qm">' + p.answer + '</span>인 식은?'; container.appendChild(t0);
     } else if (fmt === 'column') {
       var col = el('div', 'column-calc'), a = p.nums[0], b = p.nums[1], op = p.op === '-' ? '−' : '+';
@@ -841,8 +884,9 @@ G.UI = (function () {
     A.mode = 'result'; clearBubbles(); closeOverlay();
     var run = A.run, total = run.correct + run.wrong, acc = total ? run.correct / total : 0;
     var stars = win ? 1 + (A.B.lifeLost === 0 ? 1 : 0) + (acc >= 0.8 ? 1 : 0) : 0;
-    var newlyOpen = [];
-    if (win) {
+    var newlyOpen = [], tutWin = win && A.tutorial;
+    if (tutWin && !A.progress.tutorialDone) { A.progress.tutorialDone = true; newlyOpen.push('본 게임'); }
+    if (win && !A.tutorial) {   // 튜토리얼은 연습이라 별·기록에 넣지 않는다
       var before = C.speeds.map(function (s, i) { return speedOpen(i); });
       A.progress.stars[A.stageNo] = Math.max(A.progress.stars[A.stageNo] || 0, stars);
       C.speeds.forEach(function (s, i) { if (!before[i] && speedOpen(i)) newlyOpen.push(s.name); });
@@ -859,7 +903,7 @@ G.UI = (function () {
     saveAll();
     show('scr-result');
     var p = $('result-panel'); p.innerHTML = '';
-    p.appendChild(el('h2', '', win ? G.stageByNo(A.stageNo).name + ' 성공!' : '아쉬워요! 다시 해 봐요'));
+    p.appendChild(el('h2', '', tutWin ? '튜토리얼 끝! 잘했어요' : win ? G.stageByNo(A.stageNo).name + ' 성공!' : '아쉬워요! 다시 해 봐요'));
     var st = el('div', 'result-stars');
     for (var i = 0; i < 3; i++) st.appendChild(el('span', i < stars ? 'on' : '', '★'));
     p.appendChild(st);
@@ -882,13 +926,17 @@ G.UI = (function () {
       rb.onclick = function () { A.B.life = A.B.diff.life; goPrep('retry'); };
       p.appendChild(rb);
     }
-    if (win) guide('result', '#result-panel', '잘했어요!', '별 1개: 스테이지 깨기, 별 2개: 하트 지키기, 별 3개: 정답 80% 넘기. 익숙해지면 「쉬움」이나 「보통」에도 도전해 봐요!');
+    if (win) guide('result', '#result-panel', '튜토리얼 끝!', '이제 진짜 모험이에요! 「본 게임 시작!」을 누르고 난이도를 골라요. 별 1개: 깨기, 별 2개: 하트 지키기, 별 3개: 정답 80% 넘기.');
     var bs = el('div', 'result-btns');
     var again = el('button', 'btn big orange', '다시 하기'); again.onclick = function () { startStage(A.stageNo, A.heroId, A.diffKey); };
     var map = el('button', 'btn big ' + (win ? 'sky' : 'green'), '섬 지도'); map.onclick = goMap;
     bs.appendChild(again); bs.appendChild(map);
-    var nx = win ? nextInIsland(A.stageNo) : null;   // 섬 안의 다음 스테이지로 바로 이어 간다
-    if (nx) { var go = el('button', 'btn big green pulse', '다음: ' + nx.name + ' ▶'); go.onclick = function () { startStage(nx.no, A.heroId, A.diffKey); }; bs.appendChild(go); }
+    var nx = win && !tutWin ? nextInIsland(A.stageNo) : null;   // 섬 안의 다음 스테이지로 바로 이어 간다
+    if (tutWin) {   // 튜토리얼이 끝나면 본 게임: 덧뺄셈 (1) 섬을 진짜 난이도로 처음부터
+      var real = el('button', 'btn big green pulse', '본 게임 시작! ▶');
+      real.onclick = function () { A.settings.diff = C.defaultDifficulty; A.settings.diffChosen = true; saveAll(); A.island = 1; goDiffSelect(islandStart(1)); };
+      bs.appendChild(real);
+    } else if (nx) { var go = el('button', 'btn big green pulse', '다음: ' + nx.name + ' ▶'); go.onclick = function () { startStage(nx.no, A.heroId, A.diffKey); }; bs.appendChild(go); }
     else if (win) p.appendChild(el('div', 'legend-open', ISLAND_NAME[G.stageByNo(A.stageNo).unit] + ' 섬을 모두 깼어요!' + (G.stageByNo(A.stageNo).unit < 3 ? ' 다음 섬이 열렸어요.' : '')));
     p.appendChild(bs);
   }
@@ -1037,7 +1085,7 @@ G.UI = (function () {
     $('target-layer').onclick = targetTap;
     $('scr-hero').onclick = function (e) { if (!e.target.closest('button')) secretTap(); };
     $('btn-diff-next').onclick = function () { goHeroSelect(A.pendingStage); };
-    $('btn-hero-go').onclick = function (e) { e.stopPropagation(); startStage(A.pendingStage, A.settings.hero, A.settings.diff); };
+    $('btn-hero-go').onclick = function (e) { e.stopPropagation(); startStage(A.settings.diff === 'tutorial' ? 1 : A.pendingStage, A.settings.hero, A.settings.diff); };   // 튜토리얼은 언제나 과자 숲(1-1)
     $('drag-layer').addEventListener('pointerdown', dragHero); $('drag-layer').addEventListener('pointermove', dragHero);
     document.addEventListener('click', function (e) {
       var t = e.target.closest('[data-act]'); if (!t) return;

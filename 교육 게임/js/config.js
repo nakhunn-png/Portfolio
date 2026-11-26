@@ -67,7 +67,7 @@ G.CONFIG = {
       tip: '모래폭풍이 불면 적이 다른 길로 가요. 양쪽에 친구를 세워요!' },
     { no: 6, name: '전갈 왕',     unit: 2, hp: 1.7, minionHp: 1.2, path: 'arena',   boss: 'scorpion', enemies: ['babyScorpion', 'mole'], types: ['B1', 'B3'], format: 'choice', ready: true,
       tip: '보스가 나오면 영웅을 끌어서 빨간 원을 피해요!' },
-    { no: 7, name: '우주 정거장', unit: 3, hp: 1.3, speed: 1.35, path: 'rings',   enemies: ['alien', 'meteorRock'], types: ['C1'], format: 'column', ready: true,
+    { no: 7, name: '우주 정거장', unit: 3, hp: 1.3, speed: 1.5, path: 'rings',   enemies: ['alien', 'meteorRock'], types: ['C1'], format: 'column', ready: true,
       tip: '적이 바깥 고리를 돈 뒤 안쪽 고리로 갈아타요.' },
     { no: 8, name: '밤 놀이공원', unit: 3, hp: 0.95, path: 'coaster', enemies: ['toySoldier', 'balloonGhost'], types: ['C2'], format: 'pickExpr', ready: true, gimmick: 'dark',
       tip: '깜깜해서 친구들이 가까운 적만 봐요. 보너스 문제를 맞히면 조명이 켜져요!' },
@@ -104,15 +104,16 @@ G.CONFIG = {
 
   /* 2026-11-26 적이 단단해져서 배율이 크게 곱해지면 어려움부터 절벽이 됐다(보통 83% → 어려움 30%). 한 단계마다 고르게 어려워지도록 줄임
    * 난이도 5단계 (영웅 고르기 화면에서 고른다). 재앙은 숨은 난이도: 냠냠 마왕을 「아주 어려움」으로 깨면 열린다
+   * word: 준비·웨이브 사이 문제 중 식 세우기(setup)·문장제(story)가 나오는 비율 (문장제는 어려움부터)
    * hp·count·speed: 적 체력·수·빠르기 배율, bossHp: 보스 체력 배율, life: 생명, keypad: 보기 고르기 문제를 숫자 자판으로, flash: 식이 이 초 뒤에 사라짐 */
   difficulties: [
-    { key: 'tutorial', bossHp: 0.4, bossSpeed: 0.75, name: '튜토리얼',   hp: 0.5,  count: 0.7,  speed: 0.8,  life: 5, coins: 120, tutorial: true,
+    { key: 'tutorial', word: { setup: 0, story: 0 }, bossHp: 0.4, bossSpeed: 0.75, name: '튜토리얼',   hp: 0.5,  count: 0.7,  speed: 0.8,  life: 5, coins: 120, tutorial: true,
       desc: '처음이라면 여기부터! 답을 알려 주고 2분이면 끝나요.' },
-    { key: 'easy', bossHp: 0.75, bossSpeed: 0.95,     name: '쉬움',       hp: 0.95, count: 0.95, speed: 0.92,  life: 5, coins: 90, desc: '처음 하는 친구에게 딱!' },
-    { key: 'normal', bossHp: 1.0, bossSpeed: 1.06,   name: '보통',       hp: 1.0,  count: 1.0,  speed: 1.0,  life: 5, coins: 60, desc: '기본 난이도예요.' },
-    { key: 'hard', bossHp: 1.25, bossSpeed: 1.08,     name: '어려움',     hp: 1.12, count: 1.05, speed: 1.05,  life: 4, coins: 60, keypad: true, desc: '답을 숫자 자판으로 직접 써요.' },
-    { key: 'veryhard', bossHp: 1.7, bossSpeed: 1.2, name: '아주 어려움', hp: 1.32, count: 1.12, speed: 1.12,  life: 3, coins: 60, keypad: true, desc: '생명 3개, 적이 훨씬 강해요.' },
-    { key: 'disaster', bossHp: 1.9, bossSpeed: 1.2, name: '재앙',       hp: 1.52,  count: 1.15, speed: 1.15,  life: 1, coins: 60, keypad: true, flash: 2, hidden: true,
+    { key: 'easy', word: { setup: 0.15, story: 0 }, bossHp: 0.85, bossSpeed: 0.95,     name: '쉬움',       hp: 0.95, count: 0.95, speed: 0.92,  life: 5, coins: 90, desc: '처음 하는 친구에게 딱!' },
+    { key: 'normal', word: { setup: 0.25, story: 0 }, bossHp: 1.0, bossSpeed: 1.06,   name: '보통',       hp: 1.0,  count: 1.0,  speed: 1.0,  life: 5, coins: 60, desc: '기본 난이도예요.' },
+    { key: 'hard', word: { setup: 0.2, story: 0.25 }, bossHp: 1.25, bossSpeed: 1.08,     name: '어려움',     hp: 1.12, count: 1.05, speed: 1.05,  life: 4, coins: 60, keypad: true, desc: '답을 숫자 자판으로 직접 써요.' },
+    { key: 'veryhard', word: { setup: 0.2, story: 0.35 }, bossHp: 1.7, bossSpeed: 1.2, name: '아주 어려움', hp: 1.32, count: 1.12, speed: 1.12,  life: 3, coins: 60, keypad: true, desc: '생명 3개, 적이 훨씬 강해요.' },
+    { key: 'disaster', word: { setup: 0.15, story: 0.4 }, bossHp: 1.9, bossSpeed: 1.2, name: '재앙',       hp: 1.52,  count: 1.15, speed: 1.15,  life: 1, coins: 60, keypad: true, flash: 2, hidden: true,
       desc: '생명은 단 1개! 식은 2초 뒤에 사라져요.' }
   ],
   defaultDifficulty: 'normal',
