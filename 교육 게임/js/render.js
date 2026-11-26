@@ -12,7 +12,7 @@ G.Render = (function () {
   // L: { paths, slots, hero } (전투 B 도 같은 이름을 갖고 있다)
   function drawBackground(stageNo, L) {
     bctx.clearRect(0, 0, 960, 540);
-    G.MapArt.draw(bctx, stageNo, { paths: L.paths, slots: L.slots, hero: L.hero !== undefined ? L.hero : L.heroPos });
+    G.MapArt.draw(bctx, stageNo, { paths: L.paths, slots: L.slots, hero: L.hero !== undefined ? L.hero : L.heroPos, diff: L.diff });
   }
   function clear() { ctx.clearRect(0, 0, 960, 540); }
 
@@ -176,6 +176,13 @@ G.Render = (function () {
         d.fillStyle = g; d.beginPath(); d.arc(u.x, u.y - 20, 170, 0, Math.PI * 2); d.fill();
       });
       ctx.drawImage(darkCanvas, 0, 0);
+    }
+    // 재앙: 불씨가 천천히 떠오른다
+    if (B.diff && B.diff.key === 'disaster') {
+      for (var em = 0; em < 26; em++) {
+        var ey = 540 - ((em * 83 + t * (18 + em % 5 * 6)) % 600), ex = (em * 157) % 960 + Math.sin(t * 1.3 + em) * 14;
+        ctx.fillStyle = em % 3 ? 'rgba(255,110,60,.75)' : 'rgba(255,210,120,.85)'; ctx.fillRect(ex, ey, em % 4 ? 3 : 4, em % 4 ? 3 : 4);
+      }
     }
   }
   return { init: init, drawBackground: drawBackground, frame: frame, drawUnits: drawUnits, clear: clear };

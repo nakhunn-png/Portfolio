@@ -310,7 +310,43 @@ G.MapArt = (function () {
     road(ctx, L, '#3c3489', '#7f77dd', '#cecbf6');
     plates(ctx, L, '#afa9ec', '#3c3489');
   };
-  function draw(ctx, stageNo, L) { (THEMES[stageNo] || THEMES[1])(ctx, L); flag(ctx, L); }
+  /* 재앙 난이도: 같은 길·받침 위에 어두운 핏빛 하늘을 덮는다 (아주 어려움을 깬 친구만 보는 시크릿 분위기) */
+  function disaster(ctx, L) {
+    ctx.save();
+    // 1) 맵마다 원래 색은 살리고 어둡게 (multiply), 살짝만 붉게
+    ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = '#5a4258'; ctx.fillRect(0, 0, 960, 540);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = 'rgba(60,0,20,.18)'; ctx.fillRect(0, 0, 960, 540);
+    // 2) 가장자리를 더 어둡게
+    var v = ctx.createRadialGradient(480, 270, 200, 480, 270, 600);
+    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(10,0,8,.7)');
+    ctx.fillStyle = v; ctx.fillRect(0, 0, 960, 540);
+    // 3) 붉은 달 (위쪽 가운데: 화면 위 표시·버튼에 가리지 않는 자리)
+    var mx = 640, my = 40;
+    var m = ctx.createRadialGradient(mx, my, 8, mx, my, 62);
+    m.addColorStop(0, 'rgba(255,90,70,.6)'); m.addColorStop(1, 'rgba(255,40,40,0)');
+    ctx.fillStyle = m; ctx.beginPath(); ctx.arc(mx, my, 62, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#d8343a'; ctx.beginPath(); ctx.arc(mx, my, 22, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#a81e2a'; ctx.beginPath(); ctx.arc(mx - 7, my - 6, 5, 0, Math.PI * 2); ctx.arc(mx + 8, my + 7, 3, 0, Math.PI * 2); ctx.fill();
+    // 4) 아래 두 귀퉁이에 빛나는 갈라진 틈
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    [[[0, 470], [40, 492], [62, 468], [96, 500], [130, 540]], [[960, 470], [920, 494], [904, 470], [868, 506], [842, 540]]].forEach(function (c) {
+      [[12, 'rgba(255,60,40,.25)'], [5, '#ff5a3a'], [2, '#ffd27a']].forEach(function (w) {
+        ctx.strokeStyle = w[1]; ctx.lineWidth = w[0]; ctx.beginPath(); c.forEach(function (p, k) { if (k) ctx.lineTo(p[0], p[1]); else ctx.moveTo(p[0], p[1]); }); ctx.stroke();
+      });
+    });
+    // 5) 길 가장자리에 붉은 빛 테두리: 어두워도 길이 잘 보이게
+    L.paths.forEach(function (P) { strokePath(ctx, P, 68, 'rgba(255,60,60,.25)'); });
+    L.paths.forEach(function (P) { strokePath(ctx, P, 2, 'rgba(255,130,110,.75)', [10, 12]); });
+    // 6) 받침은 붉게 빛나는 테두리로 다시 그려 잘 보이게
+    L.slots.concat(L.hero ? [L.hero] : []).forEach(function (s, i) {
+      var hero = i === L.slots.length;
+      ctx.strokeStyle = hero ? '#ffd23f' : 'rgba(255,150,130,.85)'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.ellipse(s.x, s.y, 40, 15, 0, 0, Math.PI * 2); ctx.stroke();
+    });
+    ctx.restore();
+  }
+  function draw(ctx, stageNo, L) { (THEMES[stageNo] || THEMES[1])(ctx, L); if (L.diff && L.diff.key === 'disaster') disaster(ctx, L); flag(ctx, L); }
   return { draw: draw };
 })();
 

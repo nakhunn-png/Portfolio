@@ -65,7 +65,7 @@ G.CONFIG = {
       tip: '모래폭풍이 불면 적이 다른 길로 가요. 양쪽에 친구를 세워요!' },
     { no: 6, name: '전갈 왕',     unit: 2, hp: 1.7, minionHp: 1.2, path: 'arena',   boss: 'scorpion', enemies: ['babyScorpion', 'mole'], types: ['B1', 'B3'], format: 'choice', ready: true,
       tip: '보스가 나오면 영웅을 끌어서 빨간 원을 피해요!' },
-    { no: 7, name: '우주 정거장', unit: 3, hp: 1.4, speed: 1.35, path: 'rings',   enemies: ['alien', 'meteorRock'], types: ['C1'], format: 'column', ready: true,
+    { no: 7, name: '우주 정거장', unit: 3, hp: 1.3, speed: 1.35, path: 'rings',   enemies: ['alien', 'meteorRock'], types: ['C1'], format: 'column', ready: true,
       tip: '적이 바깥 고리를 돈 뒤 안쪽 고리로 갈아타요.' },
     { no: 8, name: '밤 놀이공원', unit: 3, hp: 0.95, path: 'coaster', enemies: ['toySoldier', 'balloonGhost'], types: ['C2'], format: 'pickExpr', ready: true, gimmick: 'dark',
       tip: '깜깜해서 친구들이 가까운 적만 봐요. 보너스 문제를 맞히면 조명이 켜져요!' },
@@ -94,7 +94,7 @@ G.CONFIG = {
    * 보스전 문제 칸: 맞힐 때마다 필살기 칸 1개 (3개가 차면 영웅 능력). 보스전 동안 능력 대기 시간은 멈춘다 */
   boss: {
     minionWaves: 2, lapLife: 2, pipsNeed: 3, heroMove: 320,
-    octopus:  { name: '문어 대장', hp: 3900, speed: 16, legRegrow: 22, armor: 0.3, stun: 5, vuln: 2 },
+    octopus:  { name: '문어 대장', hp: 4100, speed: 16, legRegrow: 22, armor: 0.3, stun: 5, vuln: 2 },
     scorpion: { name: '전갈 왕',   hp: 3800, speed: 18, stingEvery: 5, stingWarn: 1.5, stingR: 52, heroStun: 3, quickSec: 7 },
     demon:    { name: '냠냠 마왕', hp: 5800, speed: 15, summonEvery: 8, summonHp: 60, starEvery: 4, starWarn: 1.6, starR: 56, eatEvery: 7, eatSec: 6, comboNeed: 5 }
   },
@@ -105,11 +105,11 @@ G.CONFIG = {
   difficulties: [
     { key: 'tutorial', bossHp: 0.4, bossSpeed: 0.75, name: '튜토리얼',   hp: 0.5,  count: 0.7,  speed: 0.8,  life: 5, coins: 120, tutorial: true,
       desc: '처음이라면 여기부터! 하나씩 친절하게 알려 줘요.' },
-    { key: 'easy', bossHp: 0.8, bossSpeed: 0.95,     name: '쉬움',       hp: 0.95, count: 0.95, speed: 0.92,  life: 5, coins: 90, desc: '처음 하는 친구에게 딱!' },
-    { key: 'normal', bossHp: 1.0, bossSpeed: 1,   name: '보통',       hp: 1.0,  count: 1.0,  speed: 1.0,  life: 5, coins: 60, desc: '기본 난이도예요.' },
+    { key: 'easy', bossHp: 0.7, bossSpeed: 0.95,     name: '쉬움',       hp: 0.95, count: 0.95, speed: 0.92,  life: 5, coins: 90, desc: '처음 하는 친구에게 딱!' },
+    { key: 'normal', bossHp: 1.0, bossSpeed: 1.06,   name: '보통',       hp: 1.0,  count: 1.0,  speed: 1.0,  life: 5, coins: 60, desc: '기본 난이도예요.' },
     { key: 'hard', bossHp: 1.25, bossSpeed: 1.08,     name: '어려움',     hp: 1.12, count: 1.05, speed: 1.05,  life: 4, coins: 60, keypad: true, desc: '답을 숫자 자판으로 직접 써요.' },
     { key: 'veryhard', bossHp: 1.7, bossSpeed: 1.2, name: '아주 어려움', hp: 1.32, count: 1.12, speed: 1.12,  life: 3, coins: 60, keypad: true, desc: '생명 3개, 적이 훨씬 강해요.' },
-    { key: 'disaster', bossHp: 1.9, bossSpeed: 1.2, name: '재앙',       hp: 1.4,  count: 1.15, speed: 1.15,  life: 1, coins: 60, keypad: true, flash: 2, hidden: true,
+    { key: 'disaster', bossHp: 1.9, bossSpeed: 1.2, name: '재앙',       hp: 1.52,  count: 1.15, speed: 1.15,  life: 1, coins: 60, keypad: true, flash: 2, hidden: true,
       desc: '생명은 단 1개! 식은 2초 뒤에 사라져요.' }
   ],
   defaultDifficulty: 'normal',
