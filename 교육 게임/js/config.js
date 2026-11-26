@@ -18,24 +18,24 @@ G.CONFIG = {
   // 5. 냠냠 코인
   coin: { perCorrect: 10, comboEvery: 3, comboBonus: 5, drawCost: 30, start: 60 },
 
-  // 6-1. 직업 6가지 (노말 기준). range 는 화면 픽셀, interval 은 게임 시간 초
+  // 6-1. 직업 6가지 (노말 기준). range 는 화면 픽셀, interval 은 게임 시간 초. short: 출전 칸에 쓰는 짧은 능력 (유니크부터는 passives 의 short)
   jobs: {
-    sword:  { name: '검사',     atk: 22, interval: 0.9,  range: 200, style: '가까운 적 한 명을 세게' },
-    archer: { name: '궁수',     atk: 11, interval: 0.55, range: 330, style: '먼 적 한 명을 빠르게' },
-    mage:   { name: '마법사',   atk: 18, interval: 1.4,  range: 270, splash: 70, style: '여러 적에게 한꺼번에' },
-    knight: { name: '기사',     atk: 16, interval: 1.0,  range: 220, push: 26, style: '적을 뒤로 밀어냄' },
-    chef:   { name: '요리사',   atk: 7,  interval: 1.0,  range: 200, buff: 0.25, style: '옆 친구들 공격을 빠르게' },
-    ice:    { name: '얼음술사', atk: 8,  interval: 1.1,  range: 250, slow: 0.4, slowSec: 1.6, style: '적을 느리게' }
+    sword:  { name: '검사',     atk: 22, interval: 0.9,  range: 200, style: '가까운 적 한 명을 세게', short: '세게 때려요' },
+    archer: { name: '궁수',     atk: 11, interval: 0.55, range: 330, style: '먼 적 한 명을 빠르게', short: '멀리 쏴요' },
+    mage:   { name: '마법사',   atk: 18, interval: 1.4,  range: 270, splash: 70, style: '여러 적에게 한꺼번에', short: '한꺼번에 펑' },
+    knight: { name: '기사',     atk: 16, interval: 1.0,  range: 220, push: 26, style: '적을 뒤로 밀어냄', short: '뒤로 밀어요' },
+    chef:   { name: '요리사',   atk: 7,  interval: 1.0,  range: 200, buff: 0.25, style: '옆 친구들 공격을 빠르게', short: '친구 빠르게' },
+    ice:    { name: '얼음술사', atk: 8,  interval: 1.1,  range: 250, slow: 0.4, slowSec: 1.6, style: '적을 느리게', short: '느리게 해요' }
   },
   /* 자동 능력 (2026-11-26): 유니크부터 직업마다 하나. 레전더리·히든은 legendMul 배만큼 더 세다. 보스·작은 보스에는 멈춤·얼림이 안 걸린다 */
   passives: {
     minGrade: 'unique', legendMul: 1.6,
-    sword:  { name: '경직',   desc: '맞은 적이 잠깐 멈춰요',          stun: 0.45 },
-    archer: { name: '치명타', desc: '가끔 두 배로 세게 맞혀요',        crit: 0.25, critMul: 2 },
-    mage:   { name: '큰 폭발', desc: '폭발이 더 넓게 퍼져요',          splashMul: 1.45 },
-    knight: { name: '세게 밀기', desc: '적을 더 멀리 밀어내요',        pushMul: 2 },
-    chef:   { name: '힘내라 요리', desc: '옆 친구들 공격이 더 빨라져요', buffMul: 1.6 },
-    ice:    { name: '꽁꽁',   desc: '가끔 적을 꽁꽁 얼려 멈춰요',      freeze: 0.22, freezeSec: 1.0 }
+    sword:  { name: '경직',   desc: '맞은 적이 잠깐 멈춰요',          short: '기절시켜요', stun: 0.45 },
+    archer: { name: '치명타', desc: '가끔 두 배로 세게 맞혀요',        short: '가끔 두 배', crit: 0.25, critMul: 2 },
+    mage:   { name: '큰 폭발', desc: '폭발이 더 넓게 퍼져요',          short: '큰 폭발', splashMul: 1.45 },
+    knight: { name: '세게 밀기', desc: '적을 더 멀리 밀어내요',        short: '멀리 밀기', pushMul: 2 },
+    chef:   { name: '힘내라 요리', desc: '옆 친구들 공격이 더 빨라져요', short: '더 빠르게', buffMul: 1.6 },
+    ice:    { name: '꽁꽁',   desc: '가끔 적을 꽁꽁 얼려 멈춰요',      short: '꽁꽁 얼려요', freeze: 0.22, freezeSec: 1.0 }
   },
   slots: 8,              // 출전 칸 (2줄 × 4칸)
   life: 5,               // 생명. 적이 길을 한 바퀴 다 돌 때마다 생명 1 (보스는 2)

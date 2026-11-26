@@ -21,7 +21,15 @@ G.UI = (function () {
   /* ───────── 화면 바꾸기 ───────── */
   function show(id) {
     Array.prototype.forEach.call(document.querySelectorAll('.screen'), function (s) { s.classList.toggle('on', s.id === id); });
+    // 2026-11-26 배경 음악: 전투·보스전·나머지 화면마다 곡이 다르다
+    if (G.Music) G.Music.play(id === 'scr-battle' ? (A.B && A.B.bossPhase ? 'boss' : 'battle') : 'calm');
   }
+  function refreshMusic() {
+    var on = A.settings.music !== false, b = $('btn-music');
+    if (G.Music) G.Music.setOn(on);
+    if (b) { b.textContent = on ? '🎵 음악 켜짐' : '🔇 음악 꺼짐'; b.classList.toggle('off', !on); }
+  }
+  function toggleMusic() { A.settings.music = A.settings.music === false; saveAll(); if (G.Music) G.Music.unlock(); refreshMusic(); }
   function toast(text, ms) {
     var t = $('toast'); t.textContent = text; t.classList.remove('hidden');
     clearTimeout(toast.tm); toast.tm = setTimeout(function () { t.classList.add('hidden'); }, ms || 1800);
@@ -565,6 +573,9 @@ G.UI = (function () {
         m.style.borderColor = gi.dark;
         m.appendChild(el('span', 'job', C.jobs[ch.job].name));
         m.appendChild(img(charURL(u.id)));
+        // 2026-11-26 출전 칸에 짧은 능력 (유니크부터는 자동 능력, ✨)
+        var PV = C.passives, ord = ['normal', 'epic', 'unique', 'legendary', 'hidden'], pv = PV && PV[ch.job] && ord.indexOf(ch.grade) >= ord.indexOf(PV.minGrade) ? PV[ch.job] : null;
+        m.appendChild(el('div', 'ability' + (pv ? ' passive' : ''), pv ? '✨' + pv.short : C.jobs[ch.job].short));
         var gn = el('div', 'gname', gi.name); gn.style.background = gi.color; m.appendChild(gn);
       } else m.appendChild(el('div', 'empty-slot', '빈 칸'));
       m.onclick = function () { tapSlot(i); };
@@ -899,6 +910,9 @@ G.UI = (function () {
       { text: '계속하기', cls: 'green', fn: function () { closeOverlay(); A.paused = wasPaused && A.mode !== 'battle'; } },
       { text: A.tower ? '탑 그만 오르기' : '스테이지 나가기', cls: 'red', fn: function () { closeOverlay(); if (A.tower) finishTower(); else goMap(); } }
     ]);
+    var mb = el('button', 'btn small ' + (A.settings.music === false ? 'white' : 'sky') + ' pause-music', A.settings.music === false ? '🔇 음악 꺼짐' : '🎵 음악 켜짐');
+    mb.onclick = function () { toggleMusic(); mb.textContent = A.settings.music === false ? '🔇 음악 꺼짐' : '🎵 음악 켜짐'; mb.className = 'btn small ' + (A.settings.music === false ? 'white' : 'sky') + ' pause-music'; };
+    d.insertBefore(mb, d.querySelector('.btns'));
     if (A.mode === 'battle') {
       var sp = el('div', 'pause-speed');
       sp.appendChild(el('div', 'pause-speed-label', '전투 속도'));
@@ -1150,6 +1164,8 @@ G.UI = (function () {
     $('btn-challenge').onclick = function () {
       if (challengeOpen()) G.Plays.open(); else toast('스테이지 ' + C.challengeUnlock + ' 「' + G.stageByNo(C.challengeUnlock).name + '」을 깨면 열려요!');
     };
+    $('btn-music').onclick = toggleMusic; refreshMusic();
+    document.addEventListener('pointerdown', function () { if (G.Music) G.Music.unlock(); }, true);   // 브라우저는 한 번 눌러야 소리를 낸다
     $('btn-draw').onclick = doDraw;
     $('btn-draw-all').onclick = doDrawAll;
     $('btn-fight').onclick = startBattle;
@@ -1179,7 +1195,7 @@ G.UI = (function () {
     $('rotate-ok').onclick = function () { rotateOff = true; checkRotate(); };
     if (portrait.addEventListener) portrait.addEventListener('change', checkRotate); else portrait.addListener(checkRotate);
     checkRotate();
-    document.addEventListener('visibilitychange', function () { if (document.hidden && A.mode === 'battle' && !A.paused) pause(); });
+    document.addEventListener('visibilitychange', function () { if (G.Music) G.Music.pause(document.hidden); if (document.hidden && A.mode === 'battle' && !A.paused) pause(); });
     document.addEventListener('keydown', function (e) {
       if ((e.key === 'Escape' || e.key === ' ') && A.mode === 'battle' && !A.guideOn) { e.preventDefault(); if (A.targeting) cancelTarget(); else if (!A.paused) pause(); }
     });

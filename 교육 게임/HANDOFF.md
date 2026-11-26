@@ -22,6 +22,8 @@
   - **전투 중 끌어다 놓기**: 친구를 끌어 다른 칸에 놓으면 자리 바꿈(`ui.js` 의 `fieldDown/Move/Up`, `Battle.moveUnit`·`slotAt`, 그림은 `B.drag`). `drag-layer` 가 모든 전투에서 켜져 있다
   - **강화하기**: 지면 이어 하기. 보스전은 체력 절반부터, 웨이브는 그 웨이브부터 다시(`Battle.rewindWave` → `goPrep('wave')`)
   - 「모두 뽑기」가 「뽑기」보다 크다(`#btn-draw-all` 60px)
+  - **배경 음악** `js/audio.js`(`G.Music.play('calm'|'battle'|'boss')`, 화면이 바뀔 때 `show` 에서 고른다). 켜고 끄기: 처음 화면 오른쪽 위, 멈춤 창. 설정 `music`
+  - **출전 칸 능력 글씨**: `jobs.short`, 유니크부터 `passives.short`(✨)
   - 모든 난이도: 보너스 풍선 2초, 능력 조준 중에도 전투가 흐름, 「모두 뽑기」→「전투 시작」 버튼이 반짝이며 유도
 - **게임 전체 시간 어림 60~75분**(PRD 16장 끝). 사용자 기준 40~80분.
 
@@ -38,7 +40,7 @@ python -m http.server 8767
 - `http://localhost:8767` — 보통 플레이 / `?dev=1` — 모든 섬·배속·숨은 영웅·재앙·도전 영역 열림
 - 바로 해 볼 링크(시험판, 모든 것 열림): https://claude.ai/artifact/XeuQbw2hPCjDBZLQB79cVJ — 코드를 바꾸면 Claude 가 같은 주소로 다시 올린다(`index.html` 에서 doctype·head 를 뺀 사본 + `DEV = true`)
 - 저장은 localStorage(`냠냠2_도감`, `냠냠2_진행`, `냠냠2_설정`). localhost 와 127.0.0.1 은 저장이 따로 → 시험은 `127.0.0.1:8767`
-- 파일을 바꾸면 `index.html` 의 `?v=` 번호를 올린다(브라우저 캐시). 지금 `2026112610`
+- 파일을 바꾸면 `index.html` 의 `?v=` 번호를 올린다(브라우저 캐시). 지금 `2026112611`
 
 ## 파일
 
@@ -52,6 +54,7 @@ python -m http.server 8767
 | `js/ui.js` | 화면 흐름 전부: 섬 지도(`goMap`), 난이도(`renderDiffs`), 영웅, 문제(`renderQuiz`, `wordPicture`), 튜토리얼 안내(`guide`), 결과 |
 | `js/plays.js` | 도전 영역과 놀이 3개 |
 | `js/render.js`, `js/art/*` | 캔버스 그리기, 도트 그림, 재앙 맵 |
+| `js/audio.js` | 배경 음악(Web Audio 칩튠 3곡) |
 
 화면 흐름: 시작 → 섬 지도 → ① 난이도 → ② 영웅 → 준비(문제·뽑기) → 웨이브 ↔ 문제 → (보스) → 마무리 → 결과 → 「다음 스테이지」 또는 섬 지도.
 
