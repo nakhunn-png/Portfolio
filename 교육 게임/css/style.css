@@ -626,3 +626,12 @@ canvas { position: absolute; left: 0; top: 0; width: 960px; height: 540px; image
 
 .dc-passive { font-size: 13px; color: #b85a0c; background: #fff1dc; border-radius: 6px; padding: 1px 6px; margin-top: 2px; }
 .draw-row.many .dc-passive, .draw-row.tiny .dc-passive { display: none; }
+
+/* 보기 4개 (2026-11-26) */
+.choices { gap: 12px; }
+.choice { width: 104px; }
+.choice.wide { width: 150px; font-size: 26px; }
+.fmt-word .choice.wide { width: 146px; font-size: 24px; }
+.fmt-word .choice { width: 96px; }
+.fmt-tenframe .choice { width: 96px; }
+.bq-choices { gap: 6px; } .choice.small { width: 70px; font-size: 26px; }

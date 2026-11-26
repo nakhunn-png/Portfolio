@@ -22,23 +22,23 @@ var fail = 0;
 M.TYPES.forEach(function (t) {
   var bad = 0, seen = {};
   for (var i = 0; i < 20000; i++) {
-    var p = M.make([t], 3);
+    var p = M.make([t]);
     seen[p.text] = 1;
-    var ok = RULES[t](p) && p.choices.length === 3 && p.choices.indexOf(p.answer) >= 0 &&
-      p.choices.every(function (c) { return c >= 0 && c <= 99; }) && new Set(p.choices).size === 3;
+    var ok = RULES[t](p) && p.choices.length === 4 && p.choices.indexOf(p.answer) >= 0 &&
+      p.choices.every(function (c) { return c >= 0 && c <= 99; }) && new Set(p.choices).size === 4;
     if (!ok) { if (bad < 3) console.log('  범위 밖:', t, p.text, '=', p.answer, p.choices); bad++; }
   }
   console.log((bad ? '실패' : '통과') + '  ' + t + '  서로 다른 식 ' + Object.keys(seen).length + '개');
   fail += bad;
 });
-// 식 고르기 (스테이지 8): 보기 식 3개 중 정답 식은 하나, 다른 식은 답이 달라야 한다
+// 식 고르기 (스테이지 8): 보기 식 4개 중 정답 식은 하나, 다른 식은 답이 달라야 한다
 (function () {
   var bad = 0;
   for (var i = 0; i < 5000; i++) {
     var p = M.makePick(['C2']);
     var right = p.exprs.filter(function (e) { return e.ans === p.answer; }).length;
     var ansSet = new Set(p.exprs.map(function (e) { return e.ans; }));
-    if (p.exprs.length !== 3 || right !== 1 || ansSet.size !== 3) { if (bad < 3) console.log('  잘못된 보기:', p.answer, p.exprs); bad++; }
+    if (p.exprs.length !== 4 || right !== 1 || ansSet.size !== 4) { if (bad < 3) console.log('  잘못된 보기:', p.answer, p.exprs); bad++; }
   }
   console.log((bad ? '실패' : '통과') + '  식 고르기 보기');
   fail += bad;
@@ -55,10 +55,10 @@ M.TYPES.forEach(function (t) {
       for (var i = 0; i < 6000; i++) {
         var p = M.makeWord(u, mode), e = M.exprOf(p.kind, p.kind === 'ten' ? [p.nums[0]] : p.kind === 'from10' ? [10, p.nums[1]] : p.nums);
         kinds[u + p.kind] = 1;
-        var ok = RANGE[u](p) && e.ans === p.answer && p.story && p.ask && p.choices.length === 3 && p.choices.indexOf(p.answer) >= 0 && new Set(p.choices).size === 3;
+        var ok = RANGE[u](p) && e.ans === p.answer && p.story && p.ask && p.choices.length === 4 && p.choices.indexOf(p.answer) >= 0 && new Set(p.choices).size === 4;
         if (mode === 'setup') {
           var right = p.exprs.filter(function (x) { return x.ans === p.answer; }).length;
-          ok = ok && p.exprs.length === 3 && right === 1 && new Set(p.exprs.map(function (x) { return x.ans; })).size === 3 && p.exprs.some(function (x) { return x.text === p.expr; });
+          ok = ok && p.exprs.length === 4 && right === 1 && new Set(p.exprs.map(function (x) { return x.ans; })).size === 4 && p.exprs.some(function (x) { return x.text === p.expr; });
         }
         if (!ok) { if (bad < 5) console.log('  잘못된 문제:', u, mode, p.story, p.answer, JSON.stringify(p.exprs || p.choices)); bad++; }
       }

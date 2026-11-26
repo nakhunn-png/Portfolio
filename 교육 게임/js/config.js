@@ -122,7 +122,7 @@ G.CONFIG = {
     { key: 'easy', word: { setup: 0.15, story: 0 }, bossHp: 0.9, bossSpeed: 0.95,     name: '쉬움',       hp: 0.95, count: 0.95, speed: 0.92,  life: 5, coins: 90, desc: '처음 하는 친구에게 딱!' },
     { key: 'normal', word: { setup: 0.25, story: 0 }, bossHp: 1.0, bossSpeed: 1.06,   name: '보통',       hp: 1.0,  count: 1.0,  speed: 1.0,  life: 5, coins: 60, desc: '기본 난이도예요.' },
     { key: 'hard', word: { setup: 0.2, story: 0.25 }, bossHp: 1.25, bossSpeed: 1.08,     name: '어려움',     hp: 1.12, count: 1.05, speed: 1.05,  life: 4, coins: 60, keypad: true, desc: '답을 숫자 자판으로 직접 써요.' },
-    { key: 'veryhard', word: { setup: 0.2, story: 0.35 }, bossHp: 1.7, bossSpeed: 1.2, name: '아주 어려움', hp: 1.32, count: 1.12, speed: 1.12,  life: 3, coins: 60, keypad: true, desc: '생명 3개, 적이 훨씬 강해요.' },
+    { key: 'veryhard', word: { setup: 0.2, story: 0.35 }, bossHp: 1.7, bossSpeed: 1.2, name: '아주 어려움', hp: 1.32, count: 1.12, speed: 1.12,  life: 3, coins: 60, keypad: true, flash: 2.5, desc: '생명 3개, 적이 훨씬 강해요. 계산 식은 2.5초 뒤 가려져요.' },
     { key: 'disaster', word: { setup: 0.15, story: 0.4 }, bossHp: 1.9, bossSpeed: 1.2, name: '재앙',       hp: 1.52,  count: 1.15, speed: 1.15,  life: 1, coins: 60, keypad: true, flash: 2, hidden: true,
       desc: '생명은 단 1개! 식은 2초 뒤에 사라져요.' }
   ],

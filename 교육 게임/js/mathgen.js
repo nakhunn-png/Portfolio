@@ -5,6 +5,7 @@
 var G = globalThis.G || (globalThis.G = {});
 
 G.MathGen = (function () {
+  var CHOICES = 4;   // 보기 수 (2026-11-26: 모든 난이도 3 → 4개)
   function ri(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }   // a 이상 b 이하 정수
 
   /* 문제 하나: { type, text, answer, nums, op, wrongs[] }
@@ -122,21 +123,21 @@ G.MathGen = (function () {
       p.type = type;
     } while (p.text === last && ++tries < 20);
     last = p.text;
-    p.choices = makeChoices(p, choiceCount || 3);
+    p.choices = makeChoices(p, choiceCount || CHOICES);
     return p;
   }
 
   /* 식 고르기 (3-3, 스테이지 8): 「답이 34인 식은?」 보기 3개가 식이다.
    * 오답 식은 같은 유형에서 답이 다르고, 정답과 20 이내로 가까운 것을 고른다 */
   function makePick(types) {
-    var p = make(types, 3), exprs = [{ text: p.text, ans: p.answer }], tries = 0;
-    while (exprs.length < 3 && tries++ < 400) {
+    var p = make(types, CHOICES), exprs = [{ text: p.text, ans: p.answer }], tries = 0;
+    while (exprs.length < CHOICES && tries++ < 400) {
       var q = MAKERS[p.type]();
       if (q.answer === p.answer || Math.abs(q.answer - p.answer) > 20) continue;
       if (exprs.some(function (e) { return e.text === q.text || e.ans === q.answer; })) continue;
       exprs.push({ text: q.text, ans: q.answer });
     }
-    while (exprs.length < 3) { var r = MAKERS[p.type](); if (r.answer !== p.answer && !exprs.some(function (e) { return e.ans === r.answer; })) exprs.push({ text: r.text, ans: r.answer }); }
+    while (exprs.length < CHOICES) { var r = MAKERS[p.type](); if (r.answer !== p.answer && !exprs.some(function (e) { return e.ans === r.answer; })) exprs.push({ text: r.text, ans: r.answer }); }
     exprs.sort(function () { return Math.random() - 0.5; });
     p.pick = true; p.exprs = exprs;
     return p;
@@ -213,11 +214,14 @@ G.MathGen = (function () {
     p.text = p.story;
     if (mode === 'setup') {
       var exprs = [{ text: e.text, ans: e.ans }];
-      w.sort(function () { return Math.random() - 0.5; }).forEach(function (x) { if (exprs.length < 3 && x.ans >= 0 && !exprs.some(function (y) { return y.ans === x.ans || y.text === x.text; })) exprs.push(x); });
+      // 모자라면 수 하나를 1~2 바꾼 같은 모양의 식으로 채운다 (보기 4개)
+      var extra = [];
+      [1, -1, 2, -2].forEach(function (d) { for (var i = 0; i < n.length; i++) { if (S.kind === 'from10' && i === 0) continue; var m = n.slice(); m[i] += d; if (m[i] >= 1) extra.push(exprOf(S.kind, m)); } });
+      w.sort(function () { return Math.random() - 0.5; }).concat(extra).forEach(function (x) { if (exprs.length < CHOICES && x.ans >= 0 && !exprs.some(function (y) { return y.ans === x.ans || y.text === x.text; })) exprs.push({ text: x.text, ans: x.ans }); });
       exprs.sort(function () { return Math.random() - 0.5; });
       p.setup = true; p.pick = true; p.exprs = exprs;
     }
-    p.choices = makeChoices(p, 3);
+    p.choices = makeChoices(p, CHOICES);
     return p;
   }
 

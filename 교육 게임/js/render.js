@@ -2,7 +2,7 @@
 var G = globalThis.G || (globalThis.G = {});
 
 G.Render = (function () {
-  var bg, fg, bctx, ctx, darkCanvas = null;
+  var bg, fg, bctx, ctx, darkCanvas = null, tintCanvas = null;
   var SHOT_COLOR = { sword: '#ffffff', archer: '#8a5a32', mage: '#7fe3ff', knight: '#c9a05a', chef: '#ffd23f', ice: '#bdf3ff', hero: '#ffe27a' };
 
   function init() {
@@ -65,15 +65,25 @@ G.Render = (function () {
       var p = G.Battle.pos(B, e), hop = e.blocked ? 0 : Math.abs(Math.sin(t * 8 + e.bob)) * 4;
       ctx.fillStyle = 'rgba(58,42,63,.22)'; ctx.beginPath(); ctx.ellipse(p.x, p.y + 2, 15, 5, 0, 0, Math.PI * 2); ctx.fill();
       if (e.turbo) { ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(p.x, p.y - 20, 24, 0, Math.PI * 2); ctx.stroke(); }
-      ctx.save();
-      if (e.hit > 0) ctx.filter = 'brightness(1.8)';
-      else if (!e.boss && e.stunT > 0 && e.stunKind === 'ice') ctx.filter = 'hue-rotate(170deg) saturate(.5) brightness(1.35)';
-      else if (e.slowT > 0 || e.zoneSlow < 1) ctx.filter = 'hue-rotate(160deg) saturate(.7) brightness(1.15)';
-      G.Pixel.drawSprite(ctx, G.EnemyArt.sprite(e.type, (e.boss || e.mini) ? 0 : e.id % 3), p.x, p.y - hop + (e.boss ? 18 : e.mini ? 10 : 0), e.boss ? 124 : e.mini ? 84 : 44, p.dx < 0);
-      ctx.restore();
-      if (!e.boss && e.stunT > 0) {   // 자동 능력: 경직(노란 별) · 얼림(얼음 네모)
-        if (e.stunKind === 'ice') { ctx.fillStyle = 'rgba(191,230,255,.45)'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.fillRect(p.x - 20, p.y - 44, 40, 46); ctx.strokeRect(p.x - 20, p.y - 44, 40, 46); }
-        else { ctx.fillStyle = '#ffd23f'; ctx.font = '14px Jua, sans-serif'; ctx.textAlign = 'center'; for (var sq = 0; sq < 2; sq++) ctx.fillText('★', p.x + Math.cos(t * 7 + sq * 3.1) * 14, p.y - 50 + Math.sin(t * 7 + sq * 3.1) * 4); }
+      // 느려지거나 얼면 몸 색이 파랗게 바뀐다 (얼면 더 밝은 얼음색). 따로 글자나 효과는 넣지 않는다.
+      // 그림을 따로 그린 뒤 그 위에만 파란색을 덧칠한다 (원래 색과 상관없이 확실히 파랗게)
+      var spr = G.EnemyArt.sprite(e.type, (e.boss || e.mini) ? 0 : e.id % 3), sx = p.x, sy = p.y - hop + (e.boss ? 18 : e.mini ? 10 : 0), size = e.boss ? 124 : e.mini ? 84 : 44;
+      var tint = e.hit > 0 ? null : (!e.boss && e.stunT > 0 && e.stunKind === 'ice') ? 'rgba(150,215,255,.78)' : (e.slowT > 0 || e.zoneSlow < 1) ? 'rgba(40,120,255,.62)' : null;
+      if (tint) {
+        if (!tintCanvas) { tintCanvas = document.createElement('canvas'); tintCanvas.width = 200; tintCanvas.height = 200; }
+        var tc = tintCanvas.getContext('2d');
+        tc.globalCompositeOperation = 'source-over'; tc.clearRect(0, 0, 200, 200);
+        G.Pixel.drawSprite(tc, spr, 100, 180, size, p.dx < 0);
+        tc.globalCompositeOperation = 'source-atop'; tc.fillStyle = tint; tc.fillRect(0, 0, 200, 200);
+        ctx.drawImage(tintCanvas, sx - 100, sy - 180);
+      } else {
+        ctx.save();
+        if (e.hit > 0) ctx.filter = 'brightness(1.8)';
+        G.Pixel.drawSprite(ctx, spr, sx, sy, size, p.dx < 0);
+        ctx.restore();
+      }
+      if (!e.boss && e.stunT > 0) {   // 자동 능력: 경직이면 노란 별 (얼림은 색으로만)
+        if (e.stunKind !== 'ice') { ctx.fillStyle = '#ffd23f'; ctx.font = '14px Jua, sans-serif'; ctx.textAlign = 'center'; for (var sq = 0; sq < 2; sq++) ctx.fillText('★', p.x + Math.cos(t * 7 + sq * 3.1) * 14, p.y - 50 + Math.sin(t * 7 + sq * 3.1) * 4); }
       }
       if (e.boss) {
         if (e.stunT > 0) { ctx.fillStyle = '#ffd23f'; ctx.font = '24px Jua, sans-serif'; ctx.textAlign = 'center'; for (var q = 0; q < 3; q++) ctx.fillText('★', p.x + Math.cos(t * 5 + q * 2.1) * 40, p.y - 108 + Math.sin(t * 5 + q * 2.1) * 10); }

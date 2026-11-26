@@ -168,7 +168,7 @@ G.UI = (function () {
       else if (D.hidden && !diffOpen(D.key)) { c = card('d-disaster', '? ? ?', '「아주 어려움」으로 덧뺄셈 (3) 섬을 깨면 열려요', true); c.onclick = function () { toast('아직 잠겨 있어요!'); }; }
       else {
         var sub = D.tutorial ? (A.progress.tutorialDone ? '✔ 끝냈어요 · 답을 알려 주는 연습 판' : '처음이라면 여기부터! 답을 알려 줘요 · 2분')
-          : D.hidden ? '생명 1개 · 식이 2초 뒤 사라져요' : (D.keypad ? '답을 숫자로 써요' : '보기에서 답을 골라요');
+          : D.hidden ? '생명 1개 · 식이 2초 뒤 사라져요' : (D.keypad ? '답을 숫자로 써요' + (D.flash ? ' · 식이 ' + D.flash + '초 뒤 가려져요' : '') : '보기에서 답을 골라요');
         c = card('d-' + D.key, D.name, sub, false);
         c.onclick = function () { A.settings.diff = D.key; A.settings.diffChosen = true; saveAll(); renderDiffs(); };
       }
@@ -304,7 +304,7 @@ G.UI = (function () {
   function nextProblem(q) {
     var st = G.stageByNo(A.stageNo);
     var types = A.tower ? Ch.towerTypes(A.wavesDone + 1) : st.types;
-    q.p = stageFormat() === 'pickExpr' ? G.MathGen.makePick(types) : G.MathGen.make(types, 3);
+    q.p = stageFormat() === 'pickExpr' ? G.MathGen.makePick(types) : G.MathGen.make(types);
     // 식 세우기·문장제 (2026-11-26): 준비·웨이브 사이·마무리 문제에서 난이도마다 정한 비율로 섞는다. 풍선·보스·탑은 빨리 풀어야 해서 뺀다
     var W = A.B && A.B.diff.word, r = Math.random();
     if (W && !A.tower && (q.kind === 'prep' || q.kind === 'wave' || q.kind === 'final' || q.kind === 'boss' || q.kind === 'retry')) {
@@ -425,12 +425,14 @@ G.UI = (function () {
     } else {
       var text = el('div', 'q-text');
       var tail = p.op === 'blank+' ? '' : fmt === 'keypad' ? ' = <span class="qin">?</span>' : ' = <span class="qm">?</span>';
-      text.innerHTML = p.text.replace('□', '<span class="qbox">□</span>') + tail;
+      // 숫자 자판인데 빈칸 문제(4 + □ = 10)면 □ 자리가 답 쓰는 칸이 된다 (전에는 답 칸이 없어 멈췄다)
+      text.innerHTML = p.text.replace('□', fmt === 'keypad' ? '<span class="qin">?</span>' : '<span class="qbox">□</span>') + tail;
       container.appendChild(text);
       if (fmt === 'keypad') { var qin = text.querySelector('.qin'); display = function () { qin.textContent = q.input || '?'; qin.classList.toggle('empty', !q.input); }; }
       if (fmt === 'tenframe') container.appendChild(tenFrame(p));
       // 재앙: 식이 잠깐 보였다가 사라진다 (틀려서 다시 풀 때는 계속 보인다)
-      if (D && D.flash && q.tries === 0) setTimeout(function () { text.classList.add('gone'); }, D.flash * 1000);
+      // 아주 어려움·재앙: 단순 계산 식만 잠깐 보였다가 가려진다. 그림이 있는 문제(10칸 그림)·식 세우기·문장제는 계속 보인다 (틀려서 다시 풀 때도 보인다)
+      if (D && D.flash && q.tries === 0 && fmt !== 'tenframe') setTimeout(function () { text.classList.add('gone'); }, D.flash * 1000);
     }
     container.appendChild(hintSlot);
     if (q.tries > 0 && !p.pick) hintSlot.appendChild(hintNode(p));
@@ -740,7 +742,7 @@ G.UI = (function () {
   }
   function hideBossUI() { $('boss-ui').classList.add('hidden'); $('drag-layer').classList.add('hidden'); }
   function newBossProblem() {
-    var st = G.stageByNo(A.stageNo), p = G.MathGen.make(st.types, 3), box = $('boss-quiz');
+    var st = G.stageByNo(A.stageNo), p = G.MathGen.make(st.types), box = $('boss-quiz');
     A.bq = { p: p, lock: false, timeLeft: A.B.bossType === 'scorpion' ? C.boss.scorpion.quickSec : 0 };
     box.innerHTML = '';
     var head = el('div', 'bq-head');
