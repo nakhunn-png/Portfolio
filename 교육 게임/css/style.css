@@ -659,3 +659,45 @@ canvas { position: absolute; left: 0; top: 0; width: 960px; height: 540px; image
 .pause-music { display: block; margin: 4px auto 10px; min-height: 56px; }
 .mini .ability.legend { background: #dcf6df; color: #1f7f2c; }
 .dc-passive.legend { color: #1f7f2c; background: #dcf6df; }
+/* 2026-11-26 틀렸을 때 그림이 보기·자판을 넘거나 가리지 않게: 점은 작게 10개씩 줄, 그림 칸에 자리를 주고 식 글자를 줄인다 */
+.hint-box { gap: 6px; }
+.hint-box .hint-group { max-width: 142px; gap: 2px; }
+.hint-box .hint-group.tens { max-width: 260px; }
+.hint-box .dot { width: 12px; height: 12px; border-width: 2px; }
+.hint-box .dot.x::after { top: 3px; height: 2px; }
+.hint-box .stick { width: 7px; height: 26px; }
+.hint-box .hint-sep { font-size: 22px; }
+.math-panel.has-hint .hint-slot { min-height: 0; margin: 2px 0; }
+.math-panel.has-hint .q-text { font-size: 44px; margin: 0; }
+.math-panel.fmt-keypad.has-hint .key { height: 40px; }
+.math-panel.has-hint .q-msg { margin-top: 2px; min-height: 0; font-size: 19px; }
+.math-panel.fmt-word.has-hint .q-story, .math-panel.fmt-word.has-hint .q-ask { font-size: 19px; line-height: 1.2; }
+.math-panel.fmt-word.has-hint .q-pic { display: none; }
+.math-panel.fmt-wordkey.has-hint .key { height: 38px; }
+.math-panel.fmt-word .choices { margin-top: 3px; } .math-panel.fmt-word .q-msg { margin-top: 2px; }
+/* 2026-11-26 결과 화면: 단추는 늘 칸 안 아래에 */
+.result-panel { overflow: hidden; }
+.result-body { flex: 1 1 auto; min-height: 0; width: 100%; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+.result-panel .result-btns { flex: 0 0 auto; margin-top: 8px; }
+.result-panel.compact h2 { font-size: 30px; }
+.result-panel.compact .result-stars { font-size: 44px; }
+.result-panel.compact .result-stats { margin: 4px 0; display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; width: 560px; }
+.result-panel.compact .rs-row { font-size: 17px; padding: 1px 0; }
+.result-panel.compact .reward-box { margin: 4px 0; }
+.result-panel.compact .reward-row { padding: 2px 8px; font-size: 16px; }
+.result-panel.compact .reward-row img { width: 36px; height: 36px; }
+.result-panel.compact .legend-open, .result-panel.compact .retry-note { margin: 2px 0; font-size: 16px; }
+/* 2026-11-26 뽑기 창: 「좋아요」가 화면 밖으로 나가지 않게 */
+.draw-dialog { display: flex; flex-direction: column; max-height: 516px; padding-top: 10px; padding-bottom: 12px; }
+.draw-dialog .draw-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.draw-dialog > .btn { flex: 0 0 auto; align-self: center; margin-top: 6px; }
+.draw-dialog h2 { margin: 0 0 6px; }
+.merge-res .dc-passive, .merge-res .dc-name { font-size: 13px; }
+.merge-res .dc-passive { display: none; }
+/* 튜토리얼 안내 창이 짧은 알림 글에 가려지지 않게 */
+.guide { z-index: 45; }
+.gc.bench { background: #fff; color: var(--ink); border: 2px dashed var(--ink); }
+/* 2026-11-26 보너스 풍선이 끌기 판(drag-layer) 밑에 깔려 눌리지 않던 것 */
+#scr-battle .bubble-layer { z-index: 2; }
+/* 2026-11-26 짧은 알림은 위쪽에 (아래의 「좋아요」·「전투 시작」 같은 큰 단추를 가리지 않게) */
+.toast { bottom: auto; top: 84px; max-width: 640px; text-align: center; font-size: 20px; }

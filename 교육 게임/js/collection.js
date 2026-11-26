@@ -66,7 +66,8 @@ G.Collection = (function () {
     return { charId: id, grade: grade, isNew: r.isNew, uid: r.unit.uid };
   }
   /* 모두 뽑기: 출전 칸이 가득 차면 멈춘다 (2026-11-26). 칸이 차면 먼저 합성해 보고, 그래도 차 있으면 그만 뽑는다. 남은 코인은 다음에 쓴다 */
-  function full(run) { return run.roster.length >= run.slots.length; }
+  function full(run) { return run.roster.length >= run.slots.length + (G.CONFIG.bench || 0); }   // 출전 칸 + 대기석
+  function benchCount(run) { return Math.max(0, run.roster.length - run.slots.filter(Boolean).length); }
   function drawAll(run, book) {
     var out = [], merges = [], d;
     while (canDraw(run)) {
@@ -133,7 +134,7 @@ G.Collection = (function () {
   }
 
   return { newBook: newBook, newRun: newRun, addCoins: addCoins, answer: answer, rollGrade: rollGrade, canDraw: canDraw,
-    saveTeam: saveTeam, loadTeam: loadTeam, draw: draw, drawAll: drawAll, full: full, mergeOnce: mergeOnce, autoMerge: autoMerge, fillSlots: fillSlots, swapSlots: swapSlots,
+    benchCount: benchCount, saveTeam: saveTeam, loadTeam: loadTeam, draw: draw, drawAll: drawAll, full: full, mergeOnce: mergeOnce, autoMerge: autoMerge, fillSlots: fillSlots, swapSlots: swapSlots,
     lineup: lineup, countByGrade: countByGrade, addFriend: addFriend };
 })();
 

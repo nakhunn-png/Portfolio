@@ -31,7 +31,7 @@ G.UI = (function () {
   }
   function toggleMusic() { A.settings.music = A.settings.music === false; saveAll(); if (G.Music) G.Music.unlock(); refreshMusic(); }
   function toast(text, ms) {
-    var t = $('toast'); t.textContent = text; t.classList.remove('hidden');
+    var t = $('toast'); t.textContent = text; t.classList.remove('hidden'); toast.at = performance.now();
     clearTimeout(toast.tm); toast.tm = setTimeout(function () { t.classList.add('hidden'); }, ms || 1800);
   }
   function floatText(x, y, text, cls) {
@@ -365,30 +365,35 @@ G.UI = (function () {
     return box;
   }
 
-  // 그림 도움 (10 묶음 / 점)
+  /* 그림 도움 (틀렸을 때). 2026-11-26 그림이 보기·숫자 자판을 넘거나 가리던 것을 고침:
+   * 20 이하는 점을 10개씩 줄 맞춰 작게, 20 보다 크면 10 묶음 막대 + 낱개 점으로 짧게 보여 준다 */
   function hintNode(p) {
-    var box = el('div', 'hint-box'), colors = ['a', 'b', 'c'];
+    var box = el('div', 'hint-box'), colors = ['a', 'b', 'c'], nums = p.nums || [];
+    var big = nums.some(function (n) { return n > 20; }) || p.type === 'C1' || p.type === 'C2';
     function dots(n, cls, crossFrom) {
       var g = el('div', 'hint-group');
       for (var i = 0; i < n; i++) g.appendChild(el('span', 'dot ' + (crossFrom !== undefined && i >= crossFrom ? 'x' : cls)));
       return g;
     }
-    if (p.type === 'C1' || p.type === 'C2') {
-      p.nums.forEach(function (n, k) {
-        var g = el('div', 'hint-group');
-        for (var t = 0; t < Math.floor(n / 10); t++) g.appendChild(el('span', 'stick'));
-        for (var o = 0; o < n % 10; o++) g.appendChild(el('span', 'dot ' + colors[k]));
-        box.appendChild(g); if (k === 0) box.appendChild(el('span', 'hint-sep', p.op === '-' ? '−' : '+'));
-      });
+    function sticks(n, cls) {
+      var g = el('div', 'hint-group tens');
+      for (var t = 0; t < Math.floor(n / 10); t++) g.appendChild(el('span', 'stick'));
+      for (var o = 0; o < n % 10; o++) g.appendChild(el('span', 'dot ' + cls));
+      return g;
+    }
+    function sep(t) { box.appendChild(el('span', 'hint-sep', t)); }
+    var minus = p.op && p.op.indexOf('-') >= 0;
+    if (big) {
+      nums.forEach(function (n, k) { box.appendChild(sticks(n, colors[k % 3])); if (k < nums.length - 1) sep(minus ? '−' : '+'); });
     } else if (p.op === 'blank+') {
       var g = el('div', 'hint-group');
-      for (var i = 0; i < 10; i++) g.appendChild(el('span', 'dot ' + (i < p.nums[0] ? 'a' : 'empty')));
+      for (var i = 0; i < 10; i++) g.appendChild(el('span', 'dot ' + (i < nums[0] ? 'a' : 'empty')));
       box.appendChild(g);
-    } else if (p.op.indexOf('-') >= 0) {
-      var take = p.nums.slice(1).reduce(function (s, x) { return s + x; }, 0);
-      box.appendChild(dots(p.nums[0], 'a', p.nums[0] - take));
+    } else if (minus) {
+      var take = nums.slice(1).reduce(function (s, x) { return s + x; }, 0);
+      box.appendChild(dots(nums[0], 'a', nums[0] - take));
     } else {
-      p.nums.forEach(function (n, k) { box.appendChild(dots(n, colors[k % 3])); if (k < p.nums.length - 1) box.appendChild(el('span', 'hint-sep', '+')); });
+      nums.forEach(function (n, k) { box.appendChild(dots(n, colors[k % 3])); if (k < nums.length - 1) sep('+'); });
     }
     return box;
   }
@@ -472,7 +477,7 @@ G.UI = (function () {
       if (D && D.flash && q.tries === 0 && fmt !== 'tenframe') setTimeout(function () { text.classList.add('gone'); }, D.flash * 1000);
     }
     container.appendChild(hintSlot);
-    if (q.tries > 0 && !p.pick) hintSlot.appendChild(hintNode(p));
+    if (q.tries > 0 && !p.pick) { hintSlot.appendChild(hintNode(p)); container.classList.add('has-hint'); } else container.classList.remove('has-hint');
 
     function next(ms) { setTimeout(function () { q.p = null; renderQuiz(container, q, onDone); }, ms); }
     // 답 하나 내기 (모든 형식이 함께 쓴다)
@@ -492,7 +497,7 @@ G.UI = (function () {
         Col.answer(A.run, false, p.type); q.attempts++; q.tries++;
         if (q.tries === 1) {
           msg2.className = 'q-msg soft'; msg2.textContent = p.pick ? '괜찮아요! 식을 하나씩 계산해 봐요.' : '괜찮아요! 그림을 보고 다시 해 봐요.';
-          if (!p.pick) { hintSlot.innerHTML = ''; hintSlot.appendChild(hintNode(p)); }
+          if (!p.pick) { hintSlot.innerHTML = ''; hintSlot.appendChild(hintNode(p)); container.classList.add('has-hint'); }
           q.input = ''; if (display) display();
         } else {
           row.dataset.lock = '1';
@@ -560,7 +565,7 @@ G.UI = (function () {
   function refreshDrawBtns() {
     var can = Col.canDraw(A.run) && !Col.full(A.run);   // 출전 칸이 가득 차면 뽑지 않는다
     $('btn-draw').disabled = !can; $('btn-draw-all').disabled = !can;
-    $('btn-draw-all').textContent = Col.full(A.run) && Col.canDraw(A.run) ? '칸이 가득 찼어요' : '모두 뽑기';
+    $('btn-draw-all').textContent = Col.full(A.run) && Col.canDraw(A.run) ? '대기석까지 가득' : '모두 뽑기';
   }
   function hearts(box) {
     box.innerHTML = '';
@@ -589,6 +594,7 @@ G.UI = (function () {
     });
     var gc = $('grade-counts'), cnt = Col.countByGrade(A.run); gc.innerHTML = '';
     C.grades.forEach(function (g) { if (!cnt[g.key]) return; var c = el('span', 'gc', g.name + ' ' + cnt[g.key]); c.style.background = g.color; gc.appendChild(c); });
+    var bn = Col.benchCount(A.run); if (bn) { var bc = el('span', 'gc bench', '대기 ' + bn + '/' + C.bench); gc.appendChild(bc); }   // 대기석 (합성 재료)
     // 전투 시작 버튼
     var q = A.quiz, ready = q && quizFinished(q), fight = $('btn-fight');
     var units = A.run.slots.filter(Boolean).length;
@@ -636,21 +642,24 @@ G.UI = (function () {
     if (rewards.length) setTimeout(function () { toast(rewards.map(function (x) { return x.text; }).join(' / ') + '!', 3500); }, 300);
     var d = el('div', 'dialog draw-dialog');
     d.appendChild(el('h2', '', results.length > 1 ? results.length + '명이 왔어요!' : '새 친구!'));
-    var row = el('div', 'draw-row' + (results.length > 8 ? ' tiny' : results.length > 4 ? ' many' : ''));
+    // 2026-11-26 합성이 있으면 카드를 작게 (합성 그림과 「좋아요」가 화면 밖으로 밀려났다)
+    var row = el('div', 'draw-row' + (results.length > 8 ? ' tiny' : results.length > 4 || (results.merges || []).length || merges.length ? ' many' : ''));
     results.forEach(function (r) { row.appendChild(cardNode(r.charId, r.isNew)); });
     d.appendChild(row);
     if (merges.length) d.appendChild(mergeAnim(merges));
-    if (results.full) d.appendChild(el('div', 'full-note', '출전 칸이 가득 찼어요! 남은 코인은 다음에 써요.'));
+    if (results.full) d.appendChild(el('div', 'full-note', '출전 칸과 대기석이 가득 찼어요! 남은 코인은 다음에 써요.'));
     var ok = el('button', 'btn big green', '좋아요'); ok.onclick = function () {
       closeOverlay(); refreshPrep();
       guide('lineup', '.roster-panel', '출전 칸', '뽑은 친구는 여기에 서서 싸워요. 같은 등급 친구가 모이면 저절로 합쳐져서 더 센 친구가 돼요. 두 칸을 차례로 누르면 자리를 바꿔요.');
       guide('fight', '#btn-fight', '전투 시작!', '준비가 끝나면 이 버튼을 눌러요. 전투가 시작돼요!');
     };
     d.appendChild(ok); overlay(d);
+    // 「좋아요」는 늘 창 아래에 보이고, 나머지가 넘치면 그 칸만 굴린다
+    var body = el('div', 'draw-body'); Array.prototype.slice.call(d.childNodes).forEach(function (n) { if (n !== ok) body.appendChild(n); }); d.insertBefore(body, ok);
     refreshPrep();
   }
   function doDraw() {
-    if (Col.full(A.run)) { toast('출전 칸이 가득 찼어요!'); return; }
+    if (Col.full(A.run)) { toast('출전 칸과 대기석이 가득 찼어요!'); return; }
     var r = Col.draw(A.run, A.book); if (r) afterDraw([r]);
   }
   /* 합성 애니메이션: 재료 친구들이 가운데로 모여 번쩍! 한 다음 새 친구가 튀어나온다. 합성이 여럿이면 차례로 */
@@ -899,7 +908,7 @@ G.UI = (function () {
     A.paused = true;
     var d = el('div', 'dialog math-dialog'), box = el('div', 'math-panel in-dialog');
     d.appendChild(box);
-    var q = newQuiz('bubble'); q.left = 1;
+    var q = newQuiz('bubble'); q.left = 1; A.bubbleQ = q;
     // 밤 놀이공원: 맞히면 조명이 12초(게임 시간) 켜진다
     if (A.B.gimmick === 'dark') q.onRight = function () { Bt.light(A.B, 12); setTimeout(function () { banner('조명 켜짐!'); }, 700); };
     renderQuiz(box, q, function () {
@@ -948,6 +957,15 @@ G.UI = (function () {
     });
     return box;
   }
+  /* 2026-11-26 결과 화면: 보상·안내가 많으면 단추가 화면 밖으로 밀려났다.
+   * 단추 줄은 칸 아래에 붙이고, 나머지는 위 칸에 넣어 넘치면 먼저 작게(compact), 그래도 넘치면 그 칸만 굴려 본다 */
+  function fitResult(p) {
+    var body = el('div', 'result-body'), bs = p.querySelector('.result-btns');
+    Array.prototype.slice.call(p.childNodes).forEach(function (n) { if (n !== bs) body.appendChild(n); });
+    p.insertBefore(body, bs);
+    p.classList.remove('compact');
+    if (body.scrollHeight > body.clientHeight + 1) p.classList.add('compact');
+  }
   /* 도전의 탑 끝 (지거나 그만두면) */
   function finishTower() {
     A.mode = 'result'; clearBubbles(); closeOverlay(); hideBossUI();
@@ -969,6 +987,7 @@ G.UI = (function () {
     var again = el('button', 'btn big orange', '다시 오르기'); again.onclick = function () { startStage(G.TOWER_NO, A.heroId, A.diffKey); };
     var back = el('button', 'btn big green', '도전 영역'); back.onclick = function () { G.Plays.open(); };
     bs.appendChild(again); bs.appendChild(back); p.appendChild(bs);
+    fitResult(p);
   }
   function finishStage(win) {
     if (A.tower) { finishTower(); return; }
@@ -1036,6 +1055,7 @@ G.UI = (function () {
     } else if (nx) { var go = el('button', 'btn big green pulse', '다음: ' + nx.name + ' ▶'); go.onclick = function () { startStage(nx.no, A.heroId, A.diffKey); }; bs.appendChild(go); }
     else if (win) p.appendChild(el('div', 'legend-open', ISLAND_NAME[G.stageByNo(A.stageNo).unit] + ' 섬을 모두 깼어요!' + (G.stageByNo(A.stageNo).unit < 3 ? ' 다음 섬이 열렸어요.' : '')));
     p.appendChild(bs);
+    fitResult(p);
   }
 
   /* ───────── 튜토리얼 안내 창 ─────────
@@ -1175,7 +1195,11 @@ G.UI = (function () {
       if (challengeOpen()) G.Plays.open(); else toast('스테이지 ' + C.challengeUnlock + ' 「' + G.stageByNo(C.challengeUnlock).name + '」을 깨면 열려요!');
     };
     $('btn-music').onclick = toggleMusic; refreshMusic();
-    document.addEventListener('pointerdown', function () { if (G.Music) G.Music.unlock(); }, true);   // 브라우저는 한 번 눌러야 소리를 낸다
+    document.addEventListener('pointerdown', function () {
+      if (G.Music) G.Music.unlock();
+      // 2026-11-26 알림 글은 화면을 누르면 바로 사라진다 (뜬 지 0.4초 지나서부터: 알림을 띄운 그 터치로는 안 사라지게)
+      if (toast.at && performance.now() - toast.at > 400) $('toast').classList.add('hidden');
+    }, true);   // 브라우저는 한 번 눌러야 소리를 낸다
     $('btn-draw').onclick = doDraw;
     $('btn-draw-all').onclick = doDrawAll;
     $('btn-fight').onclick = startBattle;
