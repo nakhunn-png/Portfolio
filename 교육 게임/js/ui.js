@@ -38,7 +38,7 @@ G.UI = (function () {
     var f = el('div', 'float-text ' + (cls || ''), text); f.style.left = x + 'px'; f.style.top = y + 'px';
     $('fx').appendChild(f); setTimeout(function () { f.remove(); }, 1000);
   }
-  function overlay(node) { var o = $('overlay'); o.innerHTML = ''; o.appendChild(node); o.classList.remove('hidden'); }
+  function overlay(node) { var o = $('overlay'); o.innerHTML = ''; o.appendChild(node); o.classList.remove('hidden'); $('toast').classList.add('hidden'); }   // 창이 뜨면 남아 있던 알림 글은 지운다 (창 제목을 가리지 않게)
   function closeOverlay() { $('overlay').classList.add('hidden'); $('overlay').innerHTML = ''; }
   function dialog(title, text, buttons) {
     var d = el('div', 'dialog'); d.appendChild(el('h2', '', title)); if (text) d.appendChild(el('p', '', text));
@@ -77,8 +77,18 @@ G.UI = (function () {
   function nextInIsland(no) { var st = G.stageByNo(no), list = islandStages(st.unit), i = list.indexOf(st); return list[i + 1] || null; }
   // 섬 꾸미기 (단원 테마): 섬마다 그림 3개
   var ISLAND_DECO = { 1: ['🍭', '🌴', '🐙'], 2: ['⛄', '🌵', '🦂'], 3: ['🚀', '🎡', '👑'] };
+  function hasTeam() { return !!(A.progress.team && (A.progress.team.slots || []).some(Boolean)); }
+  /* 2026-11-26 친구 처음부터 다시 하기: 이어 가는 친구들을 보내고 다음 판부터 새로 뽑는다 (별·도감·해금은 그대로) */
+  function resetTeam() {
+    var n = (A.progress.team.slots || []).filter(Boolean).length + (A.progress.team.bench || []).length;
+    dialog('친구 처음부터 다시 하기', '함께 다니는 친구 ' + n + '명과 헤어지고, 다음 판부터 새로 뽑아요. 별과 도감은 그대로예요.', [
+      { text: '처음부터 할래요', cls: 'orange', fn: function () { A.progress.team = null; saveAll(); closeOverlay(); goMap(); toast('다음 판부터 친구를 새로 뽑아요!'); } },
+      { text: '그대로 할래요', cls: 'green', fn: closeOverlay }
+    ]);
+  }
   function goMap() {
     A.mode = 'map'; A.tower = null; show('scr-map');
+    $('btn-team-reset').classList.toggle('hidden', !hasTeam());
     var g = $('map-grid'); g.innerHTML = '';
     var firstOpen = null;
     [1, 2, 3].forEach(function (u) {
@@ -258,7 +268,7 @@ G.UI = (function () {
     var carry = !D.tutorial && !st.tower && A.progress.team && (A.progress.team.slots || []).some(Boolean);
     if (carry) { Col.loadTeam(A.run, A.progress.team); notes.push('지난 판 친구들이'); }
     A.B = Bt.create(st.tower ? Ch.towerTheme(1) : no, Col.lineup(A.run), A.heroId, A.diffKey, { extraSlot: extra, tower: !!st.tower, carry: !!carry });
-    A.retried = false; hideBossUI();
+    A.retried = false; A.diffMin = undefined; hideBossUI();
     $('prep-diff').textContent = D.name; $('prep-diff').className = 'hud-chip diff-chip d-' + D.key;
     A.wavesDone = 0; A.realBattle = 0; A.stageStart = performance.now(); A.bubbleTimer = 0; A.selectedSlot = -1; A.targeting = false;
     G.Render.drawBackground(A.B.stageNo, A.B);
@@ -927,6 +937,11 @@ G.UI = (function () {
       { text: '계속하기', cls: 'green', fn: function () { closeOverlay(); A.paused = wasPaused && A.mode !== 'battle'; } },
       { text: A.tower ? '탑 그만 오르기' : '스테이지 나가기', cls: 'red', fn: function () { closeOverlay(); if (A.tower) finishTower(); else goMap(); } }
     ]);
+    if (!A.tutorial && !A.tower && A.B) {   // 2026-11-26 난이도만 바꾸기: 뽑은 친구·코인·진행은 그대로
+      var db = el('button', 'btn small purple pause-music', '난이도만 바꾸기 (지금: ' + A.B.diff.name + ')');
+      db.onclick = function () { closeOverlay(); changeDiffDialog(wasPaused); };
+      d.insertBefore(db, d.querySelector('.btns'));
+    }
     var mb = el('button', 'btn small ' + (A.settings.music === false ? 'white' : 'sky') + ' pause-music', A.settings.music === false ? '🔇 음악 꺼짐' : '🎵 음악 켜짐');
     mb.onclick = function () { toggleMusic(); mb.textContent = A.settings.music === false ? '🔇 음악 꺼짐' : '🎵 음악 켜짐'; mb.className = 'btn small ' + (A.settings.music === false ? 'white' : 'sky') + ' pause-music'; };
     d.insertBefore(mb, d.querySelector('.btns'));
@@ -944,6 +959,38 @@ G.UI = (function () {
       if (A.B && A.B.bossPhase) sp.appendChild(el('div', 'pause-note', '보스와 싸울 때는 1.5배속까지만 돼요.'));
       d.insertBefore(sp, d.querySelector('.btns'));
     }
+  }
+
+  /* 2026-11-26 난이도만 바꾸기 (멈춤 창에서). 친구·코인·웨이브 진행은 그대로 두고 난이도만 바꾼다.
+   * 하트: 늘어난(줄어든) 칸 수만큼 함께 바꾼다 (적어도 1). 이미 나온 적은 그대로, 다음에 나오는 적부터 새 난이도.
+   * 별·기록은 이 판에서 고른 난이도 중 가장 쉬운 것으로 센다 (쉬움으로 놀다가 끝에만 어렵게 바꿔 기록을 얻지 않게) */
+  function changeDiffDialog(wasPaused) {
+    var d = el('div', 'dialog diff-change');
+    d.appendChild(el('h2', '', '난이도만 바꾸기'));
+    d.appendChild(el('p', '', '뽑은 친구와 코인은 그대로예요.'));
+    var row = el('div', 'diff-change-row');
+    C.difficulties.forEach(function (D) {
+      if (D.tutorial || !diffOpen(D.key)) return;
+      var b = el('button', 'btn small dcard-mini d-' + D.key + (A.B.diff.key === D.key ? ' sel' : ''), D.name + ' ' + '♥'.repeat(D.life));
+      b.onclick = function () { applyDiff(D.key); closeOverlay(); A.paused = wasPaused && A.mode !== 'battle'; };
+      row.appendChild(b);
+    });
+    d.appendChild(row);
+    var back = el('button', 'btn big green', '그대로 할래요'); back.onclick = function () { closeOverlay(); A.paused = wasPaused && A.mode !== 'battle'; };
+    var bs = el('div', 'btns'); bs.appendChild(back); d.appendChild(bs);
+    overlay(d);
+  }
+  function applyDiff(key) {
+    var B = A.B, old = B.diff, D = G.difficultyByKey(key);
+    if (old.key === key) return;
+    B.diff = D; A.diffKey = key; A.settings.diff = key; saveAll();
+    B.life = Math.max(1, Math.min(D.life, B.life + (D.life - old.life)));
+    var keys = C.difficulties.map(function (x) { return x.key; });
+    A.diffMin = Math.min(A.diffMin === undefined ? keys.indexOf(old.key) : A.diffMin, keys.indexOf(key));
+    $('prep-diff').textContent = D.name; $('prep-diff').className = 'hud-chip diff-chip d-' + D.key;
+    hearts($('bt-hearts')); hearts($('prep-hearts'));
+    if (A.mode === 'prep' && A.quiz && !A.quiz.done) { A.quiz.p = null; renderQuiz($('prep-math'), A.quiz, refreshPrep); }   // 숫자 자판·식 가리기가 바로 바뀐다
+    toast('난이도를 「' + D.name + '」(으)로 바꿨어요! 친구들은 그대로예요.', 2600);
   }
 
   /* ───────── 결과 (11장) ───────── */
@@ -1002,6 +1049,7 @@ G.UI = (function () {
       A.progress.stars[A.stageNo] = Math.max(A.progress.stars[A.stageNo] || 0, stars);
       C.speeds.forEach(function (s, i) { if (!before[i] && speedOpen(i)) newlyOpen.push(s.name); });
       var di = C.difficulties.map(function (d) { return d.key; }).indexOf(A.diffKey);
+      if (A.diffMin !== undefined) di = Math.min(di, A.diffMin);   // 중간에 난이도를 바꿨으면 가장 쉬운 것으로
       A.progress.diffBest = A.progress.diffBest || {};
       A.progress.diffBest[A.stageNo] = Math.max(A.progress.diffBest[A.stageNo] === undefined ? -1 : A.progress.diffBest[A.stageNo], di);
       if (G.stageByNo(A.stageNo).boss === 'demon' && di >= C.difficulties.map(function (d) { return d.key; }).indexOf('veryhard') && !A.progress.disasterOpen) { A.progress.disasterOpen = true; newlyOpen.push('숨은 난이도 「재앙」'); }
@@ -1195,6 +1243,7 @@ G.UI = (function () {
       if (challengeOpen()) G.Plays.open(); else toast('스테이지 ' + C.challengeUnlock + ' 「' + G.stageByNo(C.challengeUnlock).name + '」을 깨면 열려요!');
     };
     $('btn-music').onclick = toggleMusic; refreshMusic();
+    $('btn-team-reset').onclick = resetTeam;
     document.addEventListener('pointerdown', function () {
       if (G.Music) G.Music.unlock();
       // 2026-11-26 알림 글은 화면을 누르면 바로 사라진다 (뜬 지 0.4초 지나서부터: 알림을 띄운 그 터치로는 안 사라지게)
