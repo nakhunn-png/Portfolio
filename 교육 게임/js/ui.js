@@ -59,24 +59,41 @@ G.UI = (function () {
     for (var n = st.no - 1; n >= 1; n--) { var prev = G.stageByNo(n); if (prev.ready) return !!A.progress.stars[n]; }
     return true;
   }
+  /* 섬 지도: 섬 3개(단원 1·2·3). 섬을 누르면 그 섬의 스테이지를 차례로 한다(일반 → 일반 → 보스).
+   * 앞 섬의 보스를 깨면 다음 섬이 열린다. 섬 안에서는 아직 안 깬 첫 스테이지부터 시작한다 */
+  var ISLAND_NAME = { 1: '덧뺄셈 (1)', 2: '덧뺄셈 (2)', 3: '덧뺄셈 (3)' };
+  function islandStages(u) { return C.stages.filter(function (st) { return st.unit === u && st.ready; }); }
+  function islandOpen(u) { var f = islandStages(u)[0]; return !!f && stageOpen(f); }
+  function islandDone(u) { return islandStages(u).every(function (st) { return !!A.progress.stars[st.no]; }); }
+  function islandStart(u) { var list = islandStages(u), left = list.filter(function (st) { return !A.progress.stars[st.no]; }); return (left[0] || list[0]).no; }
+  function nextInIsland(no) { var st = G.stageByNo(no), list = islandStages(st.unit), i = list.indexOf(st); return list[i + 1] || null; }
   function goMap() {
     A.mode = 'map'; A.tower = null; show('scr-map');
     var g = $('map-grid'); g.innerHTML = '';
-    C.stages.forEach(function (st) {
-      var open = stageOpen(st), b = el('button', 'stage-card u' + st.unit + (st.boss ? ' boss' : '') + (open ? '' : ' locked'));
-      b.appendChild(el('div', 'sc-no', st.boss ? '보스' : String(st.no)));
-      b.appendChild(el('div', 'sc-name', st.name));
-      b.appendChild(el('div', 'sc-unit', UNIT_NAME[st.unit]));
-      var stars = A.progress.stars[st.no] || 0, s = el('div', 'sc-stars');
-      for (var i = 0; i < 3; i++) s.appendChild(el('span', i < stars ? 'on' : '', '★'));
-      b.appendChild(s);
-      var db = A.progress.diffBest && A.progress.diffBest[st.no];
-      if (db !== undefined && db >= 0) { var dd = C.difficulties[db]; b.appendChild(el('div', 'sc-diff d-' + dd.key, dd.name)); }
-      if (!st.ready) b.appendChild(el('div', 'sc-lock', '만드는 중'));
-      else if (!open) b.appendChild(el('div', 'sc-lock', '잠김'));
-      b.onclick = function () { if (open) goDiffSelect(st.no); else toast(st.ready ? '앞 스테이지를 먼저 깨요!' : '아직 만드는 중이에요.'); };
+    var firstOpen = null;
+    [1, 2, 3].forEach(function (u) {
+      var open = islandOpen(u), done = islandDone(u);
+      if (open && !done && firstOpen === null) firstOpen = u;
+      var b = el('button', 'island i' + u + (open ? '' : ' locked') + (done ? ' done' : ''));
+      b.appendChild(el('div', 'is-sand')); b.appendChild(el('div', 'is-land'));
+      if (open) {
+        var steps = el('div', 'is-steps'), now = islandStart(u);
+        islandStages(u).forEach(function (st) {
+          var c = el('div', 'is-step' + (st.boss ? ' boss' : '') + (A.progress.stars[st.no] ? ' clear' : '') + (!done && st.no === now ? ' now' : ''));
+          c.appendChild(el('span', '', st.name)); steps.appendChild(c);
+        });
+        b.appendChild(steps);
+        var stars = islandStages(u).reduce(function (s, st) { return s + (A.progress.stars[st.no] || 0); }, 0), max = islandStages(u).length * 3;
+        b.appendChild(el('div', 'is-stars', '★ ' + stars + ' / ' + max));
+      } else b.appendChild(el('div', 'is-lock', '🔒'));
+      b.appendChild(el('div', 'is-name', ISLAND_NAME[u]));
+      b.onclick = function () {
+        if (!open) { toast('앞 섬을 먼저 깨요!'); return; }
+        A.island = u; goDiffSelect(islandStart(u));
+      };
       g.appendChild(b);
     });
+    if (firstOpen !== null) { var f = g.children[firstOpen - 1]; f.classList.add('glow'); f.appendChild(el('div', 'is-badge', '여기부터!')); }
   }
 
   function challengeOpen() { return DEV || !!A.progress.stars[C.challengeUnlock]; }
@@ -118,7 +135,7 @@ G.UI = (function () {
     guide('hero', '#hero-cards', '영웅을 골라요', '영웅은 친구들과 함께 싸우고, 특별한 능력을 써요. 마음에 드는 영웅을 눌러 보세요!');
     guide('heroGo', '#btn-hero-go', '출발!', '다 골랐으면 「출발!」을 눌러요. 난이도를 바꾸고 싶으면 왼쪽 위 「◀ 난이도」를 눌러요.');
   }
-  /* 1단계: 난이도 고르기 (19장). 재앙은 냠냠 마왕을 「아주 어려움」 이상으로 깨면 열린다.
+  /* 1단계: 난이도 고르기 (19장). 재앙은 냠냠 마왕(덧뺄셈 (3) 섬)을 「아주 어려움」 이상으로 깨면 열린다.
    * 아직 별이 하나도 없는 친구는 「튜토리얼」이 먼저 골라져 있다 */
   function diffOpen(key) { var D = G.difficultyByKey(key); return !D.hidden || A.progress.disasterOpen || DEV; }
   function goDiffSelect(no) {
@@ -128,28 +145,37 @@ G.UI = (function () {
     if (!A.settings.diff || !diffOpen(A.settings.diff)) A.settings.diff = C.defaultDifficulty;
     renderDiffs();
   }
+  /* 난이도 화면: 맨 위 큰 칸 튜토리얼, 가운데 창문 4개(쉬움~아주 어려움), 맨 아래 재앙(덧뺄셈 (3) 섬을 아주 어려움으로 깨면 열림) */
   function renderDiffs() {
     var box = $('diff-cards'); box.innerHTML = '';
-    var list = C.difficulties.filter(function (D) { return diffOpen(D.key); });
-    box.style.gridTemplateColumns = 'repeat(' + list.length + ', 1fr)';
-    list.forEach(function (D, i) {
-      var b = el('button', 'diff-card d-' + D.key + (A.settings.diff === D.key ? ' sel' : ''));
-      b.appendChild(el('div', 'dc-title', D.name));
-      var pw = el('div', 'dc-power');   // 적 세기: 칸 6개 중 몇 칸
-      for (var k = 0; k < 6; k++) pw.appendChild(el('i', k <= C.difficulties.indexOf(D) ? 'on' : ''));
-      b.appendChild(pw);
-      b.appendChild(el('div', 'dc-desc', D.desc));
+    var top = el('div', 'dsel-row top'), mid = el('div', 'dsel-row mid'), bot = el('div', 'dsel-row bot');
+    C.difficulties.forEach(function (D) {
+      var row = D.tutorial ? top : D.hidden ? bot : mid;
+      if (D.hidden && !diffOpen(D.key)) {
+        var lk = el('button', 'diff-card wide d-locked');
+        lk.appendChild(el('div', 'dc-title', '🔒 ? ? ?'));
+        lk.appendChild(el('div', 'dc-desc', '「아주 어려움」으로 덧뺄셈 (3) 섬을 깨면 열려요'));
+        lk.onclick = function () { toast('아직 잠겨 있어요!'); };
+        row.appendChild(lk); return;
+      }
+      var b = el('button', 'diff-card d-' + D.key + (row === mid ? ' window' : ' wide') + (A.settings.diff === D.key ? ' sel' : ''));
+      b.appendChild(el('div', 'dc-title', (D.tutorial ? '🎓 ' : '') + D.name));
+      if (row === mid) {
+        var pw = el('div', 'dc-power');
+        for (var k = 0; k < 4; k++) pw.appendChild(el('i', k <= C.difficulties.indexOf(D) - 1 ? 'on' : ''));
+        b.appendChild(pw);
+      }
       var info = el('div', 'dc-info');
-      info.appendChild(el('div', '', '하트 ' + '♥'.repeat(D.life)));
+      info.appendChild(el('div', 'dc-hearts', '♥'.repeat(D.life)));
       info.appendChild(el('div', '', D.keypad ? '답: 숫자로 직접 써요' : '답: 보기에서 골라요'));
-      if (D.tutorial) info.appendChild(el('div', 'dc-tag', '친절한 설명이 나와요'));
-      if (D.flash) info.appendChild(el('div', 'dc-tag', '식이 ' + D.flash + '초 뒤 사라져요'));
+      if (row !== mid) info.appendChild(el('div', 'dc-desc', D.desc));
       b.appendChild(info);
       b.onclick = function () { A.settings.diff = D.key; A.settings.diffChosen = true; saveAll(); renderDiffs(); };
-      box.appendChild(b);
+      row.appendChild(b);
     });
+    box.appendChild(top); box.appendChild(mid); box.appendChild(bot);
     var D = G.difficultyByKey(A.settings.diff);
-    $('diff-note').textContent = D.tutorial ? '튜토리얼은 처음 하는 친구를 위해 하나씩 알려 줘요. 적도 아주 약해요.' : '고른 난이도: ' + D.name + ' — ' + D.desc;
+    $('diff-note').textContent = D.tutorial ? '튜토리얼은 답을 알려 주고 2분이면 끝나요. 처음이라면 여기부터!' : '고른 난이도: ' + D.name + ' — ' + D.desc;
   }
   function renderHeroCards(revealed) {
     var box = $('hero-cards'); box.innerHTML = '';
@@ -167,7 +193,9 @@ G.UI = (function () {
   }
   function secretTap() {
     if (A.mode !== 'hero' || A.progress.secretArch) return;
-    A.secretTaps++;
+    var now = performance.now();   // 5번 「연속」: 사이가 길면 처음부터 다시 센다
+    if (A.secretLast && now - A.secretLast > C.secretGap * 1000) A.secretTaps = 0;
+    A.secretLast = now; A.secretTaps++;
     var left = C.secretClicks - A.secretTaps;
     if (left > 0 && A.secretTaps >= 3) toast('뭔가 반짝여요… ' + left);
     if (left <= 0) {
@@ -245,11 +273,11 @@ G.UI = (function () {
     if (!Bt.skillReady(A.B)) { toast(A.B.bossPhase ? '보스 문제를 맞혀 필살기 칸을 채워요' : '아직 힘을 모으는 중이에요'); return; }
     var H = C.heroes[A.heroId];
     if (!H.target) { Bt.useSkill(A.B); banner(H.skillName); afterSkill(); return; }
-    A.targeting = true; A.paused = true;
+    A.targeting = true;   // 2026-11-26 능력 쓸 곳을 고르는 동안에도 전투는 계속 흘러간다
     $('target-layer').classList.remove('hidden');
     $('target-hint').textContent = H.skill === 'block' ? '막을 길을 눌러요' : '능력을 쓸 곳을 눌러요';
   }
-  function cancelTarget() { A.targeting = false; A.paused = false; $('target-layer').classList.add('hidden'); }
+  function cancelTarget() { A.targeting = false; $('target-layer').classList.add('hidden'); }
   function targetTap(e) {
     if (!A.targeting) return;
     if (e.target.closest('.target-cancel')) { cancelTarget(); return; }
@@ -260,12 +288,15 @@ G.UI = (function () {
 
   /* ───────── 문제 (3-3, 4장) ─────────
    * kind: prep(처음 5개) / wave(웨이브 사이 3개) / final(마무리: 정답이 15개가 될 때까지) */
+  function TQ() { return A.tutorial && !A.tower ? C.tutorialQuick : null; }   // 튜토리얼 빠른 판 설정
+  function problemsOf(k) { var t = TQ(); return t ? t[k] : C.problems[k]; }
+  function minCorrect() { var t = TQ(); return t ? t.minCorrect : C.minCorrectToClear; }
   function newQuiz(kind) {
-    var n = kind === 'prep' ? C.problems.prep : (kind === 'wave' || kind === 'boss' || kind === 'retry') ? C.problems.betweenWaves : 0;
+    var n = kind === 'prep' ? problemsOf('prep') : (kind === 'wave' || kind === 'boss' || kind === 'retry') ? problemsOf('betweenWaves') : 0;
     return { kind: kind, left: n, p: null, tries: 0, done: false, attempts: 0 };
   }
   function quizFinished(q) {
-    if (q.kind === 'final') return A.run.correct >= C.minCorrectToClear || q.attempts >= 30;
+    if (q.kind === 'final') return A.run.correct >= minCorrect() || q.attempts >= 30;
     return q.left <= 0;
   }
   function stageFormat() { return G.stageByNo(A.stageNo).format || 'choice'; }
@@ -338,7 +369,7 @@ G.UI = (function () {
     // 형식마다 문제 칸 배치를 바꾼다 (css 의 .fmt-…)
     container.className = container.className.replace(/\s*fmt-\S+/g, '') + ' fmt-' + (p.pick ? 'pick' : fmt);
     var head = el('div', 'q-label');
-    head.textContent = q.kind === 'final' ? '마무리 문제 · 정답 ' + A.run.correct + ' / ' + C.minCorrectToClear
+    head.textContent = q.kind === 'final' ? '마무리 문제 · 정답 ' + A.run.correct + ' / ' + minCorrect()
       : q.kind === 'bubble' ? '보너스 문제!' + (A.B && A.B.gimmick === 'dark' ? ' 맞히면 조명이 켜져요' : '')
       : '문제 ' + q.left + '개 남음' + (A.run.combo >= 2 ? ' · ' + A.run.combo + '연속 정답!' : '');
     container.appendChild(head);
@@ -429,6 +460,11 @@ G.UI = (function () {
       });
     }
     container.appendChild(row); container.appendChild(msg2);
+    if (A.tutorial) {   // 튜토리얼: 답을 알려 준다 (정답 단추가 반짝이고, 숫자로 쓰는 문제는 답을 보여 준다)
+      Array.prototype.forEach.call(row.children, function (x) { if (x.dataset.right) x.classList.add('tut-answer'); });
+      if (row.className === 'keypad') container.insertBefore(el('div', 'tut-answer-tip', '정답은 ' + p.answer + '! ' + (fmt === 'column' ? '일의 자리 ' + (p.answer % 10) + '부터 눌러요' : '숫자를 누르고 「확인」')), row);
+      else if (!row.querySelector('.tut-answer')) container.insertBefore(el('div', 'tut-answer-tip', '정답은 ' + p.answer + '!'), row);
+    }
     if (fmt === 'column') { var tip = el('div', 'q-tip', '일의 자리부터 써요'); container.appendChild(tip); }
   }
 
@@ -440,9 +476,9 @@ G.UI = (function () {
     $('prep-wave').textContent = waveText;
     renderQuiz($('prep-math'), A.quiz, refreshPrep);
     refreshPrep();
-    if (kind === 'prep') guide('prep', '#prep-math', '문제를 풀어요', '맞히면 코인을 10개 받아요. 3문제를 잇달아 맞히면 보너스 코인도 있어요. 틀려도 괜찮아요! 그림 힌트를 보고 한 번 더 풀 수 있어요.');
-    if (kind === 'wave') guide('wave', '#prep-math', '웨이브 성공!', '웨이브 사이에는 문제 3개를 풀어요. 모은 코인으로 친구를 더 뽑으면 더 강해져요.');
-    if (kind === 'final') guide('final', '#prep-math', '마무리 문제', '정답이 15개가 될 때까지 문제를 조금 더 풀면 끝나요.');
+    if (kind === 'prep') guide('prep', '#prep-math', '문제를 풀어요', '맞히면 코인을 10개 받아요. 튜토리얼에서는 반짝이는 단추가 정답이에요. 눌러 보세요!');
+    if (kind === 'wave') guide('wave', '#prep-math', '웨이브 성공!', '웨이브 사이에는 문제를 조금 더 풀어요. 모은 코인으로 친구를 더 뽑으면 더 강해져요.');
+    if (kind === 'final') guide('final', '#prep-math', '마무리 문제', '정답이 ' + minCorrect() + '개가 될 때까지 문제를 조금 더 풀면 끝나요.');
     if (kind === 'boss') guide('bossPrep', '#next-info', '보스가 와요!', '다음은 보스예요! 보스는 아주 튼튼해요. 친구를 많이 뽑아 두고 「보스와 싸우기!」를 눌러요.');
   }
   function refreshCoins() { $('prep-coins').textContent = A.run.coins; $('bt-coins').textContent = A.run.coins; $('bt-correct').textContent = A.run.correct; refreshDrawBtns(); }
@@ -479,9 +515,13 @@ G.UI = (function () {
     if (q.kind === 'final') { fight.textContent = '결과 보기'; fight.disabled = !ready; }
     else if (A.tower) { fight.textContent = A.wavesDone === 0 ? '탑 오르기!' : '다음 층!'; fight.disabled = !ready || units === 0; }
     else { fight.textContent = q.kind === 'boss' ? '보스와 싸우기!' : q.kind === 'retry' ? '다시 싸우기!' : A.wavesDone === 0 ? '전투 시작!' : '다음 웨이브!'; fight.disabled = !ready || units === 0; }
+    // 뽑을 코인이 있으면 「모두 뽑기」가, 다 뽑았으면 「전투 시작」이 움직이며 반짝인다 (자연스럽게 누르게)
+    var canDraw = Col.canDraw(A.run);
+    $('btn-draw-all').classList.toggle('pulse', !!ready && canDraw && q.kind !== 'final');
+    fight.classList.toggle('pulse', !!ready && !fight.disabled && (!canDraw || q.kind === 'final'));
     if (ready && q.kind === 'prep') guide('draw', '.draw-panel', '친구를 뽑아요', '코인 30개로 친구 1명이 와요. 「모두 뽑기」를 누르면 코인을 다 써서 한꺼번에 뽑아요.');
     var info = $('next-info');
-    if (!ready) info.textContent = q.kind === 'final' ? '정답 15개를 채우면 끝나요' : '문제를 먼저 풀어요';
+    if (!ready) info.textContent = q.kind === 'final' ? '정답 ' + minCorrect() + '개를 채우면 끝나요' : '문제를 먼저 풀어요';
     else if (!units) info.textContent = '뽑기로 친구를 데려와요!';
     else if (q.kind === 'boss' || q.kind === 'retry') info.innerHTML = '다음: <b class="boss">' + C.boss[A.B.bossType].name + '</b> · ' + curSpeed().name;
     else if (A.tower) { var nf = A.wavesDone + 1; info.innerHTML = '다음: <b>' + nf + '층</b>' + (nf % C.tower.miniEvery === 0 ? ' <b class="boss">작은 보스</b>' : '') + ' · ' + curSpeed().name; }
@@ -585,7 +625,7 @@ G.UI = (function () {
       if (e.type === 'bossDown') {
         A.mode = 'between'; hideBossUI(); clearBubbles();
         banner(C.boss[A.B.bossType].name + '를 물리쳤어요!');
-        setTimeout(function () { if (A.run.correct < C.minCorrectToClear) goPrep('final'); else finishStage(true); }, 1500);
+        setTimeout(function () { if (A.run.correct < minCorrect()) goPrep('final'); else finishStage(true); }, 1500);
       }
       if (e.type === 'waveEnd' && A.tower) {
         A.wavesDone++; clearBubbles(); A.mode = 'between';
@@ -595,7 +635,7 @@ G.UI = (function () {
       }
       if (e.type === 'waveEnd' && A.B.bossType && !A.B.bossPhase) {   // 보스 스테이지: 부하 웨이브 2개 → 보스
         A.wavesDone++; clearBubbles(); A.mode = 'between';
-        var toBoss = A.wavesDone >= C.boss.minionWaves;
+        var toBoss = A.wavesDone >= (TQ() ? TQ().minionWaves : C.boss.minionWaves);
         banner(toBoss ? '보스가 다가와요!' : '웨이브 ' + A.wavesDone + ' 성공!');
         setTimeout(function () { goPrep(toBoss ? 'boss' : 'wave'); }, 1000);
         return;
@@ -603,11 +643,11 @@ G.UI = (function () {
       if (e.type === 'waveEnd' && !A.B.bossType) {
         A.wavesDone++;
         clearBubbles();
-        if (Bt.wantsAnotherWave(A.wavesDone, A.B.plannedReal, curSpeed())) { banner('웨이브 ' + A.wavesDone + ' 성공!'); A.mode = 'between'; setTimeout(function () { goPrep('wave'); }, 900); }
+        if (TQ() ? A.wavesDone < TQ().waves : Bt.wantsAnotherWave(A.wavesDone, A.B.plannedReal, curSpeed())) { banner('웨이브 ' + A.wavesDone + ' 성공!'); A.mode = 'between'; setTimeout(function () { goPrep('wave'); }, 900); }
         else {
           A.mode = 'between';
           banner('모든 웨이브 성공!');
-          setTimeout(function () { if (A.run.correct < C.minCorrectToClear) goPrep('final'); else finishStage(true); }, 1100);
+          setTimeout(function () { if (A.run.correct < minCorrect()) goPrep('final'); else finishStage(true); }, 1100);
         }
       }
     });
@@ -845,8 +885,12 @@ G.UI = (function () {
     if (win) guide('result', '#result-panel', '잘했어요!', '별 1개: 스테이지 깨기, 별 2개: 하트 지키기, 별 3개: 정답 80% 넘기. 익숙해지면 「쉬움」이나 「보통」에도 도전해 봐요!');
     var bs = el('div', 'result-btns');
     var again = el('button', 'btn big orange', '다시 하기'); again.onclick = function () { startStage(A.stageNo, A.heroId, A.diffKey); };
-    var map = el('button', 'btn big green', '스테이지 고르기'); map.onclick = goMap;
-    bs.appendChild(again); bs.appendChild(map); p.appendChild(bs);
+    var map = el('button', 'btn big ' + (win ? 'sky' : 'green'), '섬 지도'); map.onclick = goMap;
+    bs.appendChild(again); bs.appendChild(map);
+    var nx = win ? nextInIsland(A.stageNo) : null;   // 섬 안의 다음 스테이지로 바로 이어 간다
+    if (nx) { var go = el('button', 'btn big green pulse', '다음: ' + nx.name + ' ▶'); go.onclick = function () { startStage(nx.no, A.heroId, A.diffKey); }; bs.appendChild(go); }
+    else if (win) p.appendChild(el('div', 'legend-open', ISLAND_NAME[G.stageByNo(A.stageNo).unit] + ' 섬을 모두 깼어요!' + (G.stageByNo(A.stageNo).unit < 3 ? ' 다음 섬이 열렸어요.' : '')));
+    p.appendChild(bs);
   }
 
   /* ───────── 튜토리얼 안내 창 ─────────
@@ -955,6 +999,7 @@ G.UI = (function () {
       else { A.bubbleTimer += realDt; if (A.bubbleTimer >= every) { A.bubbleTimer = 0; spawnBubble(); } }
       refreshSkill();
     }
+    if (A.targeting && (A.mode !== 'battle' || !Bt.skillReady(A.B))) cancelTarget();   // 웨이브가 끝나거나 기절하면 고르기를 그만둔다
     if (A.mode === 'battle' || A.mode === 'between' || A.mode === 'over') G.Render.frame(A.B, A.t);
     else if (A.mode === 'prep') { G.Render.clear(); G.Render.drawUnits(A.B, Col.lineup(A.run), A.heroId, A.t, A.selectedSlot); }
     else G.Render.clear();

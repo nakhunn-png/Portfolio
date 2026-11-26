@@ -44,10 +44,12 @@ G.CONFIG = {
   battleTime: { targetRealSec: 220, waveGameSec: 66, minWaves: 4, maxWaves: 7 },   // 적이 나오는 시간 = 66 × 0.9 ≈ 59초 (1배속)
   bossSpeedCap: 1.5,
   questionBubbleSec: 20,       // 전투 중 문제 풍선 간격 (실제 시간)
-  questionBubbleLife: 10,      // 풍선이 떠 있는 시간 (실제 시간)
+  questionBubbleLife: 2,       // 풍선이 떠 있는 시간 (실제 시간). 2026-11-26 10 → 2초 (얼른 눌러야 하는 보너스)
   minCorrectToClear: 15,       // 9-3 원칙 3
   turboEnemyBonus: 5,          // 터보 적 코인
   problems: { prep: 5, betweenWaves: 3 },
+  /* 튜토리얼은 2분 안에 끝난다 (2026-11-26): 문제 수·웨이브 수·웨이브 길이를 줄이고, 답을 알려 준다 */
+  tutorialQuick: { prep: 3, betweenWaves: 1, waves: 2, minionWaves: 1, minCorrect: 4, waveMul: 0.45 },
 
   /* 7. 스테이지 9개
    * gimmick: bubble(거품 적) / blizzard(눈보라) / storm(모래폭풍·갈림길) / dark(어둠·조명)
@@ -76,16 +78,17 @@ G.CONFIG = {
   /* 18. 영웅 (스테이지를 시작할 때 1명 고른다). cd: 능력 다시 쓰는 시간 (게임 시간 초)
    * target: true 면 능력 버튼을 누른 뒤 화면에서 위치를 고른다. dmg 는 진행 정도만큼 함께 세진다 */
   heroes: {
-    mage:   { name: '시간 마법사', skillName: '느려져라!',   skill: 'slowZone',  cd: 18, target: true, r: 120, slow: 0.3, dur: 10,
-      desc: '고른 곳의 적을 10초 동안 아주 느리게 만들어요.' },
-    cheer:  { name: '응원단장',   skillName: '힘내라 응원!', skill: 'cheer',     cd: 20, mult: 1.7, dur: 12,
-      desc: '모든 친구의 공격력을 12초 동안 크게 올려요.' },
-    shield: { name: '방패병',     skillName: '길 막기!',     skill: 'block',     cd: 16, target: true, dur: 8,
-      desc: '고른 길을 8초 동안 막아 적이 못 지나가요.' },
+    mage:   { name: '시간 마법사', skillName: '느려져라!',   skill: 'slowZone',  cd: 18, target: true, r: 120, slow: 0.3, dur: 15,
+      desc: '고른 곳의 적을 15초 동안 아주 느리게 만들어요.' },
+    cheer:  { name: '응원단장',   skillName: '힘내라 응원!', skill: 'cheer',     cd: 20, mult: 1.7, dur: 18,
+      desc: '모든 친구의 공격력을 18초 동안 크게 올려요.' },
+    shield: { name: '방패병',     skillName: '길 막기!',     skill: 'block',     cd: 16, target: true, dur: 12,
+      desc: '고른 길을 12초 동안 막아 적이 못 지나가요.' },
     archer: { name: '명사수 궁수', skillName: '화살비!',      skill: 'arrowRain', cd: 15, target: true, r: 110, dmg: 160,
       desc: '고른 곳에 화살비를 쏟아 강하게 공격해요.' },
-    arch:   { name: '아크메이지', skillName: '메테오!',      skill: 'meteor',    cd: 26, dmg: 900, secret: true,
-      desc: '화면 모든 적에게 메테오를 떨어뜨려요. 아주 아주 강해요!' }
+    // 아크메이지: 수학이 어려운 친구를 위한 치트키. 일부러 아주 세다(약하게 만들지 않는다). 2026-11-26 대기 26 → 10초, 피해 900 → 2500
+    arch:   { name: '아크메이지', skillName: '메테오!',      skill: 'meteor',    cd: 10, dmg: 2500, secret: true,
+      desc: '화면 모든 적에게 메테오를 떨어뜨려요. 10초마다 쓸 수 있어요!' }
   },
   heroOrder: ['mage', 'cheer', 'shield', 'archer', 'arch'],
 
@@ -104,8 +107,8 @@ G.CONFIG = {
    * hp·count·speed: 적 체력·수·빠르기 배율, bossHp: 보스 체력 배율, life: 생명, keypad: 보기 고르기 문제를 숫자 자판으로, flash: 식이 이 초 뒤에 사라짐 */
   difficulties: [
     { key: 'tutorial', bossHp: 0.4, bossSpeed: 0.75, name: '튜토리얼',   hp: 0.5,  count: 0.7,  speed: 0.8,  life: 5, coins: 120, tutorial: true,
-      desc: '처음이라면 여기부터! 하나씩 친절하게 알려 줘요.' },
-    { key: 'easy', bossHp: 0.7, bossSpeed: 0.95,     name: '쉬움',       hp: 0.95, count: 0.95, speed: 0.92,  life: 5, coins: 90, desc: '처음 하는 친구에게 딱!' },
+      desc: '처음이라면 여기부터! 답을 알려 주고 2분이면 끝나요.' },
+    { key: 'easy', bossHp: 0.75, bossSpeed: 0.95,     name: '쉬움',       hp: 0.95, count: 0.95, speed: 0.92,  life: 5, coins: 90, desc: '처음 하는 친구에게 딱!' },
     { key: 'normal', bossHp: 1.0, bossSpeed: 1.06,   name: '보통',       hp: 1.0,  count: 1.0,  speed: 1.0,  life: 5, coins: 60, desc: '기본 난이도예요.' },
     { key: 'hard', bossHp: 1.25, bossSpeed: 1.08,     name: '어려움',     hp: 1.12, count: 1.05, speed: 1.05,  life: 4, coins: 60, keypad: true, desc: '답을 숫자 자판으로 직접 써요.' },
     { key: 'veryhard', bossHp: 1.7, bossSpeed: 1.2, name: '아주 어려움', hp: 1.32, count: 1.12, speed: 1.12,  life: 3, coins: 60, keypad: true, desc: '생명 3개, 적이 훨씬 강해요.' },
@@ -148,7 +151,8 @@ G.CONFIG = {
   giftMax: 600,           // 모아 둘 수 있는 선물 코인
   giftPerRun: 60,         // 한 판을 시작할 때 받는 선물 코인 (남은 것은 다음 판에)
   heroAttack: { atk: 18, interval: 0.9, range: 280 },   // 영웅의 보통 공격
-  secretClicks: 5,                                       // 영웅 고르기 화면을 이만큼 누르면 아크메이지가 나온다
+  secretClicks: 5, secretGap: 1.2,   // 연속으로 누를 때 사이 시간(초)이 이보다 길면 처음부터
+                                      // 영웅 고르기 화면을 이만큼 누르면 아크메이지가 나온다
   /* 웨이브 적 수 = (base + countGrowth × 진행 정도) × 배속 적 수 배율
    * 적 체력   = hp × (1 + hpGrowth × 진행 정도)
    * 진행 정도 = 그 웨이브 전까지의 계획 실제 시간 ÷ targetRealSec (0 ~ 약 0.9). 배속과 상관없이 마지막 웨이브 세기가 같다 */
