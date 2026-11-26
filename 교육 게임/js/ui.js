@@ -124,7 +124,7 @@ G.UI = (function () {
   }
 
   /* ───────── 영웅 고르기 (18장) ─────────
-   * 화면의 빈 곳을 secretClicks(5)번 누르면 숨은 영웅 아크메이지가 나타난다. 한 번 찾으면 계속 남는다 */
+   * 물음표 칸(아크메이지 자리)을 secretClicks(5)번 누르고 비밀번호를 넣으면 숨은 영웅 아크메이지가 나타난다. 한 번 찾으면 계속 남는다 */
   function heroOpen(id) { return !C.heroes[id].secret || A.progress.secretArch || DEV; }
   function stageLabel(no) { var st = G.stageByNo(no); return st.tower ? st.name : (st.boss ? '보스' : no) + ' · ' + st.name; }
   // 2단계: 영웅 고르기
@@ -182,7 +182,7 @@ G.UI = (function () {
     var box = $('hero-cards'); box.innerHTML = '';
     C.heroOrder.forEach(function (id) {
       var H = C.heroes[id], open = heroOpen(id);
-      if (!open) { var ph = el('div', 'hero-card secret-slot'); ph.appendChild(el('div', 'secret-q', '?')); box.appendChild(ph); return; }
+      if (!open) { var ph = el('div', 'hero-card secret-slot'); ph.appendChild(el('div', 'secret-q', '?')); ph.onclick = function (e) { e.stopPropagation(); secretTap(); }; box.appendChild(ph); return; }
       var c = el('button', 'hero-card' + (A.settings.hero === id ? ' sel' : '') + (H.secret ? ' secret' : '') + (revealed === id ? ' reveal' : ''));
       c.appendChild(img(charURL(id), '', 104, 104));
       c.appendChild(el('div', 'hc-name', H.name));
@@ -192,19 +192,43 @@ G.UI = (function () {
       box.appendChild(c);
     });
   }
+  /* 2026-11-26 아크메이지 칸(물음표 칸)을 연속 5번 누르면 비밀번호 창이 뜬다. 비밀번호(secretPassword)가 맞아야 열린다 */
   function secretTap() {
     if (A.mode !== 'hero' || A.progress.secretArch) return;
     var now = performance.now();   // 5번 「연속」: 사이가 길면 처음부터 다시 센다
     if (A.secretLast && now - A.secretLast > C.secretGap * 1000) A.secretTaps = 0;
     A.secretLast = now; A.secretTaps++;
-    var left = C.secretClicks - A.secretTaps;
-    if (left > 0 && A.secretTaps >= 3) toast('뭔가 반짝여요… ' + left);
-    if (left <= 0) {
-      A.progress.secretArch = true; A.settings.hero = 'arch'; saveAll();
-      renderHeroCards('arch');
-      $('game').classList.remove('flash'); void $('game').offsetWidth; $('game').classList.add('flash');
-      toast('숨은 영웅 아크메이지를 찾았어요!');
-    }
+    if (A.secretTaps >= C.secretClicks) { A.secretTaps = 0; askSecret(); }
+  }
+  function askSecret() {
+    var pw = String(C.secretPassword), typed = '';
+    var d = el('div', 'dialog pw-dialog');
+    d.appendChild(el('h2', '', '비밀번호를 입력하세요'));
+    var dots = el('div', 'pw-dots'); d.appendChild(dots);
+    function draw() { dots.innerHTML = ''; for (var i = 0; i < pw.length; i++) dots.appendChild(el('span', '', i < typed.length ? '●' : '')); }
+    var pad = el('div', 'pw-pad');
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '지움', '0', '닫기'].forEach(function (k) {
+      var b = el('button', 'btn ' + (k === '닫기' ? 'red' : k === '지움' ? 'white' : 'sky'), k);
+      b.onclick = function () {
+        if (k === '닫기') { closeOverlay(); return; }
+        if (k === '지움') { typed = typed.slice(0, -1); draw(); return; }
+        typed += k; draw();
+        if (typed.length < pw.length) return;
+        if (typed === pw) {
+          closeOverlay();
+          A.progress.secretArch = true; A.settings.hero = 'arch'; saveAll();
+          renderHeroCards('arch');
+          $('game').classList.remove('flash'); void $('game').offsetWidth; $('game').classList.add('flash');
+          toast('숨은 영웅 아크메이지가 나타났어요!');
+        } else {
+          typed = ''; setTimeout(draw, 250);
+          d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake');
+          toast('비밀번호가 틀렸어요');
+        }
+      };
+      pad.appendChild(b);
+    });
+    d.appendChild(pad); draw(); overlay(d);
   }
 
   /* ───────── 스테이지 시작 ───────── */
@@ -644,15 +668,15 @@ G.UI = (function () {
     Bt.setLineup(A.B, Col.lineup(A.run));
     var sp = curSpeed();
     Bt.startWave(A.B, sp, A.wavesDone >= C.battleTime.minWaves);
-    A.mode = 'battle'; A.paused = false; show('scr-battle'); refreshSpeed(); cancelTarget(); refreshSkill();
+    A.mode = 'battle'; A.paused = false; show('scr-battle'); refreshSpeed(); cancelTarget(); refreshSkill(); fieldReady();
     $('bt-wave').textContent = '웨이브 ' + A.B.wave;
     hearts($('bt-hearts')); refreshCoins();
     banner('웨이브 ' + A.B.wave + (A.B.turbo ? ' · 터보!' : ''));
     battleGuides();
   }
   function battleGuides() {
-    guide('path', { x: 50, y: 80, w: 860, h: 410 }, '적이 와요!', '적은 길을 따라 빙글빙글 돌아요. 친구들은 저절로 공격해요. 적이 길을 한 바퀴 다 돌면 빠져나가요.');
-    guide('hearts', '#bt-hearts', '하트를 지켜요', '적이 빠져나가면 하트가 하나 줄어요. 하트가 다 없어지면 져요. 친구를 많이 뽑아 막아요!');
+    guide('path', { x: 50, y: 80, w: 860, h: 410 }, '적이 와요!', '적은 길을 따라 빙글빙글 돌아요. 친구들은 저절로 공격해요. 싸우는 중에도 친구를 끌어서 다른 칸에 놓으면 자리를 바꿔요.');
+    guide('hearts', '#bt-hearts', '하트를 지켜요', '적이 길을 한 바퀴 다 돌 때마다 하트가 하나 줄어요. 적은 쓰러질 때까지 계속 돌아요. 하트가 다 없어지면 져요!');
     guide('speed', '#speed-btn', '빠르기와 멈춤', '▶▶ 버튼으로 전투를 빠르게 할 수 있어요. 쉬고 싶으면 옆의 「멈춤」을 눌러요.');
   }
   /* 도전의 탑 한 층 (10-2). 5층마다 배경(길과 적)이 바뀐다: 생명·영웅 힘은 이어 간다 */
@@ -666,7 +690,7 @@ G.UI = (function () {
     Bt.setLineup(A.B, Col.lineup(A.run));
     Bt.startTowerFloor(A.B, floor, curSpeed());
     A.tower.floor = floor;
-    A.mode = 'battle'; A.paused = false; show('scr-battle'); refreshSpeed(); cancelTarget(); refreshSkill();
+    A.mode = 'battle'; A.paused = false; show('scr-battle'); refreshSpeed(); cancelTarget(); refreshSkill(); fieldReady();
     $('bt-wave').textContent = floor + '층';
     hearts($('bt-hearts')); refreshCoins();
     banner(floor + '층' + (floor % C.tower.miniEvery === 0 ? ' · 작은 보스!' : th !== old.stageNo ? ' · ' + G.stageByNo(th).name : ''));
@@ -727,7 +751,7 @@ G.UI = (function () {
       B.hero.x = B.heroPos.x; B.hero.y = B.heroPos.y; B.hero.tx = B.hero.x; B.hero.ty = B.hero.y; B.hero.stunT = 0;
       A.retried = true;
     } else Bt.startBoss(B);
-    A.mode = 'battle'; A.paused = false; show('scr-battle'); refreshSpeed(); cancelTarget(); clearBubbles();
+    A.mode = 'battle'; A.paused = false; show('scr-battle'); refreshSpeed(); cancelTarget(); clearBubbles(); fieldReady();
     $('bt-wave').textContent = '보스전'; hearts($('bt-hearts')); refreshCoins();
     $('boss-ui').classList.remove('hidden'); $('drag-layer').classList.remove('hidden');
     $('boss-name').textContent = C.boss[B.bossType].name;
@@ -740,7 +764,7 @@ G.UI = (function () {
     else guide('move', { x: 50, y: 80, w: 860, h: 410 }, '영웅 움직이기', '화면을 누르거나 끌면 영웅이 그쪽으로 걸어가요. 빨간 원이 생기면 얼른 피해요!');
     toast(B.bossType === 'scorpion' ? '영웅을 끌어서 빨간 원을 피해요!' : B.bossType === 'octopus' ? '다리 숫자 두 개로 10을 만들면 싹둑!' : '문제를 맞혀 필살기를 모아요!', 3500);
   }
-  function hideBossUI() { $('boss-ui').classList.add('hidden'); $('drag-layer').classList.add('hidden'); }
+  function hideBossUI() { $('boss-ui').classList.add('hidden'); if (A.B) A.B.drag = null; }
   function newBossProblem() {
     var st = G.stageByNo(A.stageNo), p = G.MathGen.make(st.types), box = $('boss-quiz');
     A.bq = { p: p, lock: false, timeLeft: A.B.bossType === 'scorpion' ? C.boss.scorpion.quickSec : 0 };
@@ -808,6 +832,31 @@ G.UI = (function () {
     var combo = document.querySelector('#boss-quiz .bq-combo');
     if (B.bossType === 'demon' && B.demonPhase === 3 && !combo && !A.bq.lock) newBossProblem();
   }
+  /* 2026-11-26 전투 중 친구 끌어다 놓기 (마우스는 드래그 앤 드롭, 패드는 손가락으로 끌기).
+   * 친구를 누른 채 다른 칸에 놓으면 자리를 바꾼다. 친구가 아닌 곳을 누르면 (보스전에서) 영웅이 움직인다 */
+  function fieldReady() { $('drag-layer').classList.remove('hidden'); if (A.B) A.B.drag = null; }
+  function gamePoint(e) { var r = $('game').getBoundingClientRect(); return { x: (e.clientX - r.left) / A.scale, y: (e.clientY - r.top) / A.scale }; }
+  function fieldDown(e) {
+    if (!A.B || A.mode !== 'battle' || A.paused) return;
+    var q = gamePoint(e), i = Bt.slotAt(A.B, q.x, q.y, 52), u = null;
+    A.B.units.forEach(function (x) { if (x.slot === i && !(x.eaten > 0)) u = x; });
+    if (u) {
+      A.B.drag = { slot: i, id: u.id, x: q.x, y: q.y, over: i };
+      try { e.target.setPointerCapture(e.pointerId); } catch (err) {}
+      e.preventDefault(); return;
+    }
+    dragHero(e);
+  }
+  function fieldMove(e) {
+    if (A.B && A.B.drag) { var q = gamePoint(e); A.B.drag.x = q.x; A.B.drag.y = q.y; A.B.drag.over = Bt.slotAt(A.B, q.x, q.y, 75); e.preventDefault(); return; }
+    dragHero(e);
+  }
+  function fieldUp() {
+    var d = A.B && A.B.drag; if (!d) return;
+    A.B.drag = null;
+    if (A.mode !== 'battle' || d.over < 0 || d.over === d.slot) return;
+    if (Bt.moveUnit(A.B, d.slot, d.over)) { Col.swapSlots(A.run, d.slot, d.over); A.selectedSlot = -1; }
+  }
   function dragHero(e) {
     if (!A.B || !A.B.bossPhase || A.mode !== 'battle' || A.paused) return;
     if (e.type === 'pointermove' && !(e.buttons & 1)) return;
@@ -844,6 +893,7 @@ G.UI = (function () {
   function pause() {
     if (A.mode !== 'battle' && A.mode !== 'prep') return;
     if (A.targeting) cancelTarget();
+    if (A.B) A.B.drag = null;
     var wasPaused = A.paused; A.paused = true;
     var d = dialog('멈춤', '', [
       { text: '계속하기', cls: 'green', fn: function () { closeOverlay(); A.paused = wasPaused && A.mode !== 'battle'; } },
@@ -940,13 +990,17 @@ G.UI = (function () {
     p.appendChild(stats);
     if (newlyOpen.length) p.appendChild(el('div', 'legend-open', newlyOpen.join(', ') + '이 열렸어요!'));
     if (got.length) p.appendChild(rewardBox(got));
-    if (!win && A.B.bossPhase) {   // 보스에게 졌으면: 문제 3개를 맞히고 보스 체력 절반부터 다시
-      var rb = el('button', 'btn big purple', '보스 다시 도전 (체력 절반부터)');
-      rb.onclick = function () { A.B.life = A.B.diff.life; goPrep('retry'); };
-      p.appendChild(rb);
-    }
     if (win) guide('result', '#result-panel', '튜토리얼 끝!', '이제 진짜 모험이에요! 「본 게임 시작!」을 누르고 난이도를 골라요. 별 1개: 깨기, 별 2개: 하트 지키기, 별 3개: 정답 80% 넘기.');
     var bs = el('div', 'result-btns');
+    /* 2026-11-26 졌을 때 이어 하는 단추는 「강화하기」(사용자 요청, 전: 보스 다시 도전).
+     * 보스에게 지면 보스 체력 절반부터, 웨이브에서 지면 그 웨이브부터 다시. 하트를 채우고 문제를 풀어 더 뽑은 뒤 이어 간다 */
+    if (!win && !A.tutorial) {
+      var cb = el('button', 'btn big purple pulse', '강화하기');
+      cb.onclick = A.B.bossPhase ? function () { A.B.life = A.B.diff.life; goPrep('retry'); $('prep-wave').textContent = '강화하기'; }
+        : function () { Bt.rewindWave(A.B); A.retried = true; goPrep('wave'); $('prep-wave').textContent = '강화하기'; };
+      bs.appendChild(cb);
+      p.appendChild(el('div', 'retry-note', A.B.bossPhase ? '강화하기: 친구를 더 뽑고 보스 체력 절반부터 다시 싸워요' : '강화하기: 친구를 더 뽑고 이 웨이브부터 다시 싸워요'));
+    }
     var again = el('button', 'btn big orange', '다시 하기'); again.onclick = function () { startStage(A.stageNo, A.heroId, A.diffKey); };
     var map = el('button', 'btn big ' + (win ? 'sky' : 'green'), '섬 지도'); map.onclick = goMap;
     bs.appendChild(again); bs.appendChild(map);
@@ -1102,10 +1156,10 @@ G.UI = (function () {
     $('speed-btn').onclick = cycleSpeed;
     $('skill-btn').onclick = pressSkill;
     $('target-layer').onclick = targetTap;
-    $('scr-hero').onclick = function (e) { if (!e.target.closest('button')) secretTap(); };
     $('btn-diff-next').onclick = function () { goHeroSelect(A.pendingStage); };
     $('btn-hero-go').onclick = function (e) { e.stopPropagation(); startStage(A.settings.diff === 'tutorial' ? 1 : A.pendingStage, A.settings.hero, A.settings.diff); };   // 튜토리얼은 언제나 과자 숲(1-1)
-    $('drag-layer').addEventListener('pointerdown', dragHero); $('drag-layer').addEventListener('pointermove', dragHero);
+    $('drag-layer').addEventListener('pointerdown', fieldDown); $('drag-layer').addEventListener('pointermove', fieldMove);
+    $('drag-layer').addEventListener('pointerup', fieldUp); $('drag-layer').addEventListener('pointercancel', fieldUp);
     document.addEventListener('click', function (e) {
       var t = e.target.closest('[data-act]'); if (!t) return;
       var act = t.dataset.act;

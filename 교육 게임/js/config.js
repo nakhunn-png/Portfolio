@@ -38,8 +38,10 @@ G.CONFIG = {
     ice:    { name: '꽁꽁',   desc: '가끔 적을 꽁꽁 얼려 멈춰요',      freeze: 0.22, freezeSec: 1.0 }
   },
   slots: 8,              // 출전 칸 (2줄 × 4칸)
-  life: 5,               // 생명. 적이 길을 한 바퀴 다 돌면 빠져나가며 생명 1 (보스는 2)
-  escapeLaps: 1,         // 2026-11-25 「너무 쉬워」 → 두 바퀴에서 한 바퀴로
+  life: 5,               // 생명. 적이 길을 한 바퀴 다 돌 때마다 생명 1 (보스는 2)
+  escapeLaps: 1,         // 2026-11-25 「너무 쉬워」 → 두 바퀴에서 한 바퀴로. 2026-11-26 적은 빠져나가지 않고 쓰러질 때까지 계속 돈다
+  /* 2026-11-26 중간 보스: 일반 스테이지 마지막 웨이브의 마지막 적. 그 스테이지 첫 번째 적 그림을 3배 크기로, 체력은 일반 적의 10배 */
+  midBoss: { size: 3, hp: 10, speed: 0.8, at: 0.6 },   // at: 웨이브 적이 이만큼 나왔을 때 등장 (맨 끝이면 웨이브가 너무 길어진다)
 
   // 9. 배속과 클리어 시간 보정
   speeds: [
@@ -63,23 +65,24 @@ G.CONFIG = {
 
   /* 7. 스테이지 9개
    * gimmick: bubble(거품 적) / blizzard(눈보라) / storm(모래폭풍·갈림길) / dark(어둠·조명)
+   * 2026-11-26 적이 사라지지 않고 계속 돌고 중간 보스가 생겨서 일반 스테이지 hp 를 약 10% 낮춤 (1.15·1.55·1.22·1.3·1.3·0.95 → 1.03·1.7·1.1·1.17·1.1·0.78. 바닷속은 복어가 빠르고 약해져서 오히려 올림)
    * hp: 적 체력 배율. 뒤 스테이지일수록 조금씩 세진다. speed: 적 빠르기 배율 (우주 정거장은 길이 아주 길어서 빠르게) */
   stages: [
-    { no: 1, name: '과자 숲',     unit: 1, hp: 1.15, path: 'loop',    enemies: ['jellyBear', 'cookieSoldier'], types: ['A1', 'A2'], format: 'choice', ready: true,
+    { no: 1, name: '과자 숲',     unit: 1, hp: 1.03, path: 'loop',    enemies: ['jellyBear', 'cookieSoldier'], types: ['A1', 'A2'], format: 'choice', ready: true,
       tip: '처음이에요! 문제를 풀고 친구를 뽑아요.' },
-    { no: 2, name: '바닷속',      unit: 1, hp: 1.55, path: 'eight',   enemies: ['puffer', 'jellyfish'], types: ['A3', 'A4', 'A5'], format: 'choice', ready: true, gimmick: 'bubble',
+    { no: 2, name: '바닷속',      unit: 1, hp: 1.7, path: 'eight',   enemies: ['puffer', 'jellyfish'], types: ['A3', 'A4', 'A5'], format: 'choice', ready: true, gimmick: 'bubble',
       tip: '해파리는 거품 갑옷을 입었어요. 세 번 맞혀야 거품이 터져요!' },
-    { no: 3, name: '문어 대장',   unit: 1, hp: 1.3, minionHp: 1.15, path: 'whirl',   boss: 'octopus', enemies: ['babyOctopus', 'puffer'], types: ['A5', 'A3'], format: 'choice', ready: true,
+    { no: 3, name: '문어 대장',   unit: 1, hp: 1.3, minionHp: 1.25, path: 'whirl',   boss: 'octopus', enemies: ['babyOctopus', 'puffer'], types: ['A5', 'A3'], format: 'choice', ready: true,
       tip: '보스가 나오면 문어 다리 숫자 두 개를 골라 10을 만들어 잘라요!' },
-    { no: 4, name: '눈나라',      unit: 2, hp: 1.22, path: 'zigzag',  enemies: ['snowball', 'babyBear'], types: ['B1', 'B2'], format: 'tenframe', ready: true, gimmick: 'blizzard',
+    { no: 4, name: '눈나라',      unit: 2, hp: 1.1, path: 'zigzag',  enemies: ['snowball', 'babyBear'], types: ['B1', 'B2'], format: 'tenframe', ready: true, gimmick: 'blizzard',
       tip: '눈보라가 불면 친구 하나가 잠깐 얼어요.' },
-    { no: 5, name: '사막',        unit: 2, hp: 1.3, path: 'fork',    enemies: ['mole', 'cactus'], types: ['B3', 'B4'], format: 'keypad', ready: true, gimmick: 'storm',
+    { no: 5, name: '사막',        unit: 2, hp: 1.17, path: 'fork',    enemies: ['mole', 'cactus'], types: ['B3', 'B4'], format: 'keypad', ready: true, gimmick: 'storm',
       tip: '모래폭풍이 불면 적이 다른 길로 가요. 양쪽에 친구를 세워요!' },
     { no: 6, name: '전갈 왕',     unit: 2, hp: 1.7, minionHp: 1.2, path: 'arena',   boss: 'scorpion', enemies: ['babyScorpion', 'mole'], types: ['B1', 'B3'], format: 'choice', ready: true,
       tip: '보스가 나오면 영웅을 끌어서 빨간 원을 피해요!' },
-    { no: 7, name: '우주 정거장', unit: 3, hp: 1.3, speed: 1.5, path: 'rings',   enemies: ['alien', 'meteorRock'], types: ['C1'], format: 'column', ready: true,
+    { no: 7, name: '우주 정거장', unit: 3, hp: 1.1, speed: 1.5, path: 'rings',   enemies: ['alien', 'meteorRock'], types: ['C1'], format: 'column', ready: true,
       tip: '적이 바깥 고리를 돈 뒤 안쪽 고리로 갈아타요.' },
-    { no: 8, name: '밤 놀이공원', unit: 3, hp: 0.95, path: 'coaster', enemies: ['toySoldier', 'balloonGhost'], types: ['C2'], format: 'pickExpr', ready: true, gimmick: 'dark',
+    { no: 8, name: '밤 놀이공원', unit: 3, hp: 0.78, path: 'coaster', enemies: ['toySoldier', 'balloonGhost'], types: ['C2'], format: 'pickExpr', ready: true, gimmick: 'dark',
       tip: '깜깜해서 친구들이 가까운 적만 봐요. 보너스 문제를 맞히면 조명이 켜져요!' },
     { no: 9, name: '냠냠 마왕',   unit: 3, hp: 2.0, minionHp: 1.25, path: 'star',    boss: 'demon', enemies: ['imp', 'toySoldier'], types: ['A5', 'B1', 'B3', 'C1', 'C2'], format: 'choice', ready: true,
       tip: '마왕은 세 번 변신해요. 마지막에는 5문제를 연속으로 맞혀 마지막 일격!' }
@@ -162,6 +165,7 @@ G.CONFIG = {
   giftMax: 600,           // 모아 둘 수 있는 선물 코인
   giftPerRun: 60,         // 한 판을 시작할 때 받는 선물 코인 (남은 것은 다음 판에)
   heroAttack: { atk: 18, interval: 0.9, range: 280 },   // 영웅의 보통 공격
+  secretPassword: '0420',   // 2026-11-26 아크메이지 칸을 5번 누르면 묻는 비밀번호 (선생님용)
   secretClicks: 5, secretGap: 1.2,   // 연속으로 누를 때 사이 시간(초)이 이보다 길면 처음부터
                                       // 영웅 고르기 화면을 이만큼 누르면 아크메이지가 나온다
   /* 웨이브 적 수 = (base + countGrowth × 진행 정도) × 배속 적 수 배율
@@ -173,20 +177,22 @@ G.CONFIG = {
 };
 
 // 적 종류 (hp·speed 는 wave 기본값에 곱하는 배율)
-// shield: 거품 갑옷 (이만큼 맞아야 터지고, 그 뒤에 체력이 준다)
+// shield: 방어막 (이만큼 맞아야 터지고, 그 뒤에 체력이 준다)
+// trait: 화면에 보이는 특징 — fast(빨라요: 뒤에 바람 줄), tank(튼튼해요: 조금 크다), shield(방어막)
+// 2026-11-26 「몬스터마다 빠르기·체력·방어막이 달랐으면」: 스테이지마다 서로 다른 특징의 적 둘이 섞이도록 차이를 크게 함
 G.ENEMIES = {
   jellyBear:     { name: '젤리 곰',     hp: 1.0, speed: 1.0 },
-  cookieSoldier: { name: '쿠키 병정',   hp: 1.5, speed: 0.8 },
-  puffer:        { name: '복어',       hp: 1.1, speed: 0.95 },
-  jellyfish:     { name: '해파리',     hp: 0.8, speed: 0.9, shield: 3 },
-  snowball:      { name: '눈덩이',     hp: 0.9, speed: 1.15 },
-  babyBear:      { name: '아기 백곰',   hp: 1.6, speed: 0.75 },
-  mole:          { name: '모래 두더지', hp: 1.0, speed: 1.05 },
-  cactus:        { name: '선인장',     hp: 1.5, speed: 0.8 },
-  alien:         { name: '꼬마 외계인', hp: 1.0, speed: 1.0 },
-  meteorRock:    { name: '운석',       hp: 1.6, speed: 0.75 },
-  toySoldier:    { name: '장난감 병정', hp: 1.3, speed: 0.85 },
-  balloonGhost:  { name: '풍선 유령',   hp: 0.8, speed: 1.2 },
+  cookieSoldier: { name: '쿠키 병정',   hp: 1.9, speed: 0.7,  trait: 'tank' },
+  puffer:        { name: '복어',       hp: 0.75, speed: 1.35, trait: 'fast' },
+  jellyfish:     { name: '해파리',     hp: 0.8, speed: 0.9,  shield: 3, trait: 'shield' },
+  snowball:      { name: '눈덩이',     hp: 0.7, speed: 1.4,  trait: 'fast' },
+  babyBear:      { name: '아기 백곰',   hp: 1.9, speed: 0.68, trait: 'tank' },
+  mole:          { name: '모래 두더지', hp: 0.75, speed: 1.35, trait: 'fast' },
+  cactus:        { name: '선인장',     hp: 1.1, speed: 0.85, shield: 2, trait: 'shield' },
+  alien:         { name: '꼬마 외계인', hp: 0.8, speed: 1.0,  shield: 2, trait: 'shield' },
+  meteorRock:    { name: '운석',       hp: 1.9, speed: 0.68, trait: 'tank' },
+  toySoldier:    { name: '장난감 병정', hp: 1.6, speed: 0.75, trait: 'tank' },
+  balloonGhost:  { name: '풍선 유령',   hp: 0.6, speed: 1.45, trait: 'fast' },
   // 보스 스테이지 부하
   babyOctopus:   { name: '꼬마 문어',   hp: 1.0, speed: 1.0 },
   babyScorpion:  { name: '아기 전갈',   hp: 1.2, speed: 1.0 },

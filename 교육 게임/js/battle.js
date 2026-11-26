@@ -176,11 +176,40 @@ G.Battle = (function () {
       var s = unitStats(lineup[i], B.stageNo);
       B.units.push({ slot: i, id: lineup[i], x: B.slots[i].x, y: B.slots[i].y, st: s, cd: Math.random() * s.interval, speedUp: 1, flash: 0, frozen: 0 });
     }
-    // 요리사: 옆 칸 친구 공격 빠르게
+    applyBuffs(B);
+  }
+  // 요리사: 옆 칸 친구 공격 빠르게
+  function applyBuffs(B) {
+    B.units.forEach(function (u) { u.speedUp = 1; });
     B.units.forEach(function (u) {
       if (!u.st.buff) return;
       neighbors(B.slots, u.slot).forEach(function (n) { B.units.forEach(function (v) { if (v.slot === n) v.speedUp += u.st.buff; }); });
     });
+  }
+
+  /* 2026-11-26 「강화하기」: 진 웨이브를 처음부터 다시 (생명을 채우고 적을 지운다. 뽑은 친구·코인은 그대로) */
+  function rewindWave(B) {
+    B.wave = Math.max(0, B.wave - 1); B.plannedReal = B.prevPlanned || 0;
+    B.enemies = []; B.spawnLeft = 0; B.waveRunning = false; B.midPending = false;
+    B.zones = []; B.barriers = []; B.hazards = []; B.delayed = []; B.shots = []; B.fx = []; B.drag = null;
+    B.life = B.diff.life;
+  }
+  /* 2026-11-26 전투 중 끌어다 놓기: from 칸의 친구를 to 칸으로 (to 에 친구가 있으면 서로 바꾼다). 얼음·대기 시간은 그대로 */
+  function moveUnit(B, from, to) {
+    if (from === to || !B.slots[from] || !B.slots[to]) return false;
+    var a = null, b = null;
+    B.units.forEach(function (u) { if (u.slot === from) a = u; else if (u.slot === to) b = u; });
+    if (!a || a.eaten > 0 || (b && b.eaten > 0)) return false;
+    a.slot = to; a.x = B.slots[to].x; a.y = B.slots[to].y;
+    if (b) { b.slot = from; b.x = B.slots[from].x; b.y = B.slots[from].y; }
+    applyBuffs(B);
+    return true;
+  }
+  // 게임 좌표에서 가장 가까운 칸 (dist 픽셀 안)
+  function slotAt(B, x, y, dist) {
+    var best = -1, bd = dist || 60;
+    B.slots.forEach(function (s, i) { var d = Math.hypot(s.x - x, (s.y - 24) - y); if (d < bd) { bd = d; best = i; } });
+    return best;
   }
 
   /* 웨이브 시작. speed: 지금 배속 { v, count }, turbo: 늘어난 웨이브면 true (터보 적 섞기)
@@ -192,6 +221,7 @@ G.Battle = (function () {
     var p = (B.plannedReal || 0) / C.battleTime.targetRealSec;
     B.progress = p;
     var wm = B.diff.tutorial && C.tutorialQuick ? C.tutorialQuick.waveMul : 1;   // 튜토리얼은 웨이브가 짧다
+    B.prevPlanned = B.plannedReal || 0;   // 「강화하기」로 이 웨이브를 다시 할 때 되돌린다
     B.plannedReal = (B.plannedReal || 0) + C.battleTime.waveGameSec * wm * speedCount * w.spawnPortion / speed.v;
     var n = Math.max(3, Math.round((w.base + w.countGrowth * p) * speedCount * B.diff.count * wm));
     B.spawnLeft = n; B.spawnTotal = n;
@@ -199,6 +229,8 @@ G.Battle = (function () {
     B.spawnGap = (C.battleTime.waveGameSec * wm * speedCount * w.spawnPortion) / n * (w.spawnGapMul || 1);
     B.spawnTimer = 0; B.waveRunning = true; B.turbo = !!turbo;
     if (B.gimmick === 'dark') B.lightT = 8;   // 웨이브가 시작할 때 잠깐 조명이 켜진다
+    // 2026-11-26 중간 보스: 일반 스테이지의 마지막 웨이브에 큰 적 하나 (튜토리얼·보스 스테이지·탑은 없음)
+    B.midPending = !!C.midBoss && !B.bossType && !B.tower && !B.diff.tutorial && !wantsAnotherWave(B.wave, B.plannedReal, speed);
   }
   /* 10-2. 도전의 탑 한 층: 웨이브 1개. 층이 오를수록 적이 많아지고 단단해진다. 5층마다 작은 보스가 함께 나온다 */
   function towerHpScale(floor) { var T = G.CONFIG.tower; return Math.pow(T.hpGrowth, floor - 1); }   // 층마다 hpGrowth 배
@@ -217,16 +249,25 @@ G.Battle = (function () {
   }
   function hpScale(B) { return 1 + G.CONFIG.wave.hpGrowth * (B.progress || 0); }
 
-  function spawn(B) {
+  function spawn(B, events) {
     var st = G.stageByNo(B.stageNo), w = G.CONFIG.wave;
+    if (B.midPending && B.spawnTotal - B.spawnLeft >= Math.floor(B.spawnTotal * (G.CONFIG.midBoss.at || 0.6))) { B.midPending = false; spawnMid(B, st, events); B.spawnLeft--; return; }
     var type = st.enemies[(B.spawnTotal - B.spawnLeft) % st.enemies.length];
     if (B.progress >= 0.4 && Math.random() < 0.35) type = st.enemies[1] || type;
     var E = G.ENEMIES[type], hp = w.hp * E.hp * B.hpMul * B.diff.hp * hpScale(B);
     var turbo = B.turbo && Math.random() < 0.3;
     var pi = B.paths.length > 1 ? B.forkDir : 0;
     B.enemies.push({ id: B.nextId++, type: type, pi: pi, hp: hp, maxHp: hp, s: 0, speed: w.speed * E.speed * (st.speed || 1) * B.diff.speed, slowT: 0, zoneSlow: 1,
-      turbo: turbo, hit: 0, bob: Math.random() * 6, shield: E.shield || 0 });
+      turbo: turbo, hit: 0, bob: Math.random() * 6, shield: E.shield || 0, maxShield: E.shield || 0, trait: E.trait || null });
     B.spawnLeft--;
+  }
+  /* 중간 보스 (웨이브의 60% 쯤): 그 스테이지 첫 번째 적을 3배 크기로, 체력은 일반 적의 10배. 경직·얼림·밀기가 안 걸린다 */
+  function spawnMid(B, st, events) {
+    var M = G.CONFIG.midBoss, w = G.CONFIG.wave, type = st.enemies[0], E = G.ENEMIES[type];
+    var hp = w.hp * E.hp * B.hpMul * B.diff.hp * hpScale(B) * M.hp;
+    B.enemies.push({ id: B.nextId++, type: type, mid: true, pi: B.paths.length > 1 ? B.forkDir : 0, hp: hp, maxHp: hp, s: 0,
+      speed: w.speed * M.speed * (st.speed || 1) * B.diff.speed, slowT: 0, zoneSlow: 1, hit: 0, bob: 0, shield: 0, maxShield: 0 });
+    if (events) events.push({ type: 'gimmick', text: '중간 보스 등장!' });
   }
 
   function pos(B, e) { return B.paths[e.pi || 0].at(e.s); }
@@ -413,7 +454,7 @@ G.Battle = (function () {
     // 적 나오기
     if (B.waveRunning && B.spawnLeft > 0) {
       B.spawnTimer -= dt;
-      while (B.spawnTimer <= 0 && B.spawnLeft > 0) { spawn(B); B.spawnTimer += B.spawnGap; }
+      while (B.spawnTimer <= 0 && B.spawnLeft > 0) { spawn(B, events); B.spawnTimer += B.spawnGap; }
     }
     // 느림 구역과 길막기
     B.zones.forEach(function (z) { z.t += dt; }); B.zones = B.zones.filter(function (z) { return z.t < z.life; });
@@ -439,9 +480,11 @@ G.Battle = (function () {
         events.push({ type: 'escape' }); events.push({ type: 'gimmick', text: '보스가 한 바퀴를 돌았어요! 생명 −' + lose });
         return;
       }
-      if (e.s >= B.paths[e.pi || 0].length * B.laps && e.hp > 0) {
-        e.hp = 0; e.escaped = true; B.escaped++;
-        var lost = Math.min(B.life, e.mini ? 2 : 1);   // 작은 보스는 생명 2
+      /* 2026-11-26 적은 한 바퀴를 다 돌아도 사라지지 않고 계속 돈다. 바퀴를 다 돌 때마다 생명 1 (탑의 작은 보스는 2) */
+      var lapLen = B.paths[e.pi || 0].length * B.laps;
+      if (e.hp > 0 && e.s >= lapLen * ((e.laps || 0) + 1)) {
+        e.laps = (e.laps || 0) + 1; B.escaped++;
+        var lost = Math.min(B.life, e.mini ? 2 : 1);
         B.life -= lost; B.lifeLost += lost;
         events.push({ type: 'escape' });
       }
@@ -455,6 +498,7 @@ G.Battle = (function () {
       var isHero = u === B.hero, st = isHero ? C.heroAttack : u.st;
       u.flash = Math.max(0, u.flash - dt);
       if (u.eaten > 0) { u.eaten -= dt; return; }   // 마왕에게 삼켜진 친구
+      if (!isHero && B.drag && B.drag.slot === u.slot) return;   // 끌고 있는 친구는 쉬어요
       if (u.frozen > 0) { u.frozen -= dt; return; }
       if (isHero) { u.atkCd -= dt; if (u.atkCd > 0) return; } else { u.cd -= dt * u.speedUp; if (u.cd > 0) return; }
       var range = st.range * (dark ? 0.7 : 1);   // 어둠 속에서는 사거리 70%
@@ -475,9 +519,9 @@ G.Battle = (function () {
         B.fx.push({ kind: 'boom', x: tp.x, y: tp.y, t: 0, life: 0.3, r: st.splash });
         B.enemies.forEach(function (e) { if (e.hp <= 0) return; var p = pos(B, e); if (Math.hypot(p.x - tp.x, p.y - tp.y) <= st.splash) damage(B, e, dmg, events); });
       } else damage(B, best, dmg, events);
-      if (st.push && best.hp > 0 && !best.boss && !best.mini) best.s = Math.max(0, best.s - st.push);
+      if (st.push && best.hp > 0 && !best.boss && !best.mini && !best.mid) best.s = Math.max((best.laps || 0) * B.paths[best.pi || 0].length * B.laps, best.s - st.push);   // 밀어도 지난 바퀴로 돌아가지는 않는다
       if (st.slow && best.hp > 0) best.slowT = st.slowSec;
-      var calm = best.hp > 0 && !best.boss && !best.mini;   // 보스·작은 보스는 멈추지 않는다
+      var calm = best.hp > 0 && !best.boss && !best.mini && !best.mid;   // 보스·작은 보스·중간 보스는 멈추지 않는다
       if (st.stun && calm) { best.stunT = Math.max(best.stunT || 0, st.stun); best.stunKind = 'stun'; }
       if (st.freeze && calm && Math.random() < st.freeze) { best.stunT = Math.max(best.stunT || 0, st.freezeSec); best.stunKind = 'ice'; }
     });
@@ -506,7 +550,7 @@ G.Battle = (function () {
   }
 
   return { create: create, setLineup: setLineup, startWave: startWave, startTowerFloor: startTowerFloor, towerHpScale: towerHpScale, step: step, wantsAnotherWave: wantsAnotherWave,
-    useSkill: useSkill, skillReady: skillReady, light: light, isDark: isDark, nearestPathPoint: nearestPathPoint,
+    moveUnit: moveUnit, slotAt: slotAt, rewindWave: rewindWave, useSkill: useSkill, skillReady: skillReady, light: light, isDark: isDark, nearestPathPoint: nearestPathPoint,
     startBoss: startBoss, cutLegs: cutLegs, bossAnswer: bossAnswer, moveHero: moveHero,
     pos: pos, LAYOUTS: LAYOUTS, unitStats: unitStats, W: W, H: H };
 })();

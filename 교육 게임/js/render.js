@@ -67,10 +67,16 @@ G.Render = (function () {
       if (e.turbo) { ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(p.x, p.y - 20, 24, 0, Math.PI * 2); ctx.stroke(); }
       // 느려지거나 얼면 몸 색이 파랗게 바뀐다 (얼면 더 밝은 얼음색). 따로 글자나 효과는 넣지 않는다.
       // 그림을 따로 그린 뒤 그 위에만 파란색을 덧칠한다 (원래 색과 상관없이 확실히 파랗게)
-      var spr = G.EnemyArt.sprite(e.type, (e.boss || e.mini) ? 0 : e.id % 3), sx = p.x, sy = p.y - hop + (e.boss ? 18 : e.mini ? 10 : 0), size = e.boss ? 124 : e.mini ? 84 : 44;
+      var MB = G.CONFIG.midBoss, big = e.mid ? 44 * (MB ? MB.size : 3) : e.trait === 'tank' ? 52 : 44;
+      if (e.mid) { ctx.fillStyle = 'rgba(226,75,74,.28)'; ctx.beginPath(); ctx.ellipse(p.x, p.y + 4, 56, 16, 0, 0, Math.PI * 2); ctx.fill(); }
+      if (e.trait === 'fast' && !e.blocked && !(e.stunT > 0)) {   // 빠른 적: 뒤에 바람 줄
+        var back = p.dx < 0 ? 1 : -1; ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 3;
+        for (var wl = 0; wl < 3; wl++) { var ly = p.y - 12 - wl * 10, lx = p.x + back * (22 + (t * 90 + wl * 9) % 10); ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(lx + back * 16, ly); ctx.stroke(); }
+      }
+      var spr = G.EnemyArt.sprite(e.type, (e.boss || e.mini || e.mid) ? 0 : e.id % 3), sx = p.x, sy = p.y - hop + (e.boss ? 18 : e.mini ? 10 : e.mid ? 14 : 0), size = e.boss ? 124 : e.mini ? 84 : big;
       var tint = e.hit > 0 ? null : (!e.boss && e.stunT > 0 && e.stunKind === 'ice') ? 'rgba(150,215,255,.78)' : (e.slowT > 0 || e.zoneSlow < 1) ? 'rgba(40,120,255,.62)' : null;
       if (tint) {
-        if (!tintCanvas) { tintCanvas = document.createElement('canvas'); tintCanvas.width = 200; tintCanvas.height = 200; }
+        if (!tintCanvas) { tintCanvas = document.createElement('canvas'); tintCanvas.width = 200; tintCanvas.height = 200; }   // 중간 보스(132)도 들어간다
         var tc = tintCanvas.getContext('2d');
         tc.globalCompositeOperation = 'source-over'; tc.clearRect(0, 0, 200, 200);
         G.Pixel.drawSprite(tc, spr, 100, 180, size, p.dx < 0);
@@ -93,19 +99,29 @@ G.Render = (function () {
         }
         return;
       }
-      if (e.shield > 0) {   // 거품 갑옷
-        ctx.fillStyle = 'rgba(191,230,255,.35)'; ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 3;
+      if (e.shield > 0) {   // 방어막 (해파리는 거품, 다른 적은 노란 방어막)
+        var bubbleOne = e.type === 'jellyfish';
+        ctx.fillStyle = bubbleOne ? 'rgba(191,230,255,.35)' : 'rgba(255,226,122,.28)'; ctx.strokeStyle = bubbleOne ? 'rgba(255,255,255,.9)' : 'rgba(255,200,60,.95)'; ctx.lineWidth = 3;
         ctx.beginPath(); ctx.arc(p.x, p.y - 22, 26, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
         ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(p.x - 10, p.y - 34, 4, 0, Math.PI * 2); ctx.fill();
         for (var k = 0; k < e.shield; k++) { ctx.fillStyle = '#7fd3ff'; ctx.beginPath(); ctx.arc(p.x - 8 + k * 8, p.y - 56, 3, 0, Math.PI * 2); ctx.fill(); }
       } else {
-        var w = e.mini ? 70 : 34, f = Math.max(0, e.hp / e.maxHp), by = e.mini ? p.y - 86 : p.y - 54;   // 작은 보스는 막대가 길다
+        var w = e.mini ? 70 : e.mid ? 100 : e.trait === 'tank' ? 42 : 34, f = Math.max(0, e.hp / e.maxHp), by = e.mini ? p.y - 86 : e.mid ? p.y - 140 : e.trait === 'tank' ? p.y - 62 : p.y - 54;   // 작은 보스·중간 보스는 막대가 길다
+        if (e.mid) { ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#3a2a3f'; ctx.lineWidth = 4; ctx.font = '18px Jua, sans-serif'; ctx.textAlign = 'center'; ctx.strokeText('중간 보스', p.x, by - 6); ctx.fillText('중간 보스', p.x, by - 6); }
         ctx.fillStyle = '#3a2a3f'; ctx.fillRect(p.x - w / 2 - 2, by, w + 4, 8);
         ctx.fillStyle = f > 0.5 ? '#6fdc73' : f > 0.25 ? '#ffc04d' : '#ff6b6b'; ctx.fillRect(p.x - w / 2, by + 2, w * f, 4);
       }
     });
     // 친구들
+    if (B.drag) {   // 친구를 끌고 있으면 놓을 수 있는 칸을 보여 준다
+      B.slots.forEach(function (sl, i) {
+        var on = B.drag.over === i;
+        ctx.strokeStyle = on ? '#ffd23f' : 'rgba(255,255,255,.7)'; ctx.lineWidth = on ? 6 : 3; ctx.setLineDash(on ? [] : [8, 6]);
+        ctx.beginPath(); ctx.ellipse(sl.x, sl.y, 44, 18, 0, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+      });
+    }
     B.units.forEach(function (u) {
+      if (B.drag && B.drag.slot === u.slot) { ctx.globalAlpha = 0.35; G.Pixel.drawSprite(ctx, G.CharArt.sprite(u.id), u.x, u.y + 4, 64, false); ctx.globalAlpha = 1; return; }
       if (u.eaten > 0) {   // 마왕에게 삼켜짐
         ctx.fillStyle = 'rgba(90,42,142,.5)'; ctx.beginPath(); ctx.ellipse(u.x, u.y, 36, 14, 0, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = '#ffffff'; ctx.font = '18px Jua, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('꿀꺽! ' + Math.ceil(u.eaten), u.x, u.y - 10);
@@ -120,6 +136,7 @@ G.Render = (function () {
       }
       if (B.cheerT > 0) { ctx.fillStyle = '#ff5a7a'; ctx.font = '18px Jua, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('▲', u.x + 26, u.y - 56 + Math.sin(t * 6) * 3); }
     });
+    if (B.drag && B.drag.id) G.Pixel.drawSprite(ctx, G.CharArt.sprite(B.drag.id), B.drag.x, B.drag.y + 30, 76, false);   // 손가락 밑의 친구
     if (B.hero) {
       if (B.bossPhase && B.hero.tx !== undefined && Math.hypot(B.hero.tx - B.hero.x, B.hero.ty - B.hero.y) > 6) {
         ctx.strokeStyle = 'rgba(255,226,122,.9)'; ctx.lineWidth = 3; ctx.setLineDash([6, 6]);
