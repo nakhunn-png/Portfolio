@@ -580,6 +580,8 @@ G.UI = (function () {
     var g = el('div', 'dc-grade', gi.name); g.style.background = gi.color; c.appendChild(g);
     c.appendChild(el('div', 'dc-name', ch.name));
     c.appendChild(el('div', 'dc-job', C.jobs[ch.job].name + ' · ' + C.jobs[ch.job].style));
+    var PV = C.passives, order = ['normal', 'epic', 'unique', 'legendary', 'hidden'];
+    if (PV && PV[ch.job] && order.indexOf(ch.grade) >= order.indexOf(PV.minGrade)) c.appendChild(el('div', 'dc-passive', '✨ ' + PV[ch.job].name + ': ' + PV[ch.job].desc));   // 자동 능력
     return c;
   }
   function afterDraw(results) {

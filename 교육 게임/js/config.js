@@ -27,6 +27,16 @@ G.CONFIG = {
     chef:   { name: '요리사',   atk: 7,  interval: 1.0,  range: 200, buff: 0.25, style: '옆 친구들 공격을 빠르게' },
     ice:    { name: '얼음술사', atk: 8,  interval: 1.1,  range: 250, slow: 0.4, slowSec: 1.6, style: '적을 느리게' }
   },
+  /* 자동 능력 (2026-11-26): 유니크부터 직업마다 하나. 레전더리·히든은 legendMul 배만큼 더 세다. 보스·작은 보스에는 멈춤·얼림이 안 걸린다 */
+  passives: {
+    minGrade: 'unique', legendMul: 1.6,
+    sword:  { name: '경직',   desc: '맞은 적이 잠깐 멈춰요',          stun: 0.45 },
+    archer: { name: '치명타', desc: '가끔 두 배로 세게 맞혀요',        crit: 0.25, critMul: 2 },
+    mage:   { name: '큰 폭발', desc: '폭발이 더 넓게 퍼져요',          splashMul: 1.45 },
+    knight: { name: '세게 밀기', desc: '적을 더 멀리 밀어내요',        pushMul: 2 },
+    chef:   { name: '힘내라 요리', desc: '옆 친구들 공격이 더 빨라져요', buffMul: 1.6 },
+    ice:    { name: '꽁꽁',   desc: '가끔 적을 꽁꽁 얼려 멈춰요',      freeze: 0.22, freezeSec: 1.0 }
+  },
   slots: 8,              // 출전 칸 (2줄 × 4칸)
   life: 5,               // 생명. 적이 길을 한 바퀴 다 돌면 빠져나가며 생명 1 (보스는 2)
   escapeLaps: 1,         // 2026-11-25 「너무 쉬워」 → 두 바퀴에서 한 바퀴로
@@ -78,13 +88,13 @@ G.CONFIG = {
   /* 18. 영웅 (스테이지를 시작할 때 1명 고른다). cd: 능력 다시 쓰는 시간 (게임 시간 초)
    * target: true 면 능력 버튼을 누른 뒤 화면에서 위치를 고른다. dmg 는 진행 정도만큼 함께 세진다 */
   heroes: {
-    mage:   { name: '시간 마법사', skillName: '느려져라!',   skill: 'slowZone',  cd: 18, target: true, r: 120, slow: 0.3, dur: 15,
+    mage:   { name: '시간 마법사', skillName: '느려져라!',   skill: 'slowZone',  cd: 36, target: true, r: 120, slow: 0.3, dur: 15,
       desc: '고른 곳의 적을 15초 동안 아주 느리게 만들어요.' },
-    cheer:  { name: '응원단장',   skillName: '힘내라 응원!', skill: 'cheer',     cd: 20, mult: 1.7, dur: 18,
+    cheer:  { name: '응원단장',   skillName: '힘내라 응원!', skill: 'cheer',     cd: 40, mult: 1.7, dur: 18,
       desc: '모든 친구의 공격력을 18초 동안 크게 올려요.' },
-    shield: { name: '방패병',     skillName: '길 막기!',     skill: 'block',     cd: 16, target: true, dur: 12,
+    shield: { name: '방패병',     skillName: '길 막기!',     skill: 'block',     cd: 32, target: true, dur: 12,
       desc: '고른 길을 12초 동안 막아 적이 못 지나가요.' },
-    archer: { name: '명사수 궁수', skillName: '화살비!',      skill: 'arrowRain', cd: 15, target: true, r: 110, dmg: 160,
+    archer: { name: '명사수 궁수', skillName: '화살비!',      skill: 'arrowRain', cd: 30, target: true, r: 110, dmg: 160,
       desc: '고른 곳에 화살비를 쏟아 강하게 공격해요.' },
     // 아크메이지: 수학이 어려운 친구를 위한 치트키. 일부러 아주 세다(약하게 만들지 않는다). 2026-11-26 대기 26 → 10초, 피해 900 → 2500
     arch:   { name: '아크메이지', skillName: '메테오!',      skill: 'meteor',    cd: 10, dmg: 2500, secret: true,

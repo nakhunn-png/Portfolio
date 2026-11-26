@@ -67,9 +67,14 @@ G.Render = (function () {
       if (e.turbo) { ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(p.x, p.y - 20, 24, 0, Math.PI * 2); ctx.stroke(); }
       ctx.save();
       if (e.hit > 0) ctx.filter = 'brightness(1.8)';
+      else if (!e.boss && e.stunT > 0 && e.stunKind === 'ice') ctx.filter = 'hue-rotate(170deg) saturate(.5) brightness(1.35)';
       else if (e.slowT > 0 || e.zoneSlow < 1) ctx.filter = 'hue-rotate(160deg) saturate(.7) brightness(1.15)';
       G.Pixel.drawSprite(ctx, G.EnemyArt.sprite(e.type, (e.boss || e.mini) ? 0 : e.id % 3), p.x, p.y - hop + (e.boss ? 18 : e.mini ? 10 : 0), e.boss ? 124 : e.mini ? 84 : 44, p.dx < 0);
       ctx.restore();
+      if (!e.boss && e.stunT > 0) {   // 자동 능력: 경직(노란 별) · 얼림(얼음 네모)
+        if (e.stunKind === 'ice') { ctx.fillStyle = 'rgba(191,230,255,.45)'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.fillRect(p.x - 20, p.y - 44, 40, 46); ctx.strokeRect(p.x - 20, p.y - 44, 40, 46); }
+        else { ctx.fillStyle = '#ffd23f'; ctx.font = '14px Jua, sans-serif'; ctx.textAlign = 'center'; for (var sq = 0; sq < 2; sq++) ctx.fillText('★', p.x + Math.cos(t * 7 + sq * 3.1) * 14, p.y - 50 + Math.sin(t * 7 + sq * 3.1) * 4); }
+      }
       if (e.boss) {
         if (e.stunT > 0) { ctx.fillStyle = '#ffd23f'; ctx.font = '24px Jua, sans-serif'; ctx.textAlign = 'center'; for (var q = 0; q < 3; q++) ctx.fillText('★', p.x + Math.cos(t * 5 + q * 2.1) * 40, p.y - 108 + Math.sin(t * 5 + q * 2.1) * 10); }
         if (B.bossType === 'octopus') {   // 아직 남은 다리 수만큼 분홍 동그라미
@@ -152,6 +157,8 @@ G.Render = (function () {
         ctx.strokeStyle = 'rgba(255,90,122,' + (1 - k) + ')'; ctx.lineWidth = 8; ctx.beginPath(); ctx.arc(f.x, f.y - 30, 40 + k * 500, 0, Math.PI * 2); ctx.stroke();
       } else if (f.kind === 'impact') {
         ctx.fillStyle = 'rgba(226,75,74,' + 0.6 * (1 - k) + ')'; ctx.beginPath(); ctx.arc(f.x, f.y, f.r * (1 + k * 0.4), 0, Math.PI * 2); ctx.fill();
+      } else if (f.kind === 'crit') {
+        ctx.globalAlpha = 1 - k; ctx.fillStyle = '#ff5a3a'; ctx.font = '18px Jua, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('치명타!', f.x, f.y - k * 16); ctx.globalAlpha = 1;
       } else if (f.kind === 'snow') {
         ctx.fillStyle = 'rgba(255,255,255,' + 0.6 * (1 - k) + ')';
         for (var n = 0; n < 60; n++) ctx.fillRect((n * 97 + k * 400) % 960, (n * 53 + k * 300) % 540, 5, 5);

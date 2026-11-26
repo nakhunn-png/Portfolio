@@ -128,10 +128,23 @@ G.Battle = (function () {
   function unitStats(charId, stageNo) {
     var ch = G.charById(charId), job = G.CONFIG.jobs[ch.job], gm = G.gradeInfo(ch.grade).mult;
     var theme = ch.theme === stageNo ? 1.1 : 1;
-    return {
+    var s = {
       atk: job.atk * gm * theme, interval: job.interval, range: job.range * (1 + (gm - 1) * 0.04),
       splash: job.splash || 0, push: job.push || 0, buff: job.buff || 0, slow: job.slow || 0, slowSec: job.slowSec || 0
     };
+    // 자동 능력: 유니크부터
+    var PV = G.CONFIG.passives, order = ['normal', 'epic', 'unique', 'legendary', 'hidden'], pv = PV && PV[ch.job];
+    if (pv && order.indexOf(ch.grade) >= order.indexOf(PV.minGrade)) {
+      var k = ch.grade === 'unique' ? 1 : PV.legendMul;
+      s.passive = ch.job;
+      if (pv.stun) s.stun = pv.stun * k;
+      if (pv.crit) { s.crit = Math.min(0.6, pv.crit * k); s.critMul = pv.critMul; }
+      if (pv.splashMul) s.splash *= pv.splashMul * (k > 1 ? 1.15 : 1);
+      if (pv.pushMul) s.push *= pv.pushMul * k;
+      if (pv.buffMul) s.buff *= pv.buffMul * k;
+      if (pv.freeze) { s.freeze = Math.min(0.5, pv.freeze * k); s.freezeSec = pv.freezeSec; }
+    }
+    return s;
   }
 
   /* ───────── 전투 하나 ───────── */
@@ -411,6 +424,7 @@ G.Battle = (function () {
       B.zones.forEach(function (z) { if (Math.hypot(p.x - z.x, p.y - z.y) <= z.r) mul = Math.min(mul, z.slow); });
       e.zoneSlow = mul;
       e.slowT = Math.max(0, e.slowT - dt); e.hit = Math.max(0, e.hit - dt);
+      if (!e.boss && e.stunT > 0) { e.stunT -= dt; return; }               // 자동 능력: 경직·얼림이면 멈춘다
       if (e.boss) {
         if (e.stunT > 0) { e.stunT -= dt; return; }                       // 기절하면 멈춘다
         if (B.bossType === 'demon' && B.demonPhase === 3) return;          // 마왕 3단계: 입을 벌리고 멈춘다
@@ -455,6 +469,7 @@ G.Battle = (function () {
       if (isHero) u.atkCd = st.interval; else u.cd = st.interval;
       u.flash = 0.15;
       var tp = pos(B, best), job = isHero ? 'hero' : G.charById(u.id).job, dmg = st.atk * atkMul;
+      if (st.crit && Math.random() < st.crit) { dmg *= st.critMul; B.fx.push({ kind: 'crit', x: tp.x, y: tp.y - 40, t: 0, life: 0.5 }); }   // 궁수 치명타
       B.shots.push({ job: job, x: u.x, y: u.y - 30, tx: tp.x, ty: tp.y - 14, t: 0, life: 0.18 });
       if (st.splash) {
         B.fx.push({ kind: 'boom', x: tp.x, y: tp.y, t: 0, life: 0.3, r: st.splash });
@@ -462,6 +477,9 @@ G.Battle = (function () {
       } else damage(B, best, dmg, events);
       if (st.push && best.hp > 0 && !best.boss && !best.mini) best.s = Math.max(0, best.s - st.push);
       if (st.slow && best.hp > 0) best.slowT = st.slowSec;
+      var calm = best.hp > 0 && !best.boss && !best.mini;   // 보스·작은 보스는 멈추지 않는다
+      if (st.stun && calm) { best.stunT = Math.max(best.stunT || 0, st.stun); best.stunKind = 'stun'; }
+      if (st.freeze && calm && Math.random() < st.freeze) { best.stunT = Math.max(best.stunT || 0, st.freezeSec); best.stunKind = 'ice'; }
     });
     // 늦게 터지는 능력 (화살비, 메테오)
     B.delayed.forEach(function (d) { d.t -= dt; if (d.t <= 0 && !d.done) { d.done = true; d.fn(events); } });
