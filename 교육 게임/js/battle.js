@@ -143,6 +143,17 @@ G.Battle = (function () {
       if (pv.pushMul) s.push *= pv.pushMul * k;
       if (pv.buffMul) s.buff *= pv.buffMul * k;
       if (pv.freeze) { s.freeze = Math.min(0.5, pv.freeze * k); s.freezeSec = pv.freezeSec; }
+      // 레전더리·히든: 더 센 능력 (legend)
+      var lg = ch.grade !== 'unique' && PV.legend && PV.legend[ch.job];
+      if (lg) {
+        s.legend = ch.job;
+        if (lg.cleave) { s.cleave = lg.cleave; s.cleaveMul = lg.cleaveMul; }
+        if (lg.crit) { s.crit = lg.crit; s.critMul = lg.critMul; }
+        if (lg.rapidEvery) { s.rapidEvery = lg.rapidEvery; s.rapidDur = lg.rapidDur; s.rapidMul = lg.rapidMul; }
+        if (lg.stun) s.stun = Math.max(s.stun || 0, lg.stun);
+        if (lg.allBuff) s.allBuff = lg.allBuff;
+        if (lg.freezeR) s.freezeR = lg.freezeR;
+      }
     }
     return s;
   }
@@ -154,6 +165,7 @@ G.Battle = (function () {
     var st = G.stageByNo(stageNo), C = G.CONFIG, L = (LAYOUTS[st.path] || LAYOUTS.loop)(), D = G.difficultyByKey(diffKey);
     var B = {
       stageNo: stageNo, gimmick: opts.tower ? null : (st.gimmick || null), tower: !!opts.tower, hpMul: opts.tower ? C.tower.hpMul : (st.minionHp || st.hp || 1),   // 보스 스테이지는 부하 체력을 따로 (minionHp)
+      carry: !!opts.carry, carryMul: 1,   // 친구 이어 가기 (데려온 친구가 센 만큼 적이 단단해진다)
       paths: L.paths, path: L.paths[0], slots: opts.extraSlot && L.extra ? L.slots.concat([L.extra]) : L.slots, heroPos: L.hero, bubbleSpots: L.bubbles, laps: L.laps || C.escapeLaps, rings: !!L.rings,
       time: 0, life: D.life, lifeLost: 0, diff: D, bossType: st.boss || null, bossPhase: false, boss: null,
       hazards: [], pips: 0, legs: [], legT: 0, combo: 0,
@@ -181,6 +193,7 @@ G.Battle = (function () {
   // 요리사: 옆 칸 친구 공격 빠르게
   function applyBuffs(B) {
     B.units.forEach(function (u) { u.speedUp = 1; });
+    B.units.forEach(function (u) { if (u.st.allBuff) B.units.forEach(function (v) { if (v !== u) v.speedUp += u.st.allBuff; }); });   // 레전더리 요리사: 모두 빠르게
     B.units.forEach(function (u) {
       if (!u.st.buff) return;
       neighbors(B.slots, u.slot).forEach(function (n) { B.units.forEach(function (v) { if (v.slot === n) v.speedUp += u.st.buff; }); });
@@ -225,6 +238,7 @@ G.Battle = (function () {
     B.plannedReal = (B.plannedReal || 0) + C.battleTime.waveGameSec * wm * speedCount * w.spawnPortion / speed.v;
     var n = Math.max(3, Math.round((w.base + w.countGrowth * p) * speedCount * B.diff.count * wm));
     B.spawnLeft = n; B.spawnTotal = n;
+    B.carryMul = carryMul(B, B.wave - 1);
     // 적이 많아진 만큼 웨이브도 길어진다 (적이 나오는 간격은 그대로)
     B.spawnGap = (C.battleTime.waveGameSec * wm * speedCount * w.spawnPortion) / n * (w.spawnGapMul || 1);
     B.spawnTimer = 0; B.waveRunning = true; B.turbo = !!turbo;
@@ -247,7 +261,13 @@ G.Battle = (function () {
       B.enemies.push({ id: B.nextId++, type: type, mini: true, pi: 0, hp: hp, maxHp: hp, s: 0, speed: w.speed * T.miniSpeed * B.diff.speed, slowT: 0, zoneSlow: 1, hit: 0, bob: 0, shield: 0 });
     }
   }
-  function hpScale(B) { return 1 + G.CONFIG.wave.hpGrowth * (B.progress || 0); }
+  function hpScale(B) { return (1 + G.CONFIG.wave.hpGrowth * (B.progress || 0)) * (B.carryMul || 1); }   // 친구 이어 가기 배율도 함께 (능력 피해도 같이 세진다)
+  function teamPower(B) { return B.units.reduce(function (a, u) { return a + G.gradeInfo(G.charById(u.id).grade).mult; }, 0); }
+  function carryMul(B, waveIdx) {
+    var K = G.CONFIG.carry; if (!B.carry || !K) return 1;
+    var exp = K.expect[Math.max(0, Math.min(K.expect.length - 1, waveIdx))];
+    return Math.max(1, Math.min(K.max, Math.pow(teamPower(B) / exp, K.pow)));
+  }
 
   function spawn(B, events) {
     var st = G.stageByNo(B.stageNo), w = G.CONFIG.wave;
@@ -356,8 +376,9 @@ G.Battle = (function () {
   }
   function startBoss(B) {
     var st = G.stageByNo(B.stageNo), BC = bossCfg(B);
+    B.carryMul = carryMul(B, 2);
     B.bossPhase = true; B.progress = 1; B.waveRunning = false; B.bossT = 0; B.demonPhase = 1; B.combo = 0; B.pips = 0;
-    var hp = BC.hp * (st.hp || 1) * B.diff.bossHp;
+    var hp = BC.hp * (st.hp || 1) * B.diff.bossHp * B.carryMul;
     B.boss = { id: B.nextId++, type: B.bossType, boss: true, pi: 0, hp: hp, maxHp: hp, s: 0, speed: BC.speed * (B.diff.bossSpeed || 1), slowT: 0, zoneSlow: 1, hit: 0, bob: 0, shield: 0, stunT: 0 };
     B.enemies.push(B.boss);
     if (B.hero) { B.hero.tx = B.hero.x; B.hero.ty = B.hero.y; B.hero.stunT = 0; }
@@ -500,7 +521,12 @@ G.Battle = (function () {
       if (u.eaten > 0) { u.eaten -= dt; return; }   // 마왕에게 삼켜진 친구
       if (!isHero && B.drag && B.drag.slot === u.slot) return;   // 끌고 있는 친구는 쉬어요
       if (u.frozen > 0) { u.frozen -= dt; return; }
-      if (isHero) { u.atkCd -= dt; if (u.atkCd > 0) return; } else { u.cd -= dt * u.speedUp; if (u.cd > 0) return; }
+      if (!isHero && st.rapidEvery) {   // 레전더리 마법사: 연사 모드
+        u.rapidClock = (u.rapidClock || 0) + dt;
+        var wasRapid = u.rapid > 0; u.rapid = (u.rapidClock % st.rapidEvery) >= st.rapidEvery - st.rapidDur ? 1 : 0;
+        if (u.rapid && !wasRapid) B.fx.push({ kind: 'word', text: '연사!', x: u.x, y: u.y - 70, t: 0, life: 0.8 });
+      }
+      if (isHero) { u.atkCd -= dt; if (u.atkCd > 0) return; } else { u.cd -= dt * u.speedUp * (u.rapid ? st.rapidMul : 1); if (u.cd > 0) return; }
       var range = st.range * (dark ? 0.7 : 1);   // 어둠 속에서는 사거리 70%
       // 사거리 안에서 가장 멀리 간(빠져나가기 직전인) 적을 노린다
       var best = null, bestS = -1;
@@ -519,11 +545,21 @@ G.Battle = (function () {
         B.fx.push({ kind: 'boom', x: tp.x, y: tp.y, t: 0, life: 0.3, r: st.splash });
         B.enemies.forEach(function (e) { if (e.hp <= 0) return; var p = pos(B, e); if (Math.hypot(p.x - tp.x, p.y - tp.y) <= st.splash) damage(B, e, dmg, events); });
       } else damage(B, best, dmg, events);
+      if (st.cleave) {   // 레전더리 검사: 주위도 공격
+        B.fx.push({ kind: 'slash', x: tp.x, y: tp.y, t: 0, life: 0.25, r: st.cleave });
+        B.enemies.forEach(function (e) { if (e === best || e.hp <= 0) return; var p = pos(B, e); if (Math.hypot(p.x - tp.x, p.y - tp.y) <= st.cleave) damage(B, e, dmg * st.cleaveMul, events); });
+      }
       if (st.push && best.hp > 0 && !best.boss && !best.mini && !best.mid) best.s = Math.max((best.laps || 0) * B.paths[best.pi || 0].length * B.laps, best.s - st.push);   // 밀어도 지난 바퀴로 돌아가지는 않는다
       if (st.slow && best.hp > 0) best.slowT = st.slowSec;
       var calm = best.hp > 0 && !best.boss && !best.mini && !best.mid;   // 보스·작은 보스·중간 보스는 멈추지 않는다
       if (st.stun && calm) { best.stunT = Math.max(best.stunT || 0, st.stun); best.stunKind = 'stun'; }
-      if (st.freeze && calm && Math.random() < st.freeze) { best.stunT = Math.max(best.stunT || 0, st.freezeSec); best.stunKind = 'ice'; }
+      if (st.freeze && calm && Math.random() < st.freeze) {
+        best.stunT = Math.max(best.stunT || 0, st.freezeSec); best.stunKind = 'ice';
+        if (st.freezeR) {   // 레전더리 얼음술사: 얼음 폭발
+          B.fx.push({ kind: 'boom', x: tp.x, y: tp.y, t: 0, life: 0.3, r: st.freezeR });
+          B.enemies.forEach(function (e) { if (e === best || e.hp <= 0 || e.boss || e.mini || e.mid) return; var p = pos(B, e); if (Math.hypot(p.x - tp.x, p.y - tp.y) <= st.freezeR) { e.stunT = Math.max(e.stunT || 0, st.freezeSec); e.stunKind = 'ice'; } });
+        }
+      }
     });
     // 늦게 터지는 능력 (화살비, 메테오)
     B.delayed.forEach(function (d) { d.t -= dt; if (d.t <= 0 && !d.done) { d.done = true; d.fn(events); } });
@@ -552,7 +588,7 @@ G.Battle = (function () {
   return { create: create, setLineup: setLineup, startWave: startWave, startTowerFloor: startTowerFloor, towerHpScale: towerHpScale, step: step, wantsAnotherWave: wantsAnotherWave,
     moveUnit: moveUnit, slotAt: slotAt, rewindWave: rewindWave, useSkill: useSkill, skillReady: skillReady, light: light, isDark: isDark, nearestPathPoint: nearestPathPoint,
     startBoss: startBoss, cutLegs: cutLegs, bossAnswer: bossAnswer, moveHero: moveHero,
-    pos: pos, LAYOUTS: LAYOUTS, unitStats: unitStats, W: W, H: H };
+    pos: pos, teamPower: teamPower, carryMul: carryMul, LAYOUTS: LAYOUTS, unitStats: unitStats, W: W, H: H };
 })();
 
 if (typeof module !== 'undefined') module.exports = G.Battle;

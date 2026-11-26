@@ -657,3 +657,5 @@ canvas { position: absolute; left: 0; top: 0; width: 960px; height: 540px; image
 .music-btn { position: absolute; right: 18px; top: 16px; min-height: 56px; padding: 0 18px; font-family: inherit; font-size: 20px; border: 4px solid var(--ink); border-radius: 14px; background: #7fd0ff; color: var(--ink); cursor: pointer; box-shadow: 0 4px 0 rgba(58,42,63,.5); }
 .music-btn.off { background: #fff; color: #8a7a90; }
 .pause-music { display: block; margin: 4px auto 10px; min-height: 56px; }
+.mini .ability.legend { background: #dcf6df; color: #1f7f2c; }
+.dc-passive.legend { color: #1f7f2c; background: #dcf6df; }

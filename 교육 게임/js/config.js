@@ -35,13 +35,26 @@ G.CONFIG = {
     mage:   { name: '큰 폭발', desc: '폭발이 더 넓게 퍼져요',          short: '큰 폭발', splashMul: 1.45 },
     knight: { name: '세게 밀기', desc: '적을 더 멀리 밀어내요',        short: '멀리 밀기', pushMul: 2 },
     chef:   { name: '힘내라 요리', desc: '옆 친구들 공격이 더 빨라져요', short: '더 빠르게', buffMul: 1.6 },
-    ice:    { name: '꽁꽁',   desc: '가끔 적을 꽁꽁 얼려 멈춰요',      short: '꽁꽁 얼려요', freeze: 0.22, freezeSec: 1.0 }
+    ice:    { name: '꽁꽁',   desc: '가끔 적을 꽁꽁 얼려 멈춰요',      short: '꽁꽁 얼려요', freeze: 0.22, freezeSec: 1.0 },
+    /* 2026-11-26 레전더리·히든은 자동 능력(×legendMul)에 더해 직업마다 더 센 능력 하나 (사용자 요청) */
+    legend: {
+      sword:  { name: '회오리 베기', short: '주위도 공격', desc: '맞은 적 주위의 적도 함께 공격해요', cleave: 85, cleaveMul: 0.7 },
+      archer: { name: '세 배 화살', short: '가끔 세 배',  desc: '가끔 세 배로 세게 맞혀요',        crit: 0.35, critMul: 3 },
+      mage:   { name: '연사 모드',  short: '연사 모드',   desc: '8초마다 3초 동안 마법을 세 배 빠르게 쏴요', rapidEvery: 8, rapidDur: 3, rapidMul: 3 },
+      knight: { name: '길게 기절',  short: '길게 기절',   desc: '밀어낸 적을 오래 기절시켜요',      stun: 1.3 },
+      chef:   { name: '잔치 요리',  short: '모두 빠르게', desc: '모든 친구의 공격이 빨라져요',      allBuff: 0.2 },
+      ice:    { name: '얼음 폭발',  short: '얼음 폭발',   desc: '얼릴 때 주위의 적도 함께 얼려요',  freezeR: 85 }
+    }
   },
   slots: 8,              // 출전 칸 (2줄 × 4칸)
   life: 5,               // 생명. 적이 길을 한 바퀴 다 돌 때마다 생명 1 (보스는 2)
   escapeLaps: 1,         // 2026-11-25 「너무 쉬워」 → 두 바퀴에서 한 바퀴로. 2026-11-26 적은 빠져나가지 않고 쓰러질 때까지 계속 돈다
   /* 2026-11-26 중간 보스: 일반 스테이지 마지막 웨이브의 마지막 적. 그 스테이지 첫 번째 적 그림을 3배 크기로, 체력은 일반 적의 10배 */
-  midBoss: { size: 3, hp: 10, speed: 0.8, at: 0.6 },   // at: 웨이브 적이 이만큼 나왔을 때 등장 (맨 끝이면 웨이브가 너무 길어진다)
+  midBoss: { size: 3, hp: 10, speed: 0.8, at: 0.6 },
+  /* 2026-11-26 친구 이어 가기: 스테이지를 깨면 친구들이 다음 판에도 함께 간다 (튜토리얼·탑 빼고).
+   * 대신 데려온 친구가 센 만큼 그 판 적도 단단해진다: 적 체력 × (지금 팀 힘 ÷ 새로 시작했을 때 그 웨이브 평균 팀 힘)^pow (1~max)
+   * 팀 힘 = 출전 칸 친구들 등급 배율의 합. expect 는 웨이브 1~8 의 평균 (2000판 모의, 보통 난이도) */
+  carry: { expect: [4.3, 6.6, 7.2, 7.4, 8.7, 9.5, 10.2, 11.3], pow: 1.7, max: 10 },   // pow: 1.8 이면 새로 시작과 승률이 같고 1.6 이면 꽤 쉬웠다. 데려간 보람이 조금 남도록 1.7   // at: 웨이브 적이 이만큼 나왔을 때 등장 (맨 끝이면 웨이브가 너무 길어진다)
 
   // 9. 배속과 클리어 시간 보정
   speeds: [
@@ -65,14 +78,14 @@ G.CONFIG = {
 
   /* 7. 스테이지 9개
    * gimmick: bubble(거품 적) / blizzard(눈보라) / storm(모래폭풍·갈림길) / dark(어둠·조명)
-   * 2026-11-26 적이 사라지지 않고 계속 돌고 중간 보스가 생겨서 일반 스테이지 hp 를 약 10% 낮춤 (1.15·1.55·1.22·1.3·1.3·0.95 → 1.03·1.7·1.1·1.17·1.1·0.78. 바닷속은 복어가 빠르고 약해져서 오히려 올림)
+   * 2026-11-26 적이 사라지지 않고 계속 돌고 중간 보스가 생겨서 일반 스테이지 hp 를 약 10% 낮춤 (1.15·1.55·1.22·1.3·1.3·0.95 → 0.97(과자 숲, 2026-11-26 다시 낮춤)·1.7·1.1·1.17·1.1·0.78. 바닷속은 복어가 빠르고 약해져서 오히려 올림)
    * hp: 적 체력 배율. 뒤 스테이지일수록 조금씩 세진다. speed: 적 빠르기 배율 (우주 정거장은 길이 아주 길어서 빠르게) */
   stages: [
-    { no: 1, name: '과자 숲',     unit: 1, hp: 1.03, path: 'loop',    enemies: ['jellyBear', 'cookieSoldier'], types: ['A1', 'A2'], format: 'choice', ready: true,
+    { no: 1, name: '과자 숲',     unit: 1, hp: 0.97, path: 'loop',    enemies: ['jellyBear', 'cookieSoldier'], types: ['A1', 'A2'], format: 'choice', ready: true,
       tip: '처음이에요! 문제를 풀고 친구를 뽑아요.' },
     { no: 2, name: '바닷속',      unit: 1, hp: 1.7, path: 'eight',   enemies: ['puffer', 'jellyfish'], types: ['A3', 'A4', 'A5'], format: 'choice', ready: true, gimmick: 'bubble',
       tip: '해파리는 거품 갑옷을 입었어요. 세 번 맞혀야 거품이 터져요!' },
-    { no: 3, name: '문어 대장',   unit: 1, hp: 1.3, minionHp: 1.25, path: 'whirl',   boss: 'octopus', enemies: ['babyOctopus', 'puffer'], types: ['A5', 'A3'], format: 'choice', ready: true,
+    { no: 3, name: '문어 대장',   unit: 1, hp: 1.3, minionHp: 1.35, path: 'whirl',   boss: 'octopus', enemies: ['babyOctopus', 'puffer'], types: ['A5', 'A3'], format: 'choice', ready: true,
       tip: '보스가 나오면 문어 다리 숫자 두 개를 골라 10을 만들어 잘라요!' },
     { no: 4, name: '눈나라',      unit: 2, hp: 1.1, path: 'zigzag',  enemies: ['snowball', 'babyBear'], types: ['B1', 'B2'], format: 'tenframe', ready: true, gimmick: 'blizzard',
       tip: '눈보라가 불면 친구 하나가 잠깐 얼어요.' },

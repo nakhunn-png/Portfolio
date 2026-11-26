@@ -24,6 +24,9 @@
   - 「모두 뽑기」가 「뽑기」보다 크다(`#btn-draw-all` 60px)
   - **배경 음악** `js/audio.js`(`G.Music.play('calm'|'battle'|'boss')`, 화면이 바뀔 때 `show` 에서 고른다). 켜고 끄기: 처음 화면 오른쪽 위, 멈춤 창. 설정 `music`
   - **출전 칸 능력 글씨**: `jobs.short`, 유니크부터 `passives.short`(✨)
+  - **친구 이어 가기**: 깬 판의 팀이 다음 판에 함께 온다(`progress.team`). 대신 적 체력 × (팀 힘 ÷ 평균)^1.7(`CONFIG.carry`, `Battle.carryMul`). 검사 6개는 새로 시작하는 판만 본다(이어 가기 모의는 PRD 16장)
+  - **레전더리 능력** `passives.legend`(주위도 공격·가끔 세 배·연사 모드·길게 기절·모두 빠르게·얼음 폭발, 🌟)
+  - 보스 스테이지 1.5배속 상한은 **보스전 동안만**
   - 모든 난이도: 보너스 풍선 2초, 능력 조준 중에도 전투가 흐름, 「모두 뽑기」→「전투 시작」 버튼이 반짝이며 유도
 - **게임 전체 시간 어림 60~75분**(PRD 16장 끝). 사용자 기준 40~80분.
 
@@ -40,7 +43,7 @@ python -m http.server 8767
 - `http://localhost:8767` — 보통 플레이 / `?dev=1` — 모든 섬·배속·숨은 영웅·재앙·도전 영역 열림
 - 바로 해 볼 링크(시험판, 모든 것 열림): https://claude.ai/artifact/XeuQbw2hPCjDBZLQB79cVJ — 코드를 바꾸면 Claude 가 같은 주소로 다시 올린다(`index.html` 에서 doctype·head 를 뺀 사본 + `DEV = true`)
 - 저장은 localStorage(`냠냠2_도감`, `냠냠2_진행`, `냠냠2_설정`). localhost 와 127.0.0.1 은 저장이 따로 → 시험은 `127.0.0.1:8767`
-- 파일을 바꾸면 `index.html` 의 `?v=` 번호를 올린다(브라우저 캐시). 지금 `2026112611`
+- 파일을 바꾸면 `index.html` 의 `?v=` 번호를 올린다(브라우저 캐시). 지금 `2026112612`
 
 ## 파일
 
@@ -68,7 +71,7 @@ node tests/check-boss.js        # 보스 스테이지 (~4분)
 node tests/check-challenge.js   # 놀이·보상·탑 (~4분)
 node tests/check-difficulty.js  # 난이도 사다리 (~6분)
 ```
-오래 걸리는 것은 백그라운드로, 경계 값은 무작위로 흔들리니 **두 번** 돌려 본다. 마지막 결과(2026-11-26 늦은 밤, 중간 보스·계속 도는 적 넣은 뒤): math·layout·challenge·speed 통과. boss·difficulty 는 번갈아 1건씩 경계에서 실패(보스 스테이지 「보통」이 너무 쉬움 — 문어 대장 잃은 생명 0.1~0.8, 기준 0.2). 위 「결정을 기다리는 것」.
+오래 걸리는 것은 백그라운드로, 경계 값은 무작위로 흔들리니 **두 번** 돌려 본다. 마지막 결과(2026-11-26 늦은 밤, 친구 이어 가기·레전더리 능력 넣은 뒤): math·layout·challenge 통과, speed 두 번 통과. boss·difficulty 는 번갈아 1건씩 경계에서 실패(보스 스테이지 「보통」이 너무 쉬움 — 문어 대장 잃은 생명 0.1~0.8, 기준 0.2). 위 「결정을 기다리는 것」.
 
 화면 확인은 Playwright 로 `file://…/index.html?dev=1` 을 열고 `G.UI._test.startStage(no, 'mage', 난이도)`, `goPrep('prep')`, `tick(초)` 로 흘려 찍는다. 섬이 둥실거려서 클릭은 `{ force: true }`.
 

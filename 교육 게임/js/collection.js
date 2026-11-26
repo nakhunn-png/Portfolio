@@ -15,6 +15,18 @@ G.Collection = (function () {
       correct: 0, wrong: 0, wrongTypes: {} };
   }
   function addCoins(run, n) { run.coins += n; }
+  // 2026-11-26 친구 이어 가기: 저장해 둘 팀 { slots: 칸마다 캐릭터 id 또는 null, bench: 칸에 못 선 친구 id }
+  function saveTeam(run) {
+    var onSlot = {};
+    var slots = run.slots.map(function (uid) { if (!uid) return null; onSlot[uid] = true; for (var i = 0; i < run.roster.length; i++) if (run.roster[i].uid === uid) return run.roster[i].id; return null; });
+    return { slots: slots, bench: run.roster.filter(function (u) { return !onSlot[u.uid]; }).map(function (u) { return u.id; }) };
+  }
+  function loadTeam(run, team) {
+    if (!team) return;
+    (team.slots || []).forEach(function (id, i) { if (!id || !G.charById(id)) return; var u = { uid: uidSeq++, id: id }; run.roster.push(u); if (i < run.slots.length) run.slots[i] = u.uid; });
+    (team.bench || []).forEach(function (id) { if (G.charById(id)) run.roster.push({ uid: uidSeq++, id: id }); });
+    fillSlots(run);
+  }
 
   // 문제 하나에 답함 → 얻은 코인
   function answer(run, correct, type) {
@@ -121,7 +133,7 @@ G.Collection = (function () {
   }
 
   return { newBook: newBook, newRun: newRun, addCoins: addCoins, answer: answer, rollGrade: rollGrade, canDraw: canDraw,
-    draw: draw, drawAll: drawAll, full: full, mergeOnce: mergeOnce, autoMerge: autoMerge, fillSlots: fillSlots, swapSlots: swapSlots,
+    saveTeam: saveTeam, loadTeam: loadTeam, draw: draw, drawAll: drawAll, full: full, mergeOnce: mergeOnce, autoMerge: autoMerge, fillSlots: fillSlots, swapSlots: swapSlots,
     lineup: lineup, countByGrade: countByGrade, addFriend: addFriend };
 })();
 

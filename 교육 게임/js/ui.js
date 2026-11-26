@@ -117,12 +117,14 @@ G.UI = (function () {
   function curSpeed() {
     var i = A.settings.speed || 0; if (!speedOpen(i)) i = 0;
     var s = C.speeds[i];
-    if (A.B && G.stageByNo(A.stageNo).boss && s.v > C.bossSpeedCap) return C.speeds[1];   // 보스전은 1.5배속까지
+    // 보스와 싸우는 동안만 1.5배속까지 (2026-11-26: 전에는 보스 스테이지 부하 웨이브까지 묶여서 2배속을 열어도 1.5배속만 됐다)
+    if (A.B && A.B.bossPhase && s.v > C.bossSpeedCap) return C.speeds[1];
     return s;
   }
   function cycleSpeed() {
     var i = A.settings.speed || 0;
-    if (C.speeds[i].v === 1.5 && !speedOpen(2) && !(A.B && G.stageByNo(A.stageNo).boss)) toast('과자 숲을 통과하면 2배속까지 지원해요!', 2400);
+    if (A.B && A.B.bossPhase && A.mode === 'battle') { toast('보스와 싸울 때는 1.5배속까지예요!', 2400); }
+    else if (C.speeds[i].v === 1.5 && !speedOpen(2)) toast('과자 숲을 통과하면 2배속까지 지원해요!', 2400);
     for (var k = 1; k <= C.speeds.length; k++) { var j = (i + k) % C.speeds.length; if (speedOpen(j)) { A.settings.speed = j; break; } }
     saveAll(); refreshSpeed();
   }
@@ -252,7 +254,10 @@ G.UI = (function () {
     var gift = A.progress.gift || 0, notes = [];
     if (gift > 0) { var pay = Math.min(gift, C.giftPerRun); Col.addCoins(A.run, pay); A.progress.gift = gift - pay; notes.push('선물 코인 +' + pay); saveAll(); }   // 한 판에 giftPerRun 까지만 (첫 웨이브가 너무 쉬워지지 않게)
     A.tower = st.tower ? { floor: 0 } : null;
-    A.B = Bt.create(st.tower ? Ch.towerTheme(1) : no, Col.lineup(A.run), A.heroId, A.diffKey, { extraSlot: extra, tower: !!st.tower });
+    // 2026-11-26 친구 이어 가기: 지난번에 깬 판의 친구들이 함께 온다 (튜토리얼·탑 빼고). 대신 적도 그만큼 단단해진다
+    var carry = !D.tutorial && !st.tower && A.progress.team && (A.progress.team.slots || []).some(Boolean);
+    if (carry) { Col.loadTeam(A.run, A.progress.team); notes.push('지난 판 친구들이'); }
+    A.B = Bt.create(st.tower ? Ch.towerTheme(1) : no, Col.lineup(A.run), A.heroId, A.diffKey, { extraSlot: extra, tower: !!st.tower, carry: !!carry });
     A.retried = false; hideBossUI();
     $('prep-diff').textContent = D.name; $('prep-diff').className = 'hud-chip diff-chip d-' + D.key;
     A.wavesDone = 0; A.realBattle = 0; A.stageStart = performance.now(); A.bubbleTimer = 0; A.selectedSlot = -1; A.targeting = false;
@@ -263,7 +268,7 @@ G.UI = (function () {
     $('skill-img').src = charURL(A.heroId); $('skill-name').textContent = H.skillName;
     goPrep('prep');
     var tip = st.tower ? '한 층을 지킬 때마다 문제 3개! 5층마다 작은 보스가 나와요.' : st.tip;
-    if (notes.length) tip = notes.join(' · ') + ' 함께해요! ' + (tip || '');
+    if (notes.length) tip = notes.join(' · ') + ' 함께해요!' + (carry ? ' (적도 더 단단해요)' : '') + ' ' + (tip || '');
     if (tip) toast(tip, 4500);
   }
 
@@ -575,7 +580,8 @@ G.UI = (function () {
         m.appendChild(img(charURL(u.id)));
         // 2026-11-26 출전 칸에 짧은 능력 (유니크부터는 자동 능력, ✨)
         var PV = C.passives, ord = ['normal', 'epic', 'unique', 'legendary', 'hidden'], pv = PV && PV[ch.job] && ord.indexOf(ch.grade) >= ord.indexOf(PV.minGrade) ? PV[ch.job] : null;
-        m.appendChild(el('div', 'ability' + (pv ? ' passive' : ''), pv ? '✨' + pv.short : C.jobs[ch.job].short));
+        var lg = pv && ch.grade !== 'unique' && PV.legend && PV.legend[ch.job];   // 레전더리·히든은 더 센 능력을 보여 준다
+        m.appendChild(el('div', 'ability' + (lg ? ' legend' : pv ? ' passive' : ''), lg ? '🌟' + lg.short : pv ? '✨' + pv.short : C.jobs[ch.job].short));
         var gn = el('div', 'gname', gi.name); gn.style.background = gi.color; m.appendChild(gn);
       } else m.appendChild(el('div', 'empty-slot', '빈 칸'));
       m.onclick = function () { tapSlot(i); };
@@ -619,6 +625,8 @@ G.UI = (function () {
     c.appendChild(el('div', 'dc-job', C.jobs[ch.job].name + ' · ' + C.jobs[ch.job].style));
     var PV = C.passives, order = ['normal', 'epic', 'unique', 'legendary', 'hidden'];
     if (PV && PV[ch.job] && order.indexOf(ch.grade) >= order.indexOf(PV.minGrade)) c.appendChild(el('div', 'dc-passive', '✨ ' + PV[ch.job].name + ': ' + PV[ch.job].desc));   // 자동 능력
+    var LG = PV && PV.legend && ch.grade !== 'unique' && order.indexOf(ch.grade) >= order.indexOf(PV.minGrade) && PV.legend[ch.job];
+    if (LG) c.appendChild(el('div', 'dc-passive legend', '🌟 ' + LG.name + ': ' + LG.desc));   // 레전더리 능력
     return c;
   }
   function afterDraw(results) {
@@ -924,7 +932,7 @@ G.UI = (function () {
         row.appendChild(b);
       });
       sp.appendChild(row);
-      if (G.stageByNo(A.stageNo).boss) sp.appendChild(el('div', 'pause-note', '보스 스테이지는 1.5배속까지만 돼요.'));
+      if (A.B && A.B.bossPhase) sp.appendChild(el('div', 'pause-note', '보스와 싸울 때는 1.5배속까지만 돼요.'));
       d.insertBefore(sp, d.querySelector('.btns'));
     }
   }
@@ -970,6 +978,7 @@ G.UI = (function () {
     var newlyOpen = [], tutWin = win && A.tutorial;
     if (tutWin && !A.progress.tutorialDone) { A.progress.tutorialDone = true; newlyOpen.push('본 게임'); }
     if (win && !A.tutorial) {   // 튜토리얼은 연습이라 별·기록에 넣지 않는다
+      A.progress.team = Col.saveTeam(run);   // 친구 이어 가기: 다음 판에 함께 간다
       var before = C.speeds.map(function (s, i) { return speedOpen(i); });
       A.progress.stars[A.stageNo] = Math.max(A.progress.stars[A.stageNo] || 0, stars);
       C.speeds.forEach(function (s, i) { if (!before[i] && speedOpen(i)) newlyOpen.push(s.name); });
@@ -1004,6 +1013,7 @@ G.UI = (function () {
     p.appendChild(stats);
     if (newlyOpen.length) p.appendChild(el('div', 'legend-open', newlyOpen.join(', ') + '이 열렸어요!'));
     if (got.length) p.appendChild(rewardBox(got));
+    if (win && !A.tutorial) p.appendChild(el('div', 'retry-note', '뽑은 친구들이 다음 판에도 함께 가요!'));
     if (win) guide('result', '#result-panel', '튜토리얼 끝!', '이제 진짜 모험이에요! 「본 게임 시작!」을 누르고 난이도를 골라요. 별 1개: 깨기, 별 2개: 하트 지키기, 별 3개: 정답 80% 넘기.');
     var bs = el('div', 'result-btns');
     /* 2026-11-26 졌을 때 이어 하는 단추는 「강화하기」(사용자 요청, 전: 보스 다시 도전).

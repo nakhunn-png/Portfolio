@@ -129,6 +129,7 @@ G.Render = (function () {
       }
       var jump = u.flash > 0 ? -4 : Math.sin(t * 3 + u.slot) * 2;
       if (B.cheerT > 0) { ctx.fillStyle = 'rgba(255,90,122,.25)'; ctx.beginPath(); ctx.arc(u.x, u.y - 28, 34, 0, Math.PI * 2); ctx.fill(); }
+      if (u.rapid) { ctx.strokeStyle = 'rgba(255,154,31,.9)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(u.x, u.y - 28, 36 + Math.sin(t * 20) * 3, 0, Math.PI * 2); ctx.stroke(); }   // 연사 모드
       G.Pixel.drawSprite(ctx, G.CharArt.sprite(u.id), u.x, u.y + 4 + (u.frozen > 0 ? 0 : jump), 64, false);
       if (u.frozen > 0) {
         ctx.fillStyle = 'rgba(191,230,255,.6)'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
@@ -184,6 +185,11 @@ G.Render = (function () {
         ctx.strokeStyle = 'rgba(255,90,122,' + (1 - k) + ')'; ctx.lineWidth = 8; ctx.beginPath(); ctx.arc(f.x, f.y - 30, 40 + k * 500, 0, Math.PI * 2); ctx.stroke();
       } else if (f.kind === 'impact') {
         ctx.fillStyle = 'rgba(226,75,74,' + 0.6 * (1 - k) + ')'; ctx.beginPath(); ctx.arc(f.x, f.y, f.r * (1 + k * 0.4), 0, Math.PI * 2); ctx.fill();
+      } else if (f.kind === 'slash') {   // 레전더리 검사: 주위 베기
+        ctx.strokeStyle = 'rgba(255,255,255,' + (1 - k) + ')'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(f.x, f.y - 16, f.r * (0.5 + 0.5 * k), 0, Math.PI * 1.6); ctx.stroke();
+      } else if (f.kind === 'word') {
+        ctx.globalAlpha = 1 - k; ctx.fillStyle = '#ff9a1f'; ctx.strokeStyle = '#3a2a3f'; ctx.lineWidth = 3; ctx.font = '18px Jua, sans-serif'; ctx.textAlign = 'center';
+        ctx.strokeText(f.text, f.x, f.y - k * 14); ctx.fillText(f.text, f.x, f.y - k * 14); ctx.globalAlpha = 1;
       } else if (f.kind === 'crit') {
         ctx.globalAlpha = 1 - k; ctx.fillStyle = '#ff5a3a'; ctx.font = '18px Jua, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('치명타!', f.x, f.y - k * 16); ctx.globalAlpha = 1;
       } else if (f.kind === 'snow') {
