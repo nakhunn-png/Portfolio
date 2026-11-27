@@ -775,3 +775,17 @@ canvas { position: absolute; left: 0; top: 0; width: 960px; height: 540px; image
 /* 2026-11-27 이어 하기 단추 (처음 화면) */
 .resume-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
 .resume-btn small { font-size: 15px; opacity: .92; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+/* 2026-11-27 선생님 모드 세부 설정: 칸마다 켜고 끄는 작은 단추 */
+.teacher-dialog { width: 900px; max-width: 920px; max-height: 520px; overflow-y: auto; padding: 10px 18px; }
+.teacher-dialog h2 { margin-bottom: 2px; font-size: 28px; }
+.teacher-dialog .t-note { font-size: 15px; margin: 0 0 6px; color: #8a7a90; }
+.t-sec { text-align: left; margin-bottom: 8px; }
+.t-title { font-size: 18px; margin-bottom: 4px; }
+.t-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.t-chip { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 52px; padding: 2px 10px; line-height: 1.1; }
+.t-chip b { font-weight: normal; font-size: 17px; }
+.t-chip small { font-size: 12px; opacity: .85; }
+.t-chip.natural { background: #eef6ea; }
+.teacher-dialog .btns { margin-top: 4px; }
+.teacher-dialog .btn.big { min-height: 52px; padding-top: 4px; padding-bottom: 4px; }

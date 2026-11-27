@@ -109,7 +109,7 @@ G.UI = (function () {
     d.appendChild(el('p', 'shop-note', '뽑기와 같은 코인으로 사요. 산 무기는 「강화」로 +1, +2, +3까지 세져요. 산 것은 계속 남아요.'));
     var grid = el('div', 'shop-grid');
     C.shop.forEach(function (it) {
-      var lv = shopLevel(it.key), max = it.prices.length, gift = it.key === 'speed3' && A.progress.teacher3x && !lv, done = lv >= max || gift;   // gift: 선생님이 열어 줌
+      var lv = shopLevel(it.key), max = it.prices.length, gift = it.speed && teacherSpeed(it.key) && !lv, done = lv >= max || gift;   // gift: 선생님이 열어 줌
       var price = done ? 0 : it.prices[lv], can = !done && A.run.coins >= price;
       var c = el('div', 'shop-card' + (done ? ' done' : '') + (lv ? ' owned' : ''));
       var top = el('div', 'shop-top'); top.appendChild(el('span', 'shop-icon', it.icon)); top.appendChild(el('span', 'shop-name', shopTitle(it, lv))); c.appendChild(top);
@@ -136,23 +136,62 @@ G.UI = (function () {
   }
 
   /* ───────── 선생님 모드 (2026-11-27, 비밀번호 teacherPassword) ───────── */
+  /* 선생님 모드 (2026-11-27 세부 설정): 스테이지 하나하나, 배속 하나하나, 그 밖의 숨은 것을 따로 켜고 끈다.
+   * 저장: progress.openStages {스테이지 번호: true}, teacherSpeeds {speed2·speed25·speed3: true}, secretArch, disasterOpen, challengeOpen.
+   * 히든 캐릭터는 도감(book.found)에 바로 넣고 뺀다. 예전 allOpen(모두 열기)·teacher3x(3배속)도 그대로 읽는다 */
+  function teacherSpeed(key) { var P = A.progress; return !!((P.teacherSpeeds && P.teacherSpeeds[key]) || (key === 'speed3' && P.teacher3x)); }
+  function subLabel(st) { var list = islandStages(st.unit); return st.unit + '-' + (list.indexOf(st) + 1); }
   function openTeacher() {
     var P = A.progress;
-    var items = [
-      { label: '섬 (1)(2)(3) 모두 열기', sub: '모든 섬과 스테이지를 바로 할 수 있어요', get: function () { return !!P.allOpen; }, set: function (v) { P.allOpen = v; } },
-      { label: '아크메이지 켜기', sub: '영웅 고르기에 아주 센 숨은 영웅이 나와요', get: function () { return !!P.secretArch; }, set: function (v) { P.secretArch = v; if (!v && A.settings.hero === 'arch') A.settings.hero = 'mage'; } },
-      { label: '최고 난이도 「재앙」 열기', sub: '생명 1개, 식이 2초 뒤 사라지는 난이도', get: function () { return !!P.disasterOpen; }, set: function (v) { P.disasterOpen = v; } },
-      { label: '3배속 열기', sub: '상점에서 사지 않아도 3배속을 쓸 수 있어요', get: function () { return !!P.teacher3x; }, set: function (v) { P.teacher3x = v; } }
-    ];
     var d = el('div', 'dialog teacher-dialog');
     d.appendChild(el('h2', '', '👩‍🏫 선생님 모드'));
-    items.forEach(function (it) {
-      var row = el('div', 'teacher-row'), t = el('div', 't-text');
-      t.appendChild(el('b', '', it.label)); t.appendChild(el('span', '', it.sub)); row.appendChild(t);
-      var b = el('button', 'btn small ' + (it.get() ? 'green' : 'white'), it.get() ? '켜짐' : '꺼짐');
-      b.onclick = function () { it.set(!it.get()); saveAll(); b.className = 'btn small ' + (it.get() ? 'green' : 'white'); b.textContent = it.get() ? '켜짐' : '꺼짐'; };
-      row.appendChild(b); d.appendChild(row);
+    d.appendChild(el('p', 't-note', '누르면 켜지고(초록), 다시 누르면 꺼져요. 바로 저장돼요.'));
+    function section(title, chips) {
+      var sec = el('div', 't-sec'); sec.appendChild(el('div', 't-title', title));
+      var row = el('div', 't-chips');
+      chips.forEach(function (c) {
+        var b = el('button', 'btn small t-chip');
+        function paint() {
+          var on = c.get(), nat = c.natural && c.natural();
+          b.className = 'btn small t-chip ' + (on ? 'green' : 'white') + (nat && !on ? ' natural' : '');
+          b.innerHTML = ''; b.appendChild(el('b', '', c.label));
+          b.appendChild(el('small', '', on ? '켜짐' : nat ? '원래 열림' : '꺼짐'));
+        }
+        b.onclick = function () { c.set(!c.get()); saveAll(); repaint(); };
+        c.paint = paint; row.appendChild(b);
+      });
+      sec.appendChild(row); d.appendChild(sec);
+      return chips;
+    }
+    var all = [];
+    // 스테이지 (섬마다 한 줄)
+    var stageChips = [{ label: '모두 열기', get: function () { return !!P.allOpen; }, set: function (v) { P.allOpen = v; } }];
+    [1, 2, 3].forEach(function (u) {
+      islandStages(u).forEach(function (st) {
+        stageChips.push({ label: subLabel(st) + ' ' + st.name,
+          get: function () { return !!(P.openStages && P.openStages[st.no]); },
+          set: function (v) { P.openStages = P.openStages || {}; if (v) P.openStages[st.no] = true; else delete P.openStages[st.no]; },
+          natural: function () { return stageOpen(st, true); } });
+      });
     });
+    all = all.concat(section('스테이지 열기', stageChips));
+    all = all.concat(section('배속 열기 (상점에서 안 사도 써요)', C.speeds.filter(function (sp) { return sp.shop; }).map(function (sp) {
+      return { label: sp.name, get: function () { return teacherSpeed(sp.shop); },
+        set: function (v) { P.teacherSpeeds = P.teacherSpeeds || {}; P.teacherSpeeds[sp.shop] = v; if (sp.shop === 'speed3') P.teacher3x = v; },
+        natural: function () { return owned(sp.shop); } };
+    })));
+    var etc = [
+      { label: '아크메이지', get: function () { return !!P.secretArch; }, set: function (v) { P.secretArch = v; if (!v && A.settings.hero === 'arch') A.settings.hero = 'mage'; } },
+      { label: '난이도 「재앙」', get: function () { return !!P.disasterOpen; }, set: function (v) { P.disasterOpen = v; } },
+      { label: '도전 영역', get: function () { return !!P.challengeOpen; }, set: function (v) { P.challengeOpen = v; }, natural: function () { return !!P.stars[C.challengeUnlock]; } }
+    ];
+    G.charsOfGrade('hidden').forEach(function (ch) {
+      etc.push({ label: '히든 ' + ch.name, get: function () { return !!A.book.found[ch.id]; },
+        set: function (v) { if (v) { A.book.found[ch.id] = true; A.book.count[ch.id] = Math.max(1, A.book.count[ch.id] || 0); } else delete A.book.found[ch.id]; } });
+    });
+    all = all.concat(section('그 밖에', etc));
+    function repaint() { all.forEach(function (c) { c.paint(); }); }
+    repaint();
     var close = el('button', 'btn big green', '닫기'); close.onclick = function () { closeOverlay(); goTitle(); };
     var bs = el('div', 'btns'); bs.appendChild(close); d.appendChild(bs);
     overlay(d);
@@ -176,9 +215,10 @@ G.UI = (function () {
   /* ───────── 스테이지 고르기 ───────── */
   var UNIT_NAME = { 1: '덧뺄셈 1', 2: '덧뺄셈 2', 3: '덧뺄셈 3' };
   // 앞에 있는 「만든」 스테이지를 깨면 열린다 (보스 스테이지는 아직 만드는 중이라 건너뛴다)
-  function stageOpen(st) {
+  // noTeacher: 선생님이 연 것을 빼고 원래 열렸는지만 본다 (선생님 모드 화면의 「원래 열림」)
+  function stageOpen(st, noTeacher) {
     if (!st.ready) return false;
-    if (DEV || A.progress.allOpen) return true;   // 선생님 모드: 섬·스테이지 모두 열기
+    if (!noTeacher && (DEV || A.progress.allOpen || (A.progress.openStages && A.progress.openStages[st.no]))) return true;   // 선생님 모드: 모두 열기 / 스테이지 하나씩
     for (var n = st.no - 1; n >= 1; n--) { var prev = G.stageByNo(n); if (prev.ready) return !!A.progress.stars[n]; }
     return true;
   }
@@ -186,9 +226,12 @@ G.UI = (function () {
    * 앞 섬의 보스를 깨면 다음 섬이 열린다. 섬 안에서는 아직 안 깬 첫 스테이지부터 시작한다 */
   var ISLAND_NAME = { 1: '덧뺄셈 (1)', 2: '덧뺄셈 (2)', 3: '덧뺄셈 (3)' };
   function islandStages(u) { return C.stages.filter(function (st) { return st.unit === u && st.ready; }); }
-  function islandOpen(u) { var f = islandStages(u)[0]; return !!f && stageOpen(f); }
+  function islandOpen(u) { return islandStages(u).some(function (st) { return stageOpen(st); }); }   // 섬 안에 열린 스테이지가 하나라도 있으면
   function islandDone(u) { return islandStages(u).every(function (st) { return !!A.progress.stars[st.no]; }); }
-  function islandStart(u) { var list = islandStages(u), left = list.filter(function (st) { return !A.progress.stars[st.no]; }); return (left[0] || list[0]).no; }
+  function islandStart(u) {   // 열린 스테이지 가운데 아직 안 깬 첫 스테이지 (모두 깼으면 첫 스테이지)
+    var list = islandStages(u).filter(function (st) { return stageOpen(st); }), left = list.filter(function (st) { return !A.progress.stars[st.no]; });
+    return (left[0] || list[0]).no;
+  }
   function nextInIsland(no) { var st = G.stageByNo(no), list = islandStages(st.unit), i = list.indexOf(st); return list[i + 1] || null; }
   // 섬 꾸미기 (단원 테마): 섬마다 그림 3개
   var ISLAND_DECO = { 1: ['🍭', '🌴', '🐙'], 2: ['⛄', '🌵', '🦂'], 3: ['🚀', '🎡', '👑'] };
@@ -232,14 +275,14 @@ G.UI = (function () {
     if (firstOpen !== null) { var f = g.children[firstOpen - 1]; f.classList.add('glow'); f.querySelector('.is-art').appendChild(el('div', 'is-badge', '여기부터!')); }
   }
 
-  function challengeOpen() { return DEV || !!A.progress.stars[C.challengeUnlock]; }
+  function challengeOpen() { return DEV || !!A.progress.challengeOpen || !!A.progress.stars[C.challengeUnlock]; }
 
   /* ───────── 배속 (9장) ───────── */
   // 2026-11-27 2배속부터는 상점에서 산 것만 (shop 키). 선생님 모드로 3배속을 열 수도 있다
   function owned(key) { return !!(A.progress.shop && A.progress.shop[key] > 0); }
   function speedOpen(i) {
     var k = C.speeds[i].shop;
-    return DEV || !k || owned(k) || (k === 'speed3' && A.progress.teacher3x);
+    return DEV || !k || owned(k) || teacherSpeed(k);   // 선생님 모드로 2·2.5·3배속을 하나씩 열 수 있다
   }
   function curSpeed() {
     var i = A.settings.speed || 0; if (!speedOpen(i)) i = 0;
