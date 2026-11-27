@@ -42,11 +42,12 @@ G.UI = (function () {
   }
   function refreshResumeBtn() {
     var r = getResume(), b = $('btn-resume'); if (!b) return;
-    b.classList.toggle('hidden', !r); $('scr-title').classList.toggle('has-resume', !!r);
-    if (r) $('resume-info').textContent = resumeLabel(r);
+    // 2026-11-27 단추는 언제나 보인다. 저장된 판이 없으면 흐리게 + 「이어 할 판이 없어요」
+    b.classList.remove('hidden'); b.classList.toggle('locked', !r);
+    $('resume-info').textContent = r ? resumeLabel(r) : '이어 할 판이 없어요';
   }
   function resumeStage() {
-    var r = getResume(); if (!r) { refreshResumeBtn(); return; }
+    var r = getResume(); if (!r) { refreshResumeBtn(); toast('판을 하다가 창을 닫으면 여기서 이어서 할 수 있어요. 「시작하기」로 섬을 골라요!', 3200); return; }
     try { startStage(r.stageNo, r.heroId, r.diffKey, r); }
     catch (e) { clearResume(); A.resuming = false; toast('이어 할 판을 찾지 못했어요. 섬을 골라 새로 해요!', 3000); goMap(); }
   }
