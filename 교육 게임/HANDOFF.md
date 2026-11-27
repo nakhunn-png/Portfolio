@@ -30,6 +30,8 @@
   - **2026-11-27**: 🛒 상점은 **준비 화면 뽑기 칸**, **냠냠 코인 하나로** 산다(지갑 없앰). 무기는 사기 → 강화 +1·+2·+3(`shop[].prices` = [사기, +1, +2, +3], 단계 1~4)(`#btn-shop`, `openShop`, 사면 지금 판에도 바로 적용, `CONFIG.shop`, 산 것·강화 단계 `progress.shop`, 강화는 `Battle` 의 `shopAtk`·`shopSpeed`·`heroStats`), 작은 「선생님」 단추(처음 화면 왼쪽 아래, 비밀번호 `teacherPassword` 0420, `openTeacher`: `allOpen`·`secretArch`·`disasterOpen`·`teacher3x`), 🗑️ 게임 초기화(`resetGame`, 두 번 묻기). **배속 2·2.5·3배는 상점에서만 산다**(`speeds[].shop`, `speedOpen`). 3배속 = 8웨이브
   - **친구 처음부터 다시 하기**(섬 지도, `resetTeam`) · **난이도만 바꾸기**(멈춤 창, `changeDiffDialog`/`applyDiff`, 기록은 그 판의 가장 쉬운 난이도 `A.diffMin`)
   - **화면 점검으로 고친 것**: 틀렸을 때 그림(`hintNode`, 큰 수는 막대, `has-hint`), 결과 화면(`fitResult`), 뽑기 창(`draw-body`), 보너스 풍선이 끌기 판에 깔림, 대기석 3칸(`bench`), 알림 글 위쪽·누르면 사라짐
+  - **2026-11-27 이어 하기**: 준비 화면에서 무언가 바뀔 때마다(문제·뽑기·합성·상점, `refreshCoins` → `saveResume`) 판을 `냠냠2_이어하기` 에 저장. 처음 화면 빨간 「이어 하기」(`#btn-resume`, 어느 판·어디까지 작은 글씨) → `startStage(no, hero, diff, resume)` 가 친구·코인·생명·웨이브 수·남은 문제 수·영웅 대기를 되살려 그 준비 화면부터. 전투 도중이었으면 그 웨이브 시작 전으로. 튜토리얼·탑은 저장 안 함. 판이 끝나면·「스테이지 나가기」·새 판 시작·게임 초기화 때 지운다(진 뒤 「강화하기」를 누르면 다시 저장). 친구 번호는 `Col.adoptRun` 으로 안 겹치게
+  - **2026-11-27 히든 뽑기**: 도전 과제로 해금한 히든은 뽑기에도 나온다. 히든 0.5%(`grades` 의 `drawRate`, 노말 67→66.5), 해금한 히든 가운데 골고루(`Col.hiddenUnlocked`). 히든 힘 `mult` 6 → **7.7**(레전더리 7보다 조금 세다)
   - **2026-11-27 산 무기가 전투에 보임**: 전투 화면 아래 「정답」 옆에 산 무기 아이콘·강화 단계(`#bt-shop`, `refreshShopTag`, 안 샀으면 숨김). 공격 모양(`render.js` 의 shots): 검·창·활(그 등급 친구)·총(영웅)을 사면 공이 커지고 금빛 테, 따발총은 총구 불꽃·주황 총알 줄. 단계가 오를수록 더 크고 굵다. 총알에 `grade` 를 붙였다(`battle.js`)
   - **2026-11-27 긴급 수정**: 보너스 문제(물음표 풍선) 창이 떠 있어도 **전투는 멈추지 않는다**(`bubbleQuiz` 에서 `A.paused` 를 안 씀, 창은 `A.bubbleDlg`). 창이 열린 동안 새 풍선은 안 나오고, 웨이브가 끝나면 `clearBubbles` 가 창도 닫는다
   - 모든 난이도: 보너스 풍선 2초, 능력 조준 중에도 전투가 흐름, 「모두 뽑기」→「전투 시작」 버튼이 반짝이며 유도
@@ -49,7 +51,7 @@ python -m http.server 8767
 - 바로 해 볼 링크(시험판, 모든 것 열림): https://claude.ai/artifact/XeuQbw2hPCjDBZLQB79cVJ — 코드를 바꾸면 Claude 가 같은 주소로 다시 올린다(`index.html` 에서 doctype·head 를 뺀 사본 + `DEV = true`)
 - **학생용 링크**(처음부터 차례로 열림, QR 로 나눠 줌): https://claude.ai/artifact/VHZRNEKY3RhYGE5KW4VDyG — 같은 사본에 `DEV = false`. 코드를 바꾸면 **두 링크 모두** 같은 주소로 다시 올린다. 학생이 열려면 Share 에서 「링크가 있는 모든 사람」을 켜야 한다
 - 저장은 localStorage(`냠냠2_도감`, `냠냠2_진행`, `냠냠2_설정`). localhost 와 127.0.0.1 은 저장이 따로 → 시험은 `127.0.0.1:8767`
-- 파일을 바꾸면 `index.html` 의 `?v=` 번호를 올린다(브라우저 캐시). 지금 `2026112705`
+- 파일을 바꾸면 `index.html` 의 `?v=` 번호를 올린다(브라우저 캐시). 지금 `2026112706`
 
 ## 파일
 

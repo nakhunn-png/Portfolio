@@ -18,6 +18,39 @@ G.UI = (function () {
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } }
   function saveAll() { save('냠냠2_도감', A.book); save('냠냠2_진행', A.progress); save('냠냠2_설정', A.settings); }
 
+  /* ───────── 이어 하기 (2026-11-27) ─────────
+   * 준비 화면에서 무언가 바뀔 때마다(문제·뽑기·합성·상점) 그 판을 저장한다. 창을 닫거나 새로고침해도
+   * 처음 화면 「이어 하기」로 그 준비 화면부터 다시 한다(전투 도중이었으면 그 웨이브를 시작하기 전으로).
+   * 튜토리얼·탑은 저장하지 않는다. 판이 끝나거나(이기든 지든) 「스테이지 나가기」·새 판을 시작하면 지운다 */
+  var RESUME_KEY = '냠냠2_이어하기';
+  var B_KEEP = ['wave', 'plannedReal', 'prevPlanned', 'progress', 'life', 'lifeLost', 'kills', 'escaped', 'turboCoins', 'heroHits', 'time', 'carry', 'carryMul', 'boss', 'legs', 'hero', 'pips', 'combo'];
+  function saveResume() {
+    if (A.mode !== 'prep' || !A.B || !A.run || A.tutorial || A.tower || A.resuming) return;
+    var b = {}; B_KEEP.forEach(function (k) { if (A.B[k] !== undefined && A.B[k] !== null) b[k] = A.B[k]; });
+    var q = A.quiz || {};
+    save(RESUME_KEY, { v: 1, at: Date.now(), stageNo: A.stageNo, heroId: A.heroId, diffKey: A.diffKey, run: A.run, B: b,
+      kind: q.kind, left: q.left, attempts: q.attempts, wavesDone: A.wavesDone, realBattle: A.realBattle, retried: A.retried, diffMin: A.diffMin });
+  }
+  function clearResume() { try { localStorage.removeItem(RESUME_KEY); } catch (e) { } }
+  function getResume() {
+    var r = load(RESUME_KEY, null);
+    return r && r.v === 1 && r.run && r.B && G.stageByNo(r.stageNo) && C.heroes[r.heroId] && G.difficultyByKey(r.diffKey) ? r : null;
+  }
+  function resumeLabel(r) {
+    var w = r.kind === 'prep' ? '처음 준비' : r.kind === 'boss' ? '보스 앞' : r.kind === 'retry' ? '보스 다시 도전' : r.kind === 'final' ? '마무리 문제' : '웨이브 ' + r.wavesDone + ' 끝';
+    return G.stageByNo(r.stageNo).name + ' · ' + w;
+  }
+  function refreshResumeBtn() {
+    var r = getResume(), b = $('btn-resume'); if (!b) return;
+    b.classList.toggle('hidden', !r); $('scr-title').classList.toggle('has-resume', !!r);
+    if (r) $('resume-info').textContent = resumeLabel(r);
+  }
+  function resumeStage() {
+    var r = getResume(); if (!r) { refreshResumeBtn(); return; }
+    try { startStage(r.stageNo, r.heroId, r.diffKey, r); }
+    catch (e) { clearResume(); A.resuming = false; toast('이어 할 판을 찾지 못했어요. 섬을 골라 새로 해요!', 3000); goMap(); }
+  }
+
   /* ───────── 화면 바꾸기 ───────── */
   function show(id) {
     Array.prototype.forEach.call(document.querySelectorAll('.screen'), function (s) { s.classList.toggle('on', s.id === id); });
@@ -49,7 +82,7 @@ G.UI = (function () {
 
   /* ───────── 시작 화면 ───────── */
   function goTitle() {
-    A.mode = 'title'; A.B = null; A.tower = null; show('scr-title'); closeOverlay();
+    A.mode = 'title'; A.B = null; A.tower = null; show('scr-title'); closeOverlay(); refreshResumeBtn();
     $('btn-challenge').classList.toggle('locked', !challengeOpen());
     var TL = Bt.LAYOUTS.loop(); G.Render.drawBackground(1, { paths: TL.paths, slots: [], hero: null }); G.Render.clear();   // 제목 화면에는 받침을 그리지 않는다
     var box = $('title-heroes'); box.innerHTML = '';
@@ -129,7 +162,7 @@ G.UI = (function () {
       { text: '지울래요', cls: 'red', fn: function () {
         dialog('정말 지울까요?', '지우면 되돌릴 수 없어요.', [
           { text: '네, 모두 지워요', cls: 'red', fn: function () {
-            try { ['냠냠2_도감', '냠냠2_진행', '냠냠2_설정'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+            try { ['냠냠2_도감', '냠냠2_진행', '냠냠2_설정', RESUME_KEY].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
             location.reload();
           } },
           { text: '아니요', cls: 'green', fn: closeOverlay }
@@ -331,30 +364,44 @@ G.UI = (function () {
   }
 
   /* ───────── 스테이지 시작 ───────── */
-  function startStage(no, heroId, diffKey) {
+  // resume: 이어 하기로 불러온 판 (saveResume 에서 저장한 것). 없으면 새 판
+  function startStage(no, heroId, diffKey, resume) {
     var st = G.stageByNo(no);
+    if (!resume) clearResume();
+    A.resuming = !!resume;
     A.stageNo = no; A.heroId = heroId || A.settings.hero || 'mage';
     A.diffKey = diffKey || A.settings.diff || C.defaultDifficulty;
     var D = G.difficultyByKey(A.diffKey);
     A.tutorial = !!D.tutorial;
     var extra = !!(A.progress.rewards && A.progress.rewards.slot9);
-    A.run = Col.newRun(C.slots + (extra ? C.extraSlots : 0)); Col.addCoins(A.run, D.coins);
+    A.run = resume ? Col.adoptRun(resume.run) : Col.newRun(C.slots + (extra ? C.extraSlots : 0)); if (!resume) Col.addCoins(A.run, D.coins);
     // 선물 코인 (도감 보상·도전 과제·놀이로 모아 둔 것)을 이번 판에 쓴다
-    var gift = A.progress.gift || 0, notes = [];
+    var gift = resume ? 0 : A.progress.gift || 0, notes = [];
     if (gift > 0) { var pay = Math.min(gift, C.giftPerRun); Col.addCoins(A.run, pay); A.progress.gift = gift - pay; notes.push('선물 코인 +' + pay); saveAll(); }   // 한 판에 giftPerRun 까지만 (첫 웨이브가 너무 쉬워지지 않게)
     A.tower = st.tower ? { floor: 0 } : null;
     // 2026-11-26 친구 이어 가기: 지난번에 깬 판의 친구들이 함께 온다 (튜토리얼·탑 빼고). 대신 적도 그만큼 단단해진다
-    var carry = !D.tutorial && !st.tower && A.progress.team && (A.progress.team.slots || []).some(Boolean);
-    if (carry) { Col.loadTeam(A.run, A.progress.team); notes.push('지난 판 친구들이'); }
+    var carry = resume ? !!resume.B.carry : !D.tutorial && !st.tower && A.progress.team && (A.progress.team.slots || []).some(Boolean);
+    if (carry && !resume) { Col.loadTeam(A.run, A.progress.team); notes.push('지난 판 친구들이'); }
     A.B = Bt.create(st.tower ? Ch.towerTheme(1) : no, Col.lineup(A.run), A.heroId, A.diffKey, { extraSlot: extra, tower: !!st.tower, carry: !!carry, shop: A.progress.shop });
     A.retried = false; A.diffMin = undefined; hideBossUI();
     $('prep-diff').textContent = D.name; $('prep-diff').className = 'hud-chip diff-chip d-' + D.key;
     A.wavesDone = 0; A.realBattle = 0; A.stageStart = performance.now(); A.bubbleTimer = 0; A.selectedSlot = -1; A.targeting = false;
+    if (resume) {   // 이어 하기: 웨이브 수·생명·영웅 대기 시간 등을 되살린다
+      Object.keys(resume.B).forEach(function (k) { A.B[k] = resume.B[k]; });
+      A.wavesDone = resume.wavesDone || 0; A.realBattle = resume.realBattle || 0; A.retried = !!resume.retried; A.diffMin = resume.diffMin === null ? undefined : resume.diffMin;
+      A.stageStart = performance.now() - A.realBattle * 1000;
+    }
     G.Render.drawBackground(A.B.stageNo, A.B);
     $('prep-stage-no').textContent = $('bt-stage-no').textContent = st.tower ? '탑' : st.boss ? '!' : no;
     $('prep-stage-name').textContent = $('bt-stage-name').textContent = st.name;
     var H = C.heroes[A.heroId];
     $('skill-img').src = charURL(A.heroId); $('skill-name').textContent = H.skillName;
+    if (resume) {
+      A.resuming = false;
+      goPrep(resume.kind || 'prep', resume);
+      toast('이어서 해요! ' + resumeLabel(resume), 3500);
+      return;
+    }
     goPrep('prep');
     var tip = st.tower ? '한 층을 지킬 때마다 문제 3개! 5층마다 작은 보스가 나와요.' : st.tip;
     if (notes.length) tip = notes.join(' · ') + ' 함께해요!' + (carry ? ' (적도 더 단단해요)' : '') + ' ' + (tip || '');
@@ -638,9 +685,10 @@ G.UI = (function () {
   }
 
   /* ───────── 준비 시간 ───────── */
-  function goPrep(kind) {
+  function goPrep(kind, restore) {
     A.mode = 'prep'; A.paused = false; show('scr-prep'); closeOverlay();
     A.quiz = newQuiz(kind);
+    if (restore && typeof restore.left === 'number') { A.quiz.left = restore.left; A.quiz.attempts = restore.attempts || 0; }   // 이어 하기: 남은 문제 수
     var waveText = A.tower ? (kind === 'prep' ? '1층 준비' : A.wavesDone + '층 성공') : kind === 'prep' ? '준비' : kind === 'final' ? '마무리' : kind === 'boss' ? '보스 준비' : kind === 'retry' ? '보스 다시 도전' : '웨이브 ' + A.wavesDone + ' 끝';
     $('prep-wave').textContent = waveText;
     $('btn-shop').classList.toggle('hidden', !!A.tutorial);   // 튜토리얼에는 상점이 없다
@@ -651,7 +699,7 @@ G.UI = (function () {
     if (kind === 'final') guide('final', '#prep-math', '마무리 문제', '정답이 ' + minCorrect() + '개가 될 때까지 문제를 조금 더 풀면 끝나요.');
     if (kind === 'boss') guide('bossPrep', '#next-info', '보스가 와요!', '다음은 보스예요! 보스는 아주 튼튼해요. 친구를 많이 뽑아 두고 「보스와 싸우기!」를 눌러요.');
   }
-  function refreshCoins() { $('prep-coins').textContent = A.run.coins; $('bt-coins').textContent = A.run.coins; $('bt-correct').textContent = A.run.correct; refreshDrawBtns(); }
+  function refreshCoins() { saveResume(); $('prep-coins').textContent = A.run.coins; $('bt-coins').textContent = A.run.coins; $('bt-correct').textContent = A.run.correct; refreshDrawBtns(); }
   function refreshDrawBtns() {
     var can = Col.canDraw(A.run) && !Col.full(A.run);   // 출전 칸이 가득 차면 뽑지 않는다
     $('btn-draw').disabled = !can; $('btn-draw-all').disabled = !can;
@@ -1020,7 +1068,7 @@ G.UI = (function () {
     var wasPaused = A.paused; A.paused = true;
     var d = dialog('멈춤', '', [
       { text: '계속하기', cls: 'green', fn: function () { closeOverlay(); A.paused = wasPaused && A.mode !== 'battle'; } },
-      { text: A.tower ? '탑 그만 오르기' : '스테이지 나가기', cls: 'red', fn: function () { closeOverlay(); if (A.tower) finishTower(); else goMap(); } }
+      { text: A.tower ? '탑 그만 오르기' : '스테이지 나가기', cls: 'red', fn: function () { closeOverlay(); if (A.tower) finishTower(); else { clearResume(); goMap(); } } }
     ]);
     if (!A.tutorial && !A.tower && A.B) {   // 2026-11-26 난이도만 바꾸기: 뽑은 친구·코인·진행은 그대로
       var db = el('button', 'btn small purple pause-music', '난이도만 바꾸기 (지금: ' + A.B.diff.name + ')');
@@ -1123,6 +1171,7 @@ G.UI = (function () {
   }
   function finishStage(win) {
     if (A.tower) { finishTower(); return; }
+    clearResume();   // 판이 끝났다 (졌을 때 「강화하기」를 누르면 다시 저장된다)
     A.mode = 'result'; clearBubbles(); closeOverlay();
     var run = A.run, total = run.correct + run.wrong, acc = total ? run.correct / total : 0;
     var stars = win ? 1 + (A.B.lifeLost === 0 ? 1 : 0) + (acc >= 0.8 ? 1 : 0) : 0;
@@ -1324,6 +1373,7 @@ G.UI = (function () {
     $('chest-img').src = G.Pixel.toURL('기타/뽑기상자', G.MiscArt.chest());
     Array.prototype.forEach.call(document.querySelectorAll('.coin-ico'), function (i) { i.src = G.Pixel.toURL('기타/코인', G.MiscArt.coin()); });
     $('btn-start').onclick = goMap;
+    $('btn-resume').onclick = resumeStage;
     $('btn-book').onclick = function () { openBook('title'); };
     $('btn-challenge').onclick = function () {
       if (challengeOpen()) G.Plays.open(); else toast('스테이지 ' + C.challengeUnlock + ' 「' + G.stageByNo(C.challengeUnlock).name + '」을 깨면 열려요!');

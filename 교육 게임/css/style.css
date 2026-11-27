@@ -771,3 +771,7 @@ canvas { position: absolute; left: 0; top: 0; width: 960px; height: 540px; image
 .shop-lv span { border: 2px solid #d8cfe0; border-radius: 6px; padding: 0 5px; line-height: 18px; }
 .shop-lv .on { color: #fff; background: #ff9a1f; border-color: #b85a0c; }
 .shop-card .btn { min-height: 52px; font-size: 19px; margin-top: 2px; white-space: nowrap; padding-left: 4px; padding-right: 4px; }
+
+/* 2026-11-27 이어 하기 단추 (처음 화면) */
+.resume-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
+.resume-btn small { font-size: 15px; opacity: .92; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }

@@ -15,6 +15,8 @@ G.Collection = (function () {
       correct: 0, wrong: 0, wrongTypes: {} };
   }
   function addCoins(run, n) { run.coins += n; }
+  // 2026-11-27 이어 하기: 저장해 둔 판을 다시 쓸 때 친구 번호(uid)가 겹치지 않게 한다
+  function adoptRun(run) { (run.roster || []).forEach(function (u) { if (u.uid >= uidSeq) uidSeq = u.uid + 1; }); return run; }
   // 2026-11-26 친구 이어 가기: 저장해 둘 팀 { slots: 칸마다 캐릭터 id 또는 null, bench: 칸에 못 선 친구 id }
   function saveTeam(run) {
     var onSlot = {};
@@ -38,12 +40,18 @@ G.Collection = (function () {
     return got;
   }
 
-  // 등급 뽑기: 67 / 25 / 7 / 1 (히든 0)
-  function rollGrade(rand) {
+  // 등급 뽑기: 67 / 25 / 7 / 1 (히든 0). 2026-11-27 히든을 해금했으면(hiddenOn) 히든 drawRate% 가 나오고 그만큼 노말이 준다
+  function rollGrade(rand, hiddenOn) {
     var r = (rand !== undefined ? rand : Math.random()) * 100, acc = 0, gs = G.CONFIG.grades;
-    for (var i = 0; i < gs.length; i++) { if (!gs[i].rate) continue; acc += gs[i].rate; if (r < acc) return gs[i].key; }
+    var hd = 0; if (hiddenOn) gs.forEach(function (g) { if (g.key === 'hidden') hd = g.drawRate || 0; });
+    for (var i = 0; i < gs.length; i++) {
+      var rate = gs[i].key === 'hidden' ? hd : gs[i].key === 'normal' ? gs[i].rate - hd : gs[i].rate;
+      if (!rate) continue; acc += rate; if (r < acc) return gs[i].key;
+    }
     return 'normal';
   }
+  // 해금한(도감에 있는) 히든 친구들
+  function hiddenUnlocked(book) { return G.charsOfGrade('hidden').filter(function (c) { return book && book.found[c.id]; }); }
   function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
 
   function addUnit(run, book, charId) {
@@ -61,7 +69,8 @@ G.Collection = (function () {
   function draw(run, book) {
     if (!canDraw(run)) return null;
     run.coins -= G.CONFIG.coin.drawCost;
-    var grade = rollGrade(), id = pick(G.charsOfGrade(grade)).id, r = addUnit(run, book, id);
+    var hid = hiddenUnlocked(book), grade = rollGrade(undefined, hid.length > 0);
+    var id = pick(grade === 'hidden' ? hid : G.charsOfGrade(grade)).id, r = addUnit(run, book, id);
     fillSlots(run);
     return { charId: id, grade: grade, isNew: r.isNew, uid: r.unit.uid };
   }
@@ -135,7 +144,7 @@ G.Collection = (function () {
 
   return { newBook: newBook, newRun: newRun, addCoins: addCoins, answer: answer, rollGrade: rollGrade, canDraw: canDraw,
     benchCount: benchCount, saveTeam: saveTeam, loadTeam: loadTeam, draw: draw, drawAll: drawAll, full: full, mergeOnce: mergeOnce, autoMerge: autoMerge, fillSlots: fillSlots, swapSlots: swapSlots,
-    lineup: lineup, countByGrade: countByGrade, addFriend: addFriend };
+    lineup: lineup, countByGrade: countByGrade, addFriend: addFriend, adoptRun: adoptRun, hiddenUnlocked: hiddenUnlocked };
 })();
 
 if (typeof module !== 'undefined') module.exports = G.Collection;

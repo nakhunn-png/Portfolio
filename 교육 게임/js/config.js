@@ -5,13 +5,14 @@
 var G = globalThis.G || (globalThis.G = {});
 
 G.CONFIG = {
-  // 5. 등급과 뽑기 확률 (합계 100). 히든은 뽑기로 나오지 않는다 (10-1)
+  // 5. 등급과 뽑기 확률 (합계 100). 히든은 해금 전에는 뽑기로 나오지 않는다 (10-1)
   grades: [
     { key: 'normal',    name: '노말',     color: '#9aa0a8', dark: '#5d636b', light: '#e6e8eb', rate: 67, mult: 1 },
     { key: 'epic',      name: '에픽',     color: '#a45ee5', dark: '#6b2fa3', light: '#efe0fb', rate: 25, mult: 1.8 },
     { key: 'unique',    name: '유니크',   color: '#f28c28', dark: '#b85a0c', light: '#fde9d3', rate: 7,  mult: 3.5 },
     { key: 'legendary', name: '레전더리', color: '#3fbf4f', dark: '#1f7f2c', light: '#dcf6df', rate: 1,  mult: 7 },
-    { key: 'hidden',    name: '히든',     color: '#3a2a3f', dark: '#1a1020', light: '#e4dcf0', rate: 0,  mult: 6 }
+    // 2026-11-27 히든: 도전 과제로 해금하면 뽑기에도 나온다(drawRate %, 노말에서 뺀다. 해금한 히든 가운데 골고루). 레전더리(7)보다 조금 세다
+    { key: 'hidden',    name: '히든',     color: '#3a2a3f', dark: '#1a1020', light: '#e4dcf0', rate: 0,  mult: 7.7, drawRate: 0.5 }
   ],
   merge: { normal: 5, epic: 3, unique: 3 },     // 5. 합성: 재료 몇 명 → 다음 등급 1명
 
