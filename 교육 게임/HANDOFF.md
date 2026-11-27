@@ -45,6 +45,7 @@ python -m http.server 8767
 ```
 - `http://localhost:8767` — 보통 플레이 / `?dev=1` — 모든 섬·배속·숨은 영웅·재앙·도전 영역 열림
 - 바로 해 볼 링크(시험판, 모든 것 열림): https://claude.ai/artifact/XeuQbw2hPCjDBZLQB79cVJ — 코드를 바꾸면 Claude 가 같은 주소로 다시 올린다(`index.html` 에서 doctype·head 를 뺀 사본 + `DEV = true`)
+- **학생용 링크**(처음부터 차례로 열림, QR 로 나눠 줌): https://claude.ai/artifact/VHZRNEKY3RhYGE5KW4VDyG — 같은 사본에 `DEV = false`. 코드를 바꾸면 **두 링크 모두** 같은 주소로 다시 올린다. 학생이 열려면 Share 에서 「링크가 있는 모든 사람」을 켜야 한다
 - 저장은 localStorage(`냠냠2_도감`, `냠냠2_진행`, `냠냠2_설정`). localhost 와 127.0.0.1 은 저장이 따로 → 시험은 `127.0.0.1:8767`
 - 파일을 바꾸면 `index.html` 의 `?v=` 번호를 올린다(브라우저 캐시). 지금 `2026112703`
 
