@@ -971,7 +971,12 @@ G.UI = (function () {
   }
 
   /* 전투 중 문제 풍선 (실제 시간 20초마다, 10초 뒤 사라짐) */
-  function clearBubbles() { $('bubble-layer').innerHTML = ''; A.bubble = null; }
+  function clearBubbles() {
+    $('bubble-layer').innerHTML = ''; A.bubble = null;
+    if (bubbleOpen()) closeOverlay();   // 웨이브가 끝나면 열려 있던 보너스 문제 창도 닫는다
+    A.bubbleDlg = null;
+  }
+  function bubbleOpen() { return !!(A.bubbleDlg && A.bubbleDlg.isConnected); }
   function spawnBubble() {
     // 출전 칸을 가리지 않도록 스테이지마다 정한 빈 곳에 띄운다
     var spots = A.B.bubbleSpots, s = spots[Math.floor(Math.random() * spots.length)];
@@ -982,17 +987,17 @@ G.UI = (function () {
     A.bubble = { node: b, life: C.questionBubbleLife };
     guide('bubble', b, '보너스 문제!', '물음표 풍선을 누르면 보너스 문제가 나와요. 맞히면 코인을 더 받아요. 풍선은 금방 사라지니 얼른 눌러요!');
   }
+  // 2026-11-27 긴급 수정: 보너스 문제를 푸는 동안에도 전투는 멈추지 않는다(멈추면 시간 벌기로 쓰임)
   function bubbleQuiz() {
-    A.paused = true;
     var d = el('div', 'dialog math-dialog'), box = el('div', 'math-panel in-dialog');
     d.appendChild(box);
     var q = newQuiz('bubble'); q.left = 1; A.bubbleQ = q;
     // 밤 놀이공원: 맞히면 조명이 12초(게임 시간) 켜진다
     if (A.B.gimmick === 'dark') q.onRight = function () { Bt.light(A.B, 12); setTimeout(function () { banner('조명 켜짐!'); }, 700); };
     renderQuiz(box, q, function () {
-      setTimeout(function () { closeOverlay(); A.paused = false; }, 500);
+      setTimeout(function () { if (A.bubbleDlg === d && bubbleOpen()) closeOverlay(); if (A.bubbleDlg === d) A.bubbleDlg = null; }, 500);
     });
-    overlay(d);
+    overlay(d); A.bubbleDlg = d;
   }
 
   /* ───────── 멈춤 ───────── */
@@ -1277,7 +1282,7 @@ G.UI = (function () {
       var every = A.B.gimmick === 'dark' ? 12 : C.questionBubbleSec;
       if (A.B.bossPhase) refreshBossUI(realDt);   // 보스전에는 문제 풍선 대신 보스 문제 칸
       else if (A.bubble) { A.bubble.life -= realDt; if (A.bubble.life <= 0) clearBubbles(); }
-      else { A.bubbleTimer += realDt; if (A.bubbleTimer >= every) { A.bubbleTimer = 0; spawnBubble(); } }
+      else if (!bubbleOpen()) { A.bubbleTimer += realDt; if (A.bubbleTimer >= every) { A.bubbleTimer = 0; spawnBubble(); } }
       refreshSkill();
     }
     if (A.targeting && (A.mode !== 'battle' || !Bt.skillReady(A.B))) cancelTarget();   // 웨이브가 끝나거나 기절하면 고르기를 그만둔다
