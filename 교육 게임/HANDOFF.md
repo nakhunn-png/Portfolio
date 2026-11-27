@@ -30,6 +30,7 @@
   - **2026-11-27**: 🛒 상점은 **준비 화면 뽑기 칸**, **냠냠 코인 하나로** 산다(지갑 없앰). 무기는 사기 → 강화 +1·+2·+3(`shop[].prices` = [사기, +1, +2, +3], 단계 1~4)(`#btn-shop`, `openShop`, 사면 지금 판에도 바로 적용, `CONFIG.shop`, 산 것·강화 단계 `progress.shop`, 강화는 `Battle` 의 `shopAtk`·`shopSpeed`·`heroStats`), 작은 「선생님」 단추(처음 화면 왼쪽 아래, 비밀번호 `teacherPassword` 0420, `openTeacher`: `allOpen`·`secretArch`·`disasterOpen`·`teacher3x`), 🗑️ 게임 초기화(`resetGame`, 두 번 묻기). **배속 2·2.5·3배는 상점에서만 산다**(`speeds[].shop`, `speedOpen`). 3배속 = 8웨이브
   - **친구 처음부터 다시 하기**(섬 지도, `resetTeam`) · **난이도만 바꾸기**(멈춤 창, `changeDiffDialog`/`applyDiff`, 기록은 그 판의 가장 쉬운 난이도 `A.diffMin`)
   - **화면 점검으로 고친 것**: 틀렸을 때 그림(`hintNode`, 큰 수는 막대, `has-hint`), 결과 화면(`fitResult`), 뽑기 창(`draw-body`), 보너스 풍선이 끌기 판에 깔림, 대기석 3칸(`bench`), 알림 글 위쪽·누르면 사라짐
+  - **2026-11-27 산 무기가 전투에 보임**: 전투 화면 아래 「정답」 옆에 산 무기 아이콘·강화 단계(`#bt-shop`, `refreshShopTag`, 안 샀으면 숨김). 공격 모양(`render.js` 의 shots): 검·창·활(그 등급 친구)·총(영웅)을 사면 공이 커지고 금빛 테, 따발총은 총구 불꽃·주황 총알 줄. 단계가 오를수록 더 크고 굵다. 총알에 `grade` 를 붙였다(`battle.js`)
   - **2026-11-27 긴급 수정**: 보너스 문제(물음표 풍선) 창이 떠 있어도 **전투는 멈추지 않는다**(`bubbleQuiz` 에서 `A.paused` 를 안 씀, 창은 `A.bubbleDlg`). 창이 열린 동안 새 풍선은 안 나오고, 웨이브가 끝나면 `clearBubbles` 가 창도 닫는다
   - 모든 난이도: 보너스 풍선 2초, 능력 조준 중에도 전투가 흐름, 「모두 뽑기」→「전투 시작」 버튼이 반짝이며 유도
 - **게임 전체 시간 어림 60~75분**(PRD 16장 끝). 사용자 기준 40~80분.
@@ -48,7 +49,7 @@ python -m http.server 8767
 - 바로 해 볼 링크(시험판, 모든 것 열림): https://claude.ai/artifact/XeuQbw2hPCjDBZLQB79cVJ — 코드를 바꾸면 Claude 가 같은 주소로 다시 올린다(`index.html` 에서 doctype·head 를 뺀 사본 + `DEV = true`)
 - **학생용 링크**(처음부터 차례로 열림, QR 로 나눠 줌): https://claude.ai/artifact/VHZRNEKY3RhYGE5KW4VDyG — 같은 사본에 `DEV = false`. 코드를 바꾸면 **두 링크 모두** 같은 주소로 다시 올린다. 학생이 열려면 Share 에서 「링크가 있는 모든 사람」을 켜야 한다
 - 저장은 localStorage(`냠냠2_도감`, `냠냠2_진행`, `냠냠2_설정`). localhost 와 127.0.0.1 은 저장이 따로 → 시험은 `127.0.0.1:8767`
-- 파일을 바꾸면 `index.html` 의 `?v=` 번호를 올린다(브라우저 캐시). 지금 `2026112704`
+- 파일을 바꾸면 `index.html` 의 `?v=` 번호를 올린다(브라우저 캐시). 지금 `2026112705`
 
 ## 파일
 

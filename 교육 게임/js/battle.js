@@ -552,7 +552,7 @@ G.Battle = (function () {
       u.flash = 0.15;
       var tp = pos(B, best), job = isHero ? 'hero' : G.charById(u.id).job, dmg = st.atk * atkMul;
       if (st.crit && Math.random() < st.crit) { dmg *= st.critMul; B.fx.push({ kind: 'crit', x: tp.x, y: tp.y - 40, t: 0, life: 0.5 }); }   // 궁수 치명타
-      B.shots.push({ job: job, x: u.x, y: u.y - 30, tx: tp.x, ty: tp.y - 14, t: 0, life: 0.18 });
+      B.shots.push({ job: job, grade: isHero ? 'hero' : G.charById(u.id).grade, x: u.x, y: u.y - 30, tx: tp.x, ty: tp.y - 14, t: 0, life: 0.18 });
       if (st.splash) {
         B.fx.push({ kind: 'boom', x: tp.x, y: tp.y, t: 0, life: 0.3, r: st.splash });
         B.enemies.forEach(function (e) { if (e.hp <= 0) return; var p = pos(B, e); if (Math.hypot(p.x - tp.x, p.y - tp.y) <= st.splash) damage(B, e, dmg, events); });

@@ -224,6 +224,18 @@ G.UI = (function () {
   function refreshSpeed() {
     var s = curSpeed(); $('speed-label').textContent = s.name;
     $('speed-btn').className = 'speed-btn sp' + C.speeds.indexOf(s);
+    refreshShopTag();
+  }
+  // 2026-11-27 전투 화면 아래: 상점에서 산 무기 아이콘과 강화 단계 (🗡️+1 💥+2 …). 아무것도 안 샀으면 숨긴다
+  function refreshShopTag() {
+    var box = $('bt-shop'); box.innerHTML = '';
+    C.shop.forEach(function (it) {
+      var lv = shopLevel(it.key); if (it.speed || !lv) return;
+      var s = el('span', 'st-item'); s.appendChild(el('span', 'st-ico', it.icon));
+      if (lv > 1) s.appendChild(el('b', 'st-lv', '+' + (lv - 1)));
+      s.title = shopTitle(it, lv) + ': ' + it.desc; box.appendChild(s);
+    });
+    box.classList.toggle('hidden', !box.children.length || !!A.tutorial);
   }
 
   /* ───────── 영웅 고르기 (18장) ─────────

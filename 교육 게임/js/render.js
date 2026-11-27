@@ -149,10 +149,25 @@ G.Render = (function () {
       if (B.hero.stunT > 0) { ctx.fillStyle = '#ffd23f'; ctx.font = '20px Jua, sans-serif'; ctx.textAlign = 'center'; for (var hs = 0; hs < 3; hs++) ctx.fillText('★', B.hero.x + Math.cos(t * 6 + hs * 2.1) * 24, B.hero.y - 80 + Math.sin(t * 6 + hs * 2.1) * 6); }
     }
     // 공격
+    // 2026-11-27 상점에서 산 무기가 공격 모양에 보인다: 검·창·활(그 등급 친구)·총(영웅)은 공이 커지고 금빛 테, 따발총은 총구 불꽃과 총알 줄
+    var SH = B.shop || {}, mgun = SH.mgun || 0;
     B.shots.forEach(function (s) {
       var k = s.t / s.life, x = s.x + (s.tx - s.x) * k, y = s.y + (s.ty - s.y) * k;
+      var wkey = s.job === 'hero' ? 'gun' : s.grade === 'normal' ? 'sword' : s.grade === 'epic' ? 'spear' : 'bow', wl = SH[wkey] || 0;
+      var r = (s.job === 'mage' || s.job === 'hero' ? 8 : 5) + (wl ? (s.job === 'hero' ? 2 + wl * 1.5 : 1 + wl) : 0);
+      if (mgun) {
+        var k0 = Math.max(0, k - 0.45), x0 = s.x + (s.tx - s.x) * k0, y0 = s.y + (s.ty - s.y) * k0;
+        ctx.strokeStyle = 'rgba(255,154,31,.85)'; ctx.lineWidth = 2 + mgun; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x, y); ctx.stroke();
+        if (k < 0.45) {
+          var mk = 1 - k / 0.45, mr = (7 + mgun * 2) * mk;
+          ctx.fillStyle = 'rgba(255,226,90,' + mk + ')'; ctx.beginPath();
+          for (var q = 0; q < 10; q++) { var qa = q * Math.PI / 5, qr = q % 2 ? mr * 0.45 : mr; ctx.lineTo(s.x + Math.cos(qa) * qr, s.y + Math.sin(qa) * qr); }
+          ctx.closePath(); ctx.fill();
+        }
+      }
       ctx.fillStyle = SHOT_COLOR[s.job] || '#fff'; ctx.strokeStyle = '#3a2a3f'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(x, y, s.job === 'mage' || s.job === 'hero' ? 8 : 5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      if (wl) { ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 1 + wl; ctx.beginPath(); ctx.arc(x, y, r + 2 + wl, 0, Math.PI * 2); ctx.stroke(); }
     });
     // 효과
     B.fx.forEach(function (f) {
