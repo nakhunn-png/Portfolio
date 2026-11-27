@@ -125,11 +125,23 @@ G.Battle = (function () {
   }
 
   // 캐릭터 능력치: 직업 기본값 × 등급 배율 (테마가 맞으면 공격 +10%)
-  function unitStats(charId, stageNo) {
+  /* 2026-11-27 상점 강화: shop = { sword: 단계, spear, bow, gun, mgun } (없으면 0). 이 등급 친구 공격력·모두의 공격 빠르기 */
+  function shopLv(shop, key) { return (shop && shop[key]) || 0; }
+  function shopItem(key) { var L = G.CONFIG.shop || []; for (var i = 0; i < L.length; i++) if (L[i].key === key) return L[i]; return null; }
+  function shopAtk(shop, grade) {
+    var key = grade === 'normal' ? 'sword' : grade === 'epic' ? 'spear' : 'bow', it = shopItem(key);
+    return 1 + (it ? it.lvBonus.atk * shopLv(shop, key) : 0);
+  }
+  function shopSpeed(shop) { var it = shopItem('mgun'); return 1 + (it ? it.lvBonus.speed * shopLv(shop, 'mgun') : 0); }
+  function heroStats(shop) {
+    var H = G.CONFIG.heroAttack, it = shopItem('gun');
+    return { atk: H.atk * (1 + (it ? it.lvBonus.atk * shopLv(shop, 'gun') : 0)), interval: H.interval / shopSpeed(shop), range: H.range };
+  }
+  function unitStats(charId, stageNo, shop) {
     var ch = G.charById(charId), job = G.CONFIG.jobs[ch.job], gm = G.gradeInfo(ch.grade).mult;
     var theme = ch.theme === stageNo ? 1.1 : 1;
     var s = {
-      atk: job.atk * gm * theme, interval: job.interval, range: job.range * (1 + (gm - 1) * 0.04),
+      atk: job.atk * gm * theme * shopAtk(shop, ch.grade), interval: job.interval / shopSpeed(shop), range: job.range * (1 + (gm - 1) * 0.04),
       splash: job.splash || 0, push: job.push || 0, buff: job.buff || 0, slow: job.slow || 0, slowSec: job.slowSec || 0
     };
     // 자동 능력: 유니크부터
@@ -165,7 +177,7 @@ G.Battle = (function () {
     var st = G.stageByNo(stageNo), C = G.CONFIG, L = (LAYOUTS[st.path] || LAYOUTS.loop)(), D = G.difficultyByKey(diffKey);
     var B = {
       stageNo: stageNo, gimmick: opts.tower ? null : (st.gimmick || null), tower: !!opts.tower, hpMul: opts.tower ? C.tower.hpMul : (st.minionHp || st.hp || 1),   // 보스 스테이지는 부하 체력을 따로 (minionHp)
-      carry: !!opts.carry, carryMul: 1,   // 친구 이어 가기 (데려온 친구가 센 만큼 적이 단단해진다)
+      carry: !!opts.carry, carryMul: 1, shop: opts.shop || null, heroSt: heroStats(opts.shop),   // 친구 이어 가기 (데려온 친구가 센 만큼 적이 단단해진다)
       paths: L.paths, path: L.paths[0], slots: opts.extraSlot && L.extra ? L.slots.concat([L.extra]) : L.slots, heroPos: L.hero, bubbleSpots: L.bubbles, laps: L.laps || C.escapeLaps, rings: !!L.rings,
       time: 0, life: D.life, lifeLost: 0, diff: D, bossType: st.boss || null, bossPhase: false, boss: null,
       hazards: [], pips: 0, legs: [], legT: 0, combo: 0,
@@ -185,7 +197,7 @@ G.Battle = (function () {
     B.units = [];
     for (var i = 0; i < B.slots.length; i++) {
       if (!lineup[i]) continue;
-      var s = unitStats(lineup[i], B.stageNo);
+      var s = unitStats(lineup[i], B.stageNo, B.shop);
       B.units.push({ slot: i, id: lineup[i], x: B.slots[i].x, y: B.slots[i].y, st: s, cd: Math.random() * s.interval, speedUp: 1, flash: 0, frozen: 0 });
     }
     applyBuffs(B);
@@ -516,7 +528,7 @@ G.Battle = (function () {
     var shooters = B.units.slice();
     if (B.hero) { B.hero.cast = Math.max(0, B.hero.cast - dt); if (!B.bossPhase) B.hero.cd = Math.max(0, B.hero.cd - dt); if (!(B.hero.stunT > 0)) shooters.push(B.hero); }
     shooters.forEach(function (u) {
-      var isHero = u === B.hero, st = isHero ? C.heroAttack : u.st;
+      var isHero = u === B.hero, st = isHero ? (B.heroSt || C.heroAttack) : u.st;
       u.flash = Math.max(0, u.flash - dt);
       if (u.eaten > 0) { u.eaten -= dt; return; }   // 마왕에게 삼켜진 친구
       if (!isHero && B.drag && B.drag.slot === u.slot) return;   // 끌고 있는 친구는 쉬어요

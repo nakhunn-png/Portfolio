@@ -51,6 +51,7 @@ G.UI = (function () {
   function goTitle() {
     A.mode = 'title'; A.B = null; A.tower = null; show('scr-title'); closeOverlay();
     $('btn-challenge').classList.toggle('locked', !challengeOpen());
+    $('title-wallet').textContent = '🪙 지갑 ' + (A.progress.wallet || 0);
     var TL = Bt.LAYOUTS.loop(); G.Render.drawBackground(1, { paths: TL.paths, slots: [], hero: null }); G.Render.clear();   // 제목 화면에는 받침을 그리지 않는다
     var box = $('title-heroes'); box.innerHTML = '';
     ['n1', 'n9', 'e5', 'u2', 'n11', 'e2', 'l2'].forEach(function (id, i) {
@@ -58,12 +59,90 @@ G.UI = (function () {
     });
   }
 
+  /* ───────── 상점 (2026-11-27) ─────────
+   * 지갑 코인(판을 깨면 남은 냠냠 코인 + 보너스)으로 강화·배속을 산다. 강화는 3단계까지 */
+  function shopLevel(key) { return (A.progress.shop && A.progress.shop[key]) || 0; }
+  function openShop() {
+    var d = el('div', 'dialog shop-dialog');
+    var head = el('div', 'shop-head'); head.appendChild(el('h2', '', '🛒 상점'));
+    head.appendChild(el('div', 'shop-wallet', '🪙 지갑 ' + (A.progress.wallet || 0)));
+    d.appendChild(head);
+    d.appendChild(el('p', 'shop-note', '스테이지를 깨면 남은 코인과 보너스 ' + C.wallet.winBonus + '코인이 지갑에 들어와요.'));
+    var grid = el('div', 'shop-grid');
+    C.shop.forEach(function (it) {
+      var lv = shopLevel(it.key), max = it.prices.length, gift = it.key === 'speed3' && A.progress.teacher3x && !lv, done = lv >= max || gift;   // gift: 선생님이 열어 줌
+      var price = done ? 0 : it.prices[lv], can = !done && (A.progress.wallet || 0) >= price;
+      var c = el('div', 'shop-card' + (done ? ' done' : ''));
+      c.appendChild(el('div', 'shop-icon', it.icon));
+      c.appendChild(el('div', 'shop-name', it.name));
+      c.appendChild(el('div', 'shop-desc', it.desc));
+      if (!it.speed) { var dots = el('div', 'shop-lv'); for (var i = 0; i < max; i++) dots.appendChild(el('span', i < lv ? 'on' : '', '●')); c.appendChild(dots); }
+      var b = el('button', 'btn small ' + (done ? 'white' : can ? 'green' : 'white'), done ? (gift ? '선생님 선물 ✔' : it.speed ? '샀어요 ✔' : '최고 단계 ✔') : '🪙 ' + price);
+      b.disabled = done;
+      b.onclick = function () {
+        if (!can) { toast('지갑 코인이 ' + (price - (A.progress.wallet || 0)) + '개 모자라요!'); return; }
+        A.progress.wallet -= price; A.progress.shop = A.progress.shop || {}; A.progress.shop[it.key] = lv + 1; saveAll();
+        openShop(); toast(it.speed ? it.name + '을 샀어요! 전투 중 ▶▶ 단추로 바꿔요.' : it.name + ' ' + (lv + 1) + '단계! 다음 판부터 세져요.', 2600);
+        $('title-wallet').textContent = '🪙 지갑 ' + (A.progress.wallet || 0);
+      };
+      c.appendChild(b); grid.appendChild(c);
+    });
+    d.appendChild(grid);
+    var close = el('button', 'btn small green shop-close', '닫기'); close.onclick = function () { closeOverlay(); $('title-wallet').textContent = '🪙 지갑 ' + (A.progress.wallet || 0); };
+    head.appendChild(close);
+    overlay(d);
+  }
+  // 판이 끝날 때 지갑에 넣기. 결과 화면에 보여 줄 글을 돌려준다
+  function depositWallet(amount) {
+    amount = Math.max(0, Math.round(amount)); if (!amount) return null;
+    A.progress.wallet = (A.progress.wallet || 0) + amount;
+    return { text: '지갑에 코인 +' + amount + ' 저금! (지갑 ' + A.progress.wallet + ')' };
+  }
+
+  /* ───────── 선생님 모드 (2026-11-27, 비밀번호 teacherPassword) ───────── */
+  function openTeacher() {
+    var P = A.progress;
+    var items = [
+      { label: '섬 (1)(2)(3) 모두 열기', sub: '모든 섬과 스테이지를 바로 할 수 있어요', get: function () { return !!P.allOpen; }, set: function (v) { P.allOpen = v; } },
+      { label: '아크메이지 켜기', sub: '영웅 고르기에 아주 센 숨은 영웅이 나와요', get: function () { return !!P.secretArch; }, set: function (v) { P.secretArch = v; if (!v && A.settings.hero === 'arch') A.settings.hero = 'mage'; } },
+      { label: '최고 난이도 「재앙」 열기', sub: '생명 1개, 식이 2초 뒤 사라지는 난이도', get: function () { return !!P.disasterOpen; }, set: function (v) { P.disasterOpen = v; } },
+      { label: '3배속 열기', sub: '상점에서 사지 않아도 3배속을 쓸 수 있어요', get: function () { return !!P.teacher3x; }, set: function (v) { P.teacher3x = v; } }
+    ];
+    var d = el('div', 'dialog teacher-dialog');
+    d.appendChild(el('h2', '', '👩‍🏫 선생님 모드'));
+    items.forEach(function (it) {
+      var row = el('div', 'teacher-row'), t = el('div', 't-text');
+      t.appendChild(el('b', '', it.label)); t.appendChild(el('span', '', it.sub)); row.appendChild(t);
+      var b = el('button', 'btn small ' + (it.get() ? 'green' : 'white'), it.get() ? '켜짐' : '꺼짐');
+      b.onclick = function () { it.set(!it.get()); saveAll(); b.className = 'btn small ' + (it.get() ? 'green' : 'white'); b.textContent = it.get() ? '켜짐' : '꺼짐'; };
+      row.appendChild(b); d.appendChild(row);
+    });
+    var close = el('button', 'btn big green', '닫기'); close.onclick = function () { closeOverlay(); goTitle(); };
+    var bs = el('div', 'btns'); bs.appendChild(close); d.appendChild(bs);
+    overlay(d);
+  }
+  /* 게임 초기화 (학생도 누를 수 있다). 두 번 묻고, 별·도감·친구·지갑·상점·설정을 모두 지운다 */
+  function resetGame() {
+    dialog('게임 초기화', '처음부터 다시 할까요? 별, 도감, 친구, 지갑 코인, 상점에서 산 것이 모두 지워져요.', [
+      { text: '지울래요', cls: 'red', fn: function () {
+        dialog('정말 지울까요?', '지우면 되돌릴 수 없어요.', [
+          { text: '네, 모두 지워요', cls: 'red', fn: function () {
+            try { ['냠냠2_도감', '냠냠2_진행', '냠냠2_설정'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+            location.reload();
+          } },
+          { text: '아니요', cls: 'green', fn: closeOverlay }
+        ]);
+      } },
+      { text: '아니요', cls: 'green', fn: closeOverlay }
+    ]);
+  }
+
   /* ───────── 스테이지 고르기 ───────── */
   var UNIT_NAME = { 1: '덧뺄셈 1', 2: '덧뺄셈 2', 3: '덧뺄셈 3' };
   // 앞에 있는 「만든」 스테이지를 깨면 열린다 (보스 스테이지는 아직 만드는 중이라 건너뛴다)
   function stageOpen(st) {
     if (!st.ready) return false;
-    if (DEV) return true;
+    if (DEV || A.progress.allOpen) return true;   // 선생님 모드: 섬·스테이지 모두 열기
     for (var n = st.no - 1; n >= 1; n--) { var prev = G.stageByNo(n); if (prev.ready) return !!A.progress.stars[n]; }
     return true;
   }
@@ -120,9 +199,11 @@ G.UI = (function () {
   function challengeOpen() { return DEV || !!A.progress.stars[C.challengeUnlock]; }
 
   /* ───────── 배속 (9장) ───────── */
+  // 2026-11-27 2배속부터는 상점에서 산 것만 (shop 키). 선생님 모드로 3배속을 열 수도 있다
+  function owned(key) { return !!(A.progress.shop && A.progress.shop[key] > 0); }
   function speedOpen(i) {
-    var u = C.speeds[i].unlock;
-    return DEV || !u || !!A.progress.stars[u];
+    var k = C.speeds[i].shop;
+    return DEV || !k || owned(k) || (k === 'speed3' && A.progress.teacher3x);
   }
   function curSpeed() {
     var i = A.settings.speed || 0; if (!speedOpen(i)) i = 0;
@@ -134,7 +215,7 @@ G.UI = (function () {
   function cycleSpeed() {
     var i = A.settings.speed || 0;
     if (A.B && A.B.bossPhase && A.mode === 'battle') { toast('보스와 싸울 때는 1.5배속까지예요!', 2400); }
-    else if (C.speeds[i].v === 1.5 && !speedOpen(2)) toast('과자 숲을 통과하면 2배속까지 지원해요!', 2400);
+    else if (C.speeds[i].v === 1.5 && !speedOpen(2)) toast('2배속은 처음 화면 「상점」에서 살 수 있어요!', 2400);
     for (var k = 1; k <= C.speeds.length; k++) { var j = (i + k) % C.speeds.length; if (speedOpen(j)) { A.settings.speed = j; break; } }
     saveAll(); refreshSpeed();
   }
@@ -144,7 +225,7 @@ G.UI = (function () {
   }
 
   /* ───────── 영웅 고르기 (18장) ─────────
-   * 물음표 칸(아크메이지 자리)을 secretClicks(5)번 누르고 비밀번호를 넣으면 숨은 영웅 아크메이지가 나타난다. 한 번 찾으면 계속 남는다 */
+   * 숨은 영웅 아크메이지는 선생님 모드(처음 화면 「선생님」)에서 켜면 나온다 */
   function heroOpen(id) { return !C.heroes[id].secret || A.progress.secretArch || DEV; }
   function stageLabel(no) { var st = G.stageByNo(no); return st.tower ? st.name : (st.boss ? '보스' : no) + ' · ' + st.name; }
   // 2단계: 영웅 고르기
@@ -202,7 +283,7 @@ G.UI = (function () {
     var box = $('hero-cards'); box.innerHTML = '';
     C.heroOrder.forEach(function (id) {
       var H = C.heroes[id], open = heroOpen(id);
-      if (!open) { var ph = el('div', 'hero-card secret-slot'); ph.appendChild(el('div', 'secret-q', '?')); ph.onclick = function (e) { e.stopPropagation(); secretTap(); }; box.appendChild(ph); return; }
+      if (!open) return;   // 2026-11-27 아크메이지는 선생님 모드에서 켜야 보인다 (물음표 칸·비밀번호 없앰)
       var c = el('button', 'hero-card' + (A.settings.hero === id ? ' sel' : '') + (H.secret ? ' secret' : '') + (revealed === id ? ' reveal' : ''));
       c.appendChild(img(charURL(id), '', 104, 104));
       c.appendChild(el('div', 'hc-name', H.name));
@@ -212,18 +293,11 @@ G.UI = (function () {
       box.appendChild(c);
     });
   }
-  /* 2026-11-26 아크메이지 칸(물음표 칸)을 연속 5번 누르면 비밀번호 창이 뜬다. 비밀번호(secretPassword)가 맞아야 열린다 */
-  function secretTap() {
-    if (A.mode !== 'hero' || A.progress.secretArch) return;
-    var now = performance.now();   // 5번 「연속」: 사이가 길면 처음부터 다시 센다
-    if (A.secretLast && now - A.secretLast > C.secretGap * 1000) A.secretTaps = 0;
-    A.secretLast = now; A.secretTaps++;
-    if (A.secretTaps >= C.secretClicks) { A.secretTaps = 0; askSecret(); }
-  }
-  function askSecret() {
-    var pw = String(C.secretPassword), typed = '';
+  /* 비밀번호 숫자판 (선생님 모드). 맞으면 onOk */
+  function askPassword(title, pw, onOk) {
+    pw = String(pw); var typed = '';
     var d = el('div', 'dialog pw-dialog');
-    d.appendChild(el('h2', '', '비밀번호를 입력하세요'));
+    d.appendChild(el('h2', '', title));
     var dots = el('div', 'pw-dots'); d.appendChild(dots);
     function draw() { dots.innerHTML = ''; for (var i = 0; i < pw.length; i++) dots.appendChild(el('span', '', i < typed.length ? '●' : '')); }
     var pad = el('div', 'pw-pad');
@@ -234,17 +308,8 @@ G.UI = (function () {
         if (k === '지움') { typed = typed.slice(0, -1); draw(); return; }
         typed += k; draw();
         if (typed.length < pw.length) return;
-        if (typed === pw) {
-          closeOverlay();
-          A.progress.secretArch = true; A.settings.hero = 'arch'; saveAll();
-          renderHeroCards('arch');
-          $('game').classList.remove('flash'); void $('game').offsetWidth; $('game').classList.add('flash');
-          toast('숨은 영웅 아크메이지가 나타났어요!');
-        } else {
-          typed = ''; setTimeout(draw, 250);
-          d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake');
-          toast('비밀번호가 틀렸어요');
-        }
+        if (typed === pw) { closeOverlay(); onOk(); }
+        else { typed = ''; setTimeout(draw, 250); d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake'); toast('비밀번호가 틀렸어요'); }
       };
       pad.appendChild(b);
     });
@@ -267,7 +332,7 @@ G.UI = (function () {
     // 2026-11-26 친구 이어 가기: 지난번에 깬 판의 친구들이 함께 온다 (튜토리얼·탑 빼고). 대신 적도 그만큼 단단해진다
     var carry = !D.tutorial && !st.tower && A.progress.team && (A.progress.team.slots || []).some(Boolean);
     if (carry) { Col.loadTeam(A.run, A.progress.team); notes.push('지난 판 친구들이'); }
-    A.B = Bt.create(st.tower ? Ch.towerTheme(1) : no, Col.lineup(A.run), A.heroId, A.diffKey, { extraSlot: extra, tower: !!st.tower, carry: !!carry });
+    A.B = Bt.create(st.tower ? Ch.towerTheme(1) : no, Col.lineup(A.run), A.heroId, A.diffKey, { extraSlot: extra, tower: !!st.tower, carry: !!carry, shop: A.progress.shop });
     A.retried = false; A.diffMin = undefined; hideBossUI();
     $('prep-diff').textContent = D.name; $('prep-diff').className = 'hud-chip diff-chip d-' + D.key;
     A.wavesDone = 0; A.realBattle = 0; A.stageStart = performance.now(); A.bubbleTimer = 0; A.selectedSlot = -1; A.targeting = false;
@@ -721,7 +786,7 @@ G.UI = (function () {
   function startTowerFloor() {
     var floor = A.wavesDone + 1, th = Ch.towerTheme(floor), old = A.B;
     if (th !== old.stageNo) {
-      A.B = Bt.create(th, Col.lineup(A.run), A.heroId, A.diffKey, { extraSlot: A.run.slots.length > C.slots, tower: true });
+      A.B = Bt.create(th, Col.lineup(A.run), A.heroId, A.diffKey, { extraSlot: A.run.slots.length > C.slots, tower: true, shop: A.progress.shop });
       A.B.life = old.life; A.B.lifeLost = old.lifeLost; A.B.hero.cd = old.hero.cd;
       G.Render.drawBackground(th, A.B);
     }
@@ -1017,8 +1082,10 @@ G.UI = (function () {
   function finishTower() {
     A.mode = 'result'; clearBubbles(); closeOverlay(); hideBossUI();
     var floor = A.wavesDone, old = (A.progress.tower && A.progress.tower.floor) || 0;
+    var dep = depositWallet(A.run.coins + floor * C.wallet.perFloor); A.run.coins = 0;   // 탑: 남은 코인 + 오른 층 × perFloor
     var got = Ch.record(A.progress, A.book, { towerFloor: floor, speedName: curSpeed().name, diffName: G.difficultyByKey(A.diffKey).name, bestCombo: A.run.bestCombo });
     got = got.concat(Ch.checkBook(A.book, A.progress));
+    if (dep) got.push(dep);
     saveAll(); show('scr-result');
     var p = $('result-panel'); p.innerHTML = '';
     p.appendChild(el('h2', '', floor > 0 ? floor + '층까지 올랐어요!' : '1층부터 다시 도전해요!'));
@@ -1058,6 +1125,8 @@ G.UI = (function () {
     }
     var got = Ch.record(A.progress, A.book, { stageNo: A.stageNo, win: win, bossType: win ? A.B.bossType : null, speedV: curSpeed().v,
       lifeLost: A.B.lifeLost, heroHits: A.B.heroHits, bestCombo: run.bestCombo }).concat(Ch.checkBook(A.book, A.progress));
+    // 지갑: 깨면 남은 코인 + 보너스 (지면 「강화하기」로 이어 갈 수 있어서 넣지 않는다)
+    if (win) { var dep = depositWallet(run.coins + (A.tutorial ? 0 : C.wallet.winBonus)); run.coins = 0; if (dep) got.push(dep); }
     if (win && A.stageNo === C.challengeUnlock && !A.progress.challengeSeen) { A.progress.challengeSeen = true; got.push({ text: '도전 영역이 열렸어요! 처음 화면에서 들어가요.' }); }
     saveAll();
     show('scr-result');
@@ -1244,6 +1313,9 @@ G.UI = (function () {
     };
     $('btn-music').onclick = toggleMusic; refreshMusic();
     $('btn-team-reset').onclick = resetTeam;
+    $('btn-shop').onclick = openShop;
+    $('btn-teacher').onclick = function () { askPassword('선생님 비밀번호', C.teacherPassword, openTeacher); };
+    $('btn-reset').onclick = resetGame;
     document.addEventListener('pointerdown', function () {
       if (G.Music) G.Music.unlock();
       // 2026-11-26 알림 글은 화면을 누르면 바로 사라진다 (뜬 지 0.4초 지나서부터: 알림을 띄운 그 터치로는 안 사라지게)

@@ -12,7 +12,7 @@ require(path.join(__dirname, '../js/battle.js'));
 require(path.join(__dirname, '../js/collection.js'));
 var C = G.CONFIG, B = G.Battle, Col = G.Collection;
 
-var EXPECT = { '1배속': 4, '1.5배속': 5, '2배속': 6, '2.5배속': 7 };
+var EXPECT = { '1배속': 4, '1.5배속': 5, '2배속': 6, '2.5배속': 7, '3배속': 8 };   // 2026-11-27 3배속 추가
 var fail = 0;
 
 // 위치를 고르는 능력은 가장 멀리 간 적 자리에 쓴다

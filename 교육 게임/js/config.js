@@ -59,15 +59,33 @@ G.CONFIG = {
 
   // 9. 배속과 클리어 시간 보정
   speeds: [
-    { name: '1배속',   v: 1,   count: 1.0, unlock: null },
-    { name: '1.5배속', v: 1.5, count: 1.1, unlock: null },
-    { name: '2배속',   v: 2,   count: 1.2, unlock: 1 },   // 과자 숲(스테이지 1)을 깨면 (2026-11-26, 전에는 스테이지 3)
-    { name: '2.5배속', v: 2.5, count: 1.3, unlock: 6 }    // 스테이지 6을 깨면
+    // 2026-11-27 2배속부터는 저절로 열리지 않고 상점에서 산다 (shop: 상점 물건 key). 3배속은 선생님 모드로도 열 수 있다
+    { name: '1배속',   v: 1,   count: 1.0, shop: null },
+    { name: '1.5배속', v: 1.5, count: 1.1, shop: null },
+    { name: '2배속',   v: 2,   count: 1.2, shop: 'speed2' },
+    { name: '2.5배속', v: 2.5, count: 1.3, shop: 'speed25' },
+    { name: '3배속',   v: 3,   count: 1.4, shop: 'speed3' }
   ],
+  /* 2026-11-27 상점. 지갑 코인으로 산다.
+   * 지갑: 판이 끝날 때 남은 냠냠 코인이 들어가고, 깨면 보너스 wallet.winBonus 를 더 받는다 (도전의 탑은 오른 층 × perFloor).
+   * 한 판에 보통 남는 코인 50~150 + 보너스 50 → 한 판 100~200. 본 게임(9스테이지)을 한 번 다 하면 약 1300, 다시 하기·탑까지 하면 모두 살 수 있는 정도 (전부 약 2700).
+   * 강화는 3단계까지. lvBonus: 한 단계마다 얼마나 세지나 (atk: 공격력 배율 +, speed: 공격 빠르기 +) */
+  wallet: { winBonus: 50, perFloor: 5 },
+  shop: [
+    { key: 'sword',  icon: '🗡️', name: '검',     desc: '노말 친구 공격력이 세져요',            target: 'normal',   lvBonus: { atk: 0.15 },  prices: [50, 90, 140] },
+    { key: 'spear',  icon: '🔱', name: '창',     desc: '에픽 친구 공격력이 세져요',            target: 'epic',     lvBonus: { atk: 0.15 },  prices: [70, 120, 180] },
+    { key: 'bow',    icon: '🏹', name: '활',     desc: '유니크·레전더리 친구 공격력이 세져요',  target: 'high',     lvBonus: { atk: 0.15 },  prices: [100, 160, 240] },
+    { key: 'gun',    icon: '🔫', name: '총',     desc: '영웅 공격력이 세져요',                 target: 'hero',     lvBonus: { atk: 0.3 },   prices: [40, 80, 130] },
+    { key: 'mgun',   icon: '💥', name: '따발총', desc: '모든 친구가 더 빨리 공격해요',          target: 'all',      lvBonus: { speed: 0.08 }, prices: [120, 200, 300] },
+    { key: 'speed2',  icon: '⏩', name: '2배속',   desc: '전투를 2배 빠르게',   speed: true, prices: [100] },
+    { key: 'speed25', icon: '⏩', name: '2.5배속', desc: '전투를 2.5배 빠르게', speed: true, prices: [200] },
+    { key: 'speed3',  icon: '🚀', name: '3배속',   desc: '전투를 3배 빠르게',   speed: true, prices: [400] }
+  ],
+  teacherPassword: '0420',   // 처음 화면 「선생님」 (섬 모두 열기·아크메이지·재앙·3배속)
   /* 웨이브 수는 미리 정하지 않고 실제 전투 시간으로 정한다 (9-3 원칙 2).
    * 웨이브가 끝날 때마다: 지금까지 실제 전투 시간 ≥ targetRealSec − (다음 웨이브 예상 실제 시간 × 0.5) 이면 끝.
-   * 배속을 바꾸지 않으면 1배속 4, 1.5배속 5, 2배속 6, 2.5배속 7 웨이브가 된다. */
-  battleTime: { targetRealSec: 220, waveGameSec: 66, minWaves: 4, maxWaves: 7 },   // 적이 나오는 시간 = 66 × 0.9 ≈ 59초 (1배속)
+   * 배속을 바꾸지 않으면 1배속 4, 1.5배속 5, 2배속 6, 2.5배속 7, 3배속 8 웨이브가 된다. */
+  battleTime: { targetRealSec: 220, waveGameSec: 66, minWaves: 4, maxWaves: 8 },   // 2026-11-27 3배속이 생겨 maxWaves 7 → 8   // 적이 나오는 시간 = 66 × 0.9 ≈ 59초 (1배속)
   bossSpeedCap: 1.5,
   questionBubbleSec: 20,       // 전투 중 문제 풍선 간격 (실제 시간)
   questionBubbleLife: 2,       // 풍선이 떠 있는 시간 (실제 시간). 2026-11-26 10 → 2초 (얼른 눌러야 하는 보너스)
@@ -179,9 +197,7 @@ G.CONFIG = {
   giftMax: 600,           // 모아 둘 수 있는 선물 코인
   giftPerRun: 60,         // 한 판을 시작할 때 받는 선물 코인 (남은 것은 다음 판에)
   heroAttack: { atk: 18, interval: 0.9, range: 280 },   // 영웅의 보통 공격
-  secretPassword: '0420',   // 2026-11-26 아크메이지 칸을 5번 누르면 묻는 비밀번호 (선생님용)
-  secretClicks: 5, secretGap: 1.2,   // 연속으로 누를 때 사이 시간(초)이 이보다 길면 처음부터
-                                      // 영웅 고르기 화면을 이만큼 누르면 아크메이지가 나온다
+  // 2026-11-27 아크메이지는 물음표 칸 5번 + 비밀번호가 아니라 선생님 모드에서만 켠다
   /* 웨이브 적 수 = (base + countGrowth × 진행 정도) × 배속 적 수 배율
    * 적 체력   = hp × (1 + hpGrowth × 진행 정도)
    * 진행 정도 = 그 웨이브 전까지의 계획 실제 시간 ÷ targetRealSec (0 ~ 약 0.9). 배속과 상관없이 마지막 웨이브 세기가 같다 */
