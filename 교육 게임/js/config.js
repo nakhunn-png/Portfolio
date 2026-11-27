@@ -66,20 +66,20 @@ G.CONFIG = {
     { name: '2.5배속', v: 2.5, count: 1.3, shop: 'speed25' },
     { name: '3배속',   v: 3,   count: 1.4, shop: 'speed3' }
   ],
-  /* 2026-11-27 상점. 지갑 코인으로 산다.
-   * 지갑: 판이 끝날 때 남은 냠냠 코인이 들어가고, 깨면 보너스 wallet.winBonus 를 더 받는다 (도전의 탑은 오른 층 × perFloor).
-   * 한 판에 보통 남는 코인 50~150 + 보너스 50 → 한 판 100~200. 본 게임(9스테이지)을 한 번 다 하면 약 1300, 다시 하기·탑까지 하면 모두 살 수 있는 정도 (전부 약 2700).
-   * 강화는 3단계까지. lvBonus: 한 단계마다 얼마나 세지나 (atk: 공격력 배율 +, speed: 공격 빠르기 +) */
-  wallet: { winBonus: 50, perFloor: 5 },
+  /* 2026-11-27 상점 (준비 화면 뽑기 칸). 코인은 하나로: 뽑기에 쓰는 냠냠 코인으로 산다 (지갑 코인 없앰).
+   * 무기는 먼저 사고(prices[0]) 「강화」로 +1 · +2 · +3 (prices[1..3]). 산 것과 강화는 계속 남는다.
+   * 단계(level) = 사면 1, +1 이면 2 … +3 이면 4. 한 단계마다 lvBonus 만큼 세진다 (+3 이면 4배).
+   * 가격 셈: 한 판에 버는 코인 약 250~300 (문제 20개 + 연속 보너스), 뽑기 1번 = 30.
+   *   무기 사기 = 뽑기 1~3번 값. 뽑기와 강화 중에서 아이가 고른다. 모두 사고 다 강화하면 약 1800 (6~7판 몫) */
   shop: [
-    { key: 'sword',  icon: '🗡️', name: '검',     desc: '노말 친구 공격력이 세져요',            target: 'normal',   lvBonus: { atk: 0.15 },  prices: [50, 90, 140] },
-    { key: 'spear',  icon: '🔱', name: '창',     desc: '에픽 친구 공격력이 세져요',            target: 'epic',     lvBonus: { atk: 0.15 },  prices: [70, 120, 180] },
-    { key: 'bow',    icon: '🏹', name: '활',     desc: '유니크·레전더리 친구 공격력이 세져요',  target: 'high',     lvBonus: { atk: 0.15 },  prices: [100, 160, 240] },
-    { key: 'gun',    icon: '🔫', name: '총',     desc: '영웅 공격력이 세져요',                 target: 'hero',     lvBonus: { atk: 0.3 },   prices: [40, 80, 130] },
-    { key: 'mgun',   icon: '💥', name: '따발총', desc: '모든 친구가 더 빨리 공격해요',          target: 'all',      lvBonus: { speed: 0.08 }, prices: [120, 200, 300] },
-    { key: 'speed2',  icon: '⏩', name: '2배속',   desc: '전투를 2배 빠르게',   speed: true, prices: [100] },
-    { key: 'speed25', icon: '⏩', name: '2.5배속', desc: '전투를 2.5배 빠르게', speed: true, prices: [200] },
-    { key: 'speed3',  icon: '🚀', name: '3배속',   desc: '전투를 3배 빠르게',   speed: true, prices: [400] }
+    { key: 'sword', icon: '🗡️', name: '검',     desc: '노말 친구 공격력',          lvBonus: { atk: 0.1 },  prices: [40, 30, 50, 80] },
+    { key: 'spear', icon: '🔱', name: '창',     desc: '에픽 친구 공격력',          lvBonus: { atk: 0.1 },  prices: [60, 40, 60, 90] },
+    { key: 'bow',   icon: '🏹', name: '활',     desc: '유니크·레전더리 공격력',     lvBonus: { atk: 0.1 },  prices: [80, 50, 80, 120] },
+    { key: 'gun',   icon: '🔫', name: '총',     desc: '영웅 공격력',              lvBonus: { atk: 0.2 },  prices: [30, 20, 40, 60] },
+    { key: 'mgun',  icon: '💥', name: '따발총', desc: '모두 더 빨리 공격',          lvBonus: { speed: 0.06 }, prices: [100, 60, 90, 130] },
+    { key: 'speed2',  icon: '⏩', name: '2배속',   desc: '전투를 2배 빠르게',   speed: true, prices: [80] },
+    { key: 'speed25', icon: '⏩', name: '2.5배속', desc: '전투를 2.5배 빠르게', speed: true, prices: [150] },
+    { key: 'speed3',  icon: '🚀', name: '3배속',   desc: '전투를 3배 빠르게',   speed: true, prices: [250] }
   ],
   teacherPassword: '0420',   // 처음 화면 「선생님」 (섬 모두 열기·아크메이지·재앙·3배속)
   /* 웨이브 수는 미리 정하지 않고 실제 전투 시간으로 정한다 (9-3 원칙 2).

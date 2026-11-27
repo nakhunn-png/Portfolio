@@ -62,41 +62,43 @@ G.UI = (function () {
    * 지갑 코인(판을 깨면 남은 냠냠 코인 + 보너스)으로 강화·배속을 산다. 강화는 3단계까지.
    * 2026-11-27 처음 화면이 아니라 준비 화면 뽑기 칸에 있다. 사면 바로 세진다 */
   function shopLevel(key) { return (A.progress.shop && A.progress.shop[key]) || 0; }
+  // 무기 이름 옆 강화 단계: 사면 「검」, 강화하면 「검 +1」…
+  function shopTitle(it, lv) { return it.name + (!it.speed && lv > 1 ? ' +' + (lv - 1) : ''); }
   function openShop() {
+    if (!A.run) return;
     var d = el('div', 'dialog shop-dialog');
     var head = el('div', 'shop-head'); head.appendChild(el('h2', '', '🛒 상점'));
-    head.appendChild(el('div', 'shop-wallet', '🪙 지갑 ' + (A.progress.wallet || 0)));
+    head.appendChild(el('div', 'shop-wallet', '🪙 ' + A.run.coins));
+    var close = el('button', 'btn small green shop-close', '닫기'); close.onclick = function () { closeOverlay(); refreshPrep(); };
+    head.appendChild(close);
     d.appendChild(head);
-    d.appendChild(el('p', 'shop-note', '상점은 지갑 코인으로 사요. 스테이지를 깨면 남은 코인과 보너스 ' + C.wallet.winBonus + '코인이 지갑에 들어와요.'));
+    d.appendChild(el('p', 'shop-note', '뽑기와 같은 코인으로 사요. 산 무기는 「강화」로 +1, +2, +3까지 세져요. 산 것은 계속 남아요.'));
     var grid = el('div', 'shop-grid');
     C.shop.forEach(function (it) {
       var lv = shopLevel(it.key), max = it.prices.length, gift = it.key === 'speed3' && A.progress.teacher3x && !lv, done = lv >= max || gift;   // gift: 선생님이 열어 줌
-      var price = done ? 0 : it.prices[lv], can = !done && (A.progress.wallet || 0) >= price;
-      var c = el('div', 'shop-card' + (done ? ' done' : ''));
-      c.appendChild(el('div', 'shop-icon', it.icon));
-      c.appendChild(el('div', 'shop-name', it.name));
-      c.appendChild(el('div', 'shop-desc', it.desc));
-      if (!it.speed) { var dots = el('div', 'shop-lv'); for (var i = 0; i < max; i++) dots.appendChild(el('span', i < lv ? 'on' : '', '●')); c.appendChild(dots); }
-      var b = el('button', 'btn small ' + (done ? 'white' : can ? 'green' : 'white'), done ? (gift ? '선생님 선물 ✔' : it.speed ? '샀어요 ✔' : '최고 단계 ✔') : '🪙 ' + price);
+      var price = done ? 0 : it.prices[lv], can = !done && A.run.coins >= price;
+      var c = el('div', 'shop-card' + (done ? ' done' : '') + (lv ? ' owned' : ''));
+      var top = el('div', 'shop-top'); top.appendChild(el('span', 'shop-icon', it.icon)); top.appendChild(el('span', 'shop-name', shopTitle(it, lv))); c.appendChild(top);
+      c.appendChild(el('div', 'shop-desc', it.desc + (it.speed ? '' : ' +' + Math.round((it.lvBonus.atk || it.lvBonus.speed) * 100) + '%씩')));
+      if (!it.speed) {   // 강화 칸: 산 것 1칸 + 강화 3칸
+        var dots = el('div', 'shop-lv');
+        for (var i = 0; i < max; i++) dots.appendChild(el('span', i < lv ? 'on' : '', i === 0 ? '■' : '+' + i));
+        c.appendChild(dots);
+      }
+      var label = done ? (gift ? '선생님 선물 ✔' : it.speed ? '샀어요 ✔' : '+3 최고 ✔') : (lv === 0 ? '사기' : '강화 +' + lv) + ' 🪙' + price;
+      var b = el('button', 'btn small ' + (done ? 'white' : can ? (lv ? 'orange' : 'green') : 'white'), label);
       b.disabled = done;
       b.onclick = function () {
-        if (!can) { toast('지갑 코인이 ' + (price - (A.progress.wallet || 0)) + '개 모자라요!'); return; }
-        A.progress.wallet -= price; A.progress.shop = A.progress.shop || {}; A.progress.shop[it.key] = lv + 1; saveAll();
+        if (!can) { toast('코인이 ' + (price - A.run.coins) + '개 모자라요! 문제를 풀어 모아요.'); return; }
+        A.run.coins -= price; A.progress.shop = A.progress.shop || {}; A.progress.shop[it.key] = lv + 1; saveAll();
         if (A.B) { A.B.shop = A.progress.shop; A.B.heroSt = Bt.heroStats(A.progress.shop); Bt.setLineup(A.B, Col.lineup(A.run)); }   // 지금 판에도 바로
-        openShop(); toast(it.speed ? it.name + '을 샀어요! 전투 중 ▶▶ 단추로 바꿔요.' : it.name + ' ' + (lv + 1) + '단계! 친구들이 바로 세졌어요.', 2600);
+        refreshCoins(); openShop();
+        toast(it.speed ? it.name + '을 샀어요! 전투 중 ▶▶ 단추로 바꿔요.' : lv === 0 ? it.name + '을 샀어요! 이제 「강화」로 더 세게 할 수 있어요.' : shopTitle(it, lv + 1) + ' 강화 성공! 친구들이 바로 세졌어요.', 2600);
       };
       c.appendChild(b); grid.appendChild(c);
     });
     d.appendChild(grid);
-    var close = el('button', 'btn small green shop-close', '닫기'); close.onclick = function () { closeOverlay(); if (A.mode === 'prep') refreshPrep(); };
-    head.appendChild(close);
     overlay(d);
-  }
-  // 판이 끝날 때 지갑에 넣기. 결과 화면에 보여 줄 글을 돌려준다
-  function depositWallet(amount) {
-    amount = Math.max(0, Math.round(amount)); if (!amount) return null;
-    A.progress.wallet = (A.progress.wallet || 0) + amount;
-    return { text: '지갑에 코인 +' + amount + ' 저금! (지갑 ' + A.progress.wallet + ')' };
   }
 
   /* ───────── 선생님 모드 (2026-11-27, 비밀번호 teacherPassword) ───────── */
@@ -629,6 +631,7 @@ G.UI = (function () {
     A.quiz = newQuiz(kind);
     var waveText = A.tower ? (kind === 'prep' ? '1층 준비' : A.wavesDone + '층 성공') : kind === 'prep' ? '준비' : kind === 'final' ? '마무리' : kind === 'boss' ? '보스 준비' : kind === 'retry' ? '보스 다시 도전' : '웨이브 ' + A.wavesDone + ' 끝';
     $('prep-wave').textContent = waveText;
+    $('btn-shop').classList.toggle('hidden', !!A.tutorial);   // 튜토리얼에는 상점이 없다
     renderQuiz($('prep-math'), A.quiz, refreshPrep);
     refreshPrep();
     if (kind === 'prep') guide('prep', '#prep-math', '문제를 풀어요', '맞히면 코인을 10개 받아요. 튜토리얼에서는 반짝이는 단추가 정답이에요. 눌러 보세요!');
@@ -1082,10 +1085,8 @@ G.UI = (function () {
   function finishTower() {
     A.mode = 'result'; clearBubbles(); closeOverlay(); hideBossUI();
     var floor = A.wavesDone, old = (A.progress.tower && A.progress.tower.floor) || 0;
-    var dep = depositWallet(A.run.coins + floor * C.wallet.perFloor); A.run.coins = 0;   // 탑: 남은 코인 + 오른 층 × perFloor
     var got = Ch.record(A.progress, A.book, { towerFloor: floor, speedName: curSpeed().name, diffName: G.difficultyByKey(A.diffKey).name, bestCombo: A.run.bestCombo });
     got = got.concat(Ch.checkBook(A.book, A.progress));
-    if (dep) got.push(dep);
     saveAll(); show('scr-result');
     var p = $('result-panel'); p.innerHTML = '';
     p.appendChild(el('h2', '', floor > 0 ? floor + '층까지 올랐어요!' : '1층부터 다시 도전해요!'));
@@ -1125,8 +1126,6 @@ G.UI = (function () {
     }
     var got = Ch.record(A.progress, A.book, { stageNo: A.stageNo, win: win, bossType: win ? A.B.bossType : null, speedV: curSpeed().v,
       lifeLost: A.B.lifeLost, heroHits: A.B.heroHits, bestCombo: run.bestCombo }).concat(Ch.checkBook(A.book, A.progress));
-    // 지갑: 깨면 남은 코인 + 보너스 (지면 「강화하기」로 이어 갈 수 있어서 넣지 않는다)
-    if (win) { var dep = depositWallet(run.coins + (A.tutorial ? 0 : C.wallet.winBonus)); run.coins = 0; if (dep) got.push(dep); }
     if (win && A.stageNo === C.challengeUnlock && !A.progress.challengeSeen) { A.progress.challengeSeen = true; got.push({ text: '도전 영역이 열렸어요! 처음 화면에서 들어가요.' }); }
     saveAll();
     show('scr-result');
@@ -1296,6 +1295,7 @@ G.UI = (function () {
     try { localStorage.setItem('냠냠2_시험', '1'); localStorage.removeItem('냠냠2_시험'); } catch (e) { $('save-note').classList.remove('hidden'); }
     A.book = load('냠냠2_도감', null) || Col.newBook();
     A.progress = Object.assign({ stars: {}, best: {} }, load('냠냠2_진행', {}));
+    if (A.progress.wallet) { A.progress.gift = Math.min(C.giftMax, (A.progress.gift || 0) + A.progress.wallet); delete A.progress.wallet; }   // 2026-11-27 지갑 코인 없앰 → 선물 코인으로 옮긴다
     A.settings = Object.assign({ speed: 0, diff: C.defaultDifficulty }, load('냠냠2_설정', {}));
     if (A.progress.diffVer !== 2) {
       Object.keys(A.progress.diffBest || {}).forEach(function (k) { if (A.progress.diffBest[k] >= 0) A.progress.diffBest[k]++; });

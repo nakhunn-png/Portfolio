@@ -751,3 +751,19 @@ canvas { position: absolute; left: 0; top: 0; width: 960px; height: 540px; image
 .draw-panel .chest-wrap { gap: 10px; justify-content: center; }
 .draw-panel .chest { width: 50px; height: 44px; }
 .draw-panel .shop-btn { min-height: 52px; font-size: 20px; padding: 0 14px; }
+/* 2026-11-27 상점 다시: 칸이 창 아래로 넘치던 것 고침 (아이콘과 이름을 한 줄로, 카드를 낮게) */
+.shop-dialog { width: 900px; max-height: 510px; padding: 10px 16px 14px; overflow: hidden; }
+.shop-head { min-height: 56px; }
+.shop-note { margin: 2px 0 8px; font-size: 15px; }
+.shop-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: auto; gap: 10px; overflow: visible; }
+.shop-card { padding: 6px 8px 8px; gap: 3px; min-width: 0; }
+.shop-card.owned { background: #fff8e6; border-color: #b85a0c; }
+.shop-card.done { background: #eaf8e4; border-color: #1f7f2c; }
+.shop-top { display: flex; align-items: center; gap: 6px; }
+.shop-icon { font-size: 28px; line-height: 1; }
+.shop-name { font-size: 22px; white-space: nowrap; }
+.shop-desc { font-size: 14px; min-height: 0; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.shop-lv { display: flex; gap: 3px; color: #c9bcd4; font-size: 13px; letter-spacing: 0; }
+.shop-lv span { border: 2px solid #d8cfe0; border-radius: 6px; padding: 0 5px; line-height: 18px; }
+.shop-lv .on { color: #fff; background: #ff9a1f; border-color: #b85a0c; }
+.shop-card .btn { min-height: 52px; font-size: 19px; margin-top: 2px; white-space: nowrap; padding-left: 4px; padding-right: 4px; }
