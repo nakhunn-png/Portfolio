@@ -598,7 +598,7 @@ G.Battle = (function () {
   }
 
   return { create: create, setLineup: setLineup, startWave: startWave, startTowerFloor: startTowerFloor, towerHpScale: towerHpScale, step: step, wantsAnotherWave: wantsAnotherWave,
-    moveUnit: moveUnit, slotAt: slotAt, rewindWave: rewindWave, useSkill: useSkill, skillReady: skillReady, light: light, isDark: isDark, nearestPathPoint: nearestPathPoint,
+    heroStats: heroStats, moveUnit: moveUnit, slotAt: slotAt, rewindWave: rewindWave, useSkill: useSkill, skillReady: skillReady, light: light, isDark: isDark, nearestPathPoint: nearestPathPoint,
     startBoss: startBoss, cutLegs: cutLegs, bossAnswer: bossAnswer, moveHero: moveHero,
     pos: pos, teamPower: teamPower, carryMul: carryMul, LAYOUTS: LAYOUTS, unitStats: unitStats, W: W, H: H };
 })();

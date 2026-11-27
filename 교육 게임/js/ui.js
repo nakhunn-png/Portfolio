@@ -51,7 +51,6 @@ G.UI = (function () {
   function goTitle() {
     A.mode = 'title'; A.B = null; A.tower = null; show('scr-title'); closeOverlay();
     $('btn-challenge').classList.toggle('locked', !challengeOpen());
-    $('title-wallet').textContent = '🪙 지갑 ' + (A.progress.wallet || 0);
     var TL = Bt.LAYOUTS.loop(); G.Render.drawBackground(1, { paths: TL.paths, slots: [], hero: null }); G.Render.clear();   // 제목 화면에는 받침을 그리지 않는다
     var box = $('title-heroes'); box.innerHTML = '';
     ['n1', 'n9', 'e5', 'u2', 'n11', 'e2', 'l2'].forEach(function (id, i) {
@@ -60,14 +59,15 @@ G.UI = (function () {
   }
 
   /* ───────── 상점 (2026-11-27) ─────────
-   * 지갑 코인(판을 깨면 남은 냠냠 코인 + 보너스)으로 강화·배속을 산다. 강화는 3단계까지 */
+   * 지갑 코인(판을 깨면 남은 냠냠 코인 + 보너스)으로 강화·배속을 산다. 강화는 3단계까지.
+   * 2026-11-27 처음 화면이 아니라 준비 화면 뽑기 칸에 있다. 사면 바로 세진다 */
   function shopLevel(key) { return (A.progress.shop && A.progress.shop[key]) || 0; }
   function openShop() {
     var d = el('div', 'dialog shop-dialog');
     var head = el('div', 'shop-head'); head.appendChild(el('h2', '', '🛒 상점'));
     head.appendChild(el('div', 'shop-wallet', '🪙 지갑 ' + (A.progress.wallet || 0)));
     d.appendChild(head);
-    d.appendChild(el('p', 'shop-note', '스테이지를 깨면 남은 코인과 보너스 ' + C.wallet.winBonus + '코인이 지갑에 들어와요.'));
+    d.appendChild(el('p', 'shop-note', '상점은 지갑 코인으로 사요. 스테이지를 깨면 남은 코인과 보너스 ' + C.wallet.winBonus + '코인이 지갑에 들어와요.'));
     var grid = el('div', 'shop-grid');
     C.shop.forEach(function (it) {
       var lv = shopLevel(it.key), max = it.prices.length, gift = it.key === 'speed3' && A.progress.teacher3x && !lv, done = lv >= max || gift;   // gift: 선생님이 열어 줌
@@ -82,13 +82,13 @@ G.UI = (function () {
       b.onclick = function () {
         if (!can) { toast('지갑 코인이 ' + (price - (A.progress.wallet || 0)) + '개 모자라요!'); return; }
         A.progress.wallet -= price; A.progress.shop = A.progress.shop || {}; A.progress.shop[it.key] = lv + 1; saveAll();
-        openShop(); toast(it.speed ? it.name + '을 샀어요! 전투 중 ▶▶ 단추로 바꿔요.' : it.name + ' ' + (lv + 1) + '단계! 다음 판부터 세져요.', 2600);
-        $('title-wallet').textContent = '🪙 지갑 ' + (A.progress.wallet || 0);
+        if (A.B) { A.B.shop = A.progress.shop; A.B.heroSt = Bt.heroStats(A.progress.shop); Bt.setLineup(A.B, Col.lineup(A.run)); }   // 지금 판에도 바로
+        openShop(); toast(it.speed ? it.name + '을 샀어요! 전투 중 ▶▶ 단추로 바꿔요.' : it.name + ' ' + (lv + 1) + '단계! 친구들이 바로 세졌어요.', 2600);
       };
       c.appendChild(b); grid.appendChild(c);
     });
     d.appendChild(grid);
-    var close = el('button', 'btn small green shop-close', '닫기'); close.onclick = function () { closeOverlay(); $('title-wallet').textContent = '🪙 지갑 ' + (A.progress.wallet || 0); };
+    var close = el('button', 'btn small green shop-close', '닫기'); close.onclick = function () { closeOverlay(); if (A.mode === 'prep') refreshPrep(); };
     head.appendChild(close);
     overlay(d);
   }

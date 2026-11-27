@@ -746,3 +746,8 @@ canvas { position: absolute; left: 0; top: 0; width: 960px; height: 540px; image
 .shop-grid { overflow: visible; }
 .shop-icon { font-size: 34px; }
 .shop-card { padding: 4px 6px 6px; }
+/* 2026-11-27 선생님 단추는 작게(이모지 없이), 상점은 뽑기 칸 상자 옆 */
+.teacher-btn { pointer-events: auto; font-family: inherit; font-size: 14px; padding: 4px 10px; min-height: 0; border: 2px solid rgba(58,42,63,.6); border-radius: 8px; background: rgba(255,255,255,.7); color: #6a5a70; cursor: pointer; align-self: flex-end; }
+.draw-panel .chest-wrap { gap: 10px; justify-content: center; }
+.draw-panel .chest { width: 50px; height: 44px; }
+.draw-panel .shop-btn { min-height: 52px; font-size: 20px; padding: 0 14px; }

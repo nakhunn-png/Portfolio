@@ -27,7 +27,7 @@
   - **친구 이어 가기**: 깬 판의 팀이 다음 판에 함께 온다(`progress.team`). 대신 적 체력 × (팀 힘 ÷ 평균)^1.7(`CONFIG.carry`, `Battle.carryMul`). 검사 6개는 새로 시작하는 판만 본다(이어 가기 모의는 PRD 16장)
   - **레전더리 능력** `passives.legend`(주위도 공격·가끔 세 배·연사 모드·길게 기절·모두 빠르게·얼음 폭발, 🌟)
   - 보스 스테이지 1.5배속 상한은 **보스전 동안만**
-  - **2026-11-27 처음 화면**: 🛒 상점(`openShop`, `CONFIG.shop`, 지갑 `progress.wallet`·산 것 `progress.shop`, 강화는 `Battle` 의 `shopAtk`·`shopSpeed`·`heroStats`), 👩‍🏫 선생님(비밀번호 `teacherPassword` 0420, `openTeacher`: `allOpen`·`secretArch`·`disasterOpen`·`teacher3x`), 🗑️ 게임 초기화(`resetGame`, 두 번 묻기). **배속 2·2.5·3배는 상점에서만 산다**(`speeds[].shop`, `speedOpen`). 3배속 = 8웨이브
+  - **2026-11-27**: 🛒 상점은 **준비 화면 뽑기 칸**(`#btn-shop`, `openShop`, 사면 지금 판에도 바로 적용, `CONFIG.shop`, 지갑 `progress.wallet`·산 것 `progress.shop`, 강화는 `Battle` 의 `shopAtk`·`shopSpeed`·`heroStats`), 작은 「선생님」 단추(처음 화면 왼쪽 아래, 비밀번호 `teacherPassword` 0420, `openTeacher`: `allOpen`·`secretArch`·`disasterOpen`·`teacher3x`), 🗑️ 게임 초기화(`resetGame`, 두 번 묻기). **배속 2·2.5·3배는 상점에서만 산다**(`speeds[].shop`, `speedOpen`). 3배속 = 8웨이브
   - **친구 처음부터 다시 하기**(섬 지도, `resetTeam`) · **난이도만 바꾸기**(멈춤 창, `changeDiffDialog`/`applyDiff`, 기록은 그 판의 가장 쉬운 난이도 `A.diffMin`)
   - **화면 점검으로 고친 것**: 틀렸을 때 그림(`hintNode`, 큰 수는 막대, `has-hint`), 결과 화면(`fitResult`), 뽑기 창(`draw-body`), 보너스 풍선이 끌기 판에 깔림, 대기석 3칸(`bench`), 알림 글 위쪽·누르면 사라짐
   - 모든 난이도: 보너스 풍선 2초, 능력 조준 중에도 전투가 흐름, 「모두 뽑기」→「전투 시작」 버튼이 반짝이며 유도
@@ -46,7 +46,7 @@ python -m http.server 8767
 - `http://localhost:8767` — 보통 플레이 / `?dev=1` — 모든 섬·배속·숨은 영웅·재앙·도전 영역 열림
 - 바로 해 볼 링크(시험판, 모든 것 열림): https://claude.ai/artifact/XeuQbw2hPCjDBZLQB79cVJ — 코드를 바꾸면 Claude 가 같은 주소로 다시 올린다(`index.html` 에서 doctype·head 를 뺀 사본 + `DEV = true`)
 - 저장은 localStorage(`냠냠2_도감`, `냠냠2_진행`, `냠냠2_설정`). localhost 와 127.0.0.1 은 저장이 따로 → 시험은 `127.0.0.1:8767`
-- 파일을 바꾸면 `index.html` 의 `?v=` 번호를 올린다(브라우저 캐시). 지금 `2026112701`
+- 파일을 바꾸면 `index.html` 의 `?v=` 번호를 올린다(브라우저 캐시). 지금 `2026112702`
 
 ## 파일
 
